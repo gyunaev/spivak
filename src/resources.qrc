@@ -1,0 +1,23 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/dryicons_play.png</file>
+        <file>images/dryicons_pause.png</file>
+        <file>images/dryicons_forward.png</file>
+        <file>images/dryicons_rewind.png</file>
+        <file>images/dryicons_stop.png</file>
+        <file>html/index.html</file>
+        <file>images/icon_open_file.png</file>
+        <file>sounds/test.mp3</file>
+        <file>sounds/test.wav</file>
+        <file>sounds/test.mid</file>
+        <file>images/welcomewizard.jpg</file>
+        <file>background/image5.webp</file>
+        <file>background/image1.webp</file>
+        <file>background/image2.webp</file>
+        <file>background/image3.webp</file>
+        <file>background/image4.webp</file>
+        <file>sounds/test.m4a</file>
+        <file>sounds/test.ogg</file>
+        <file>sounds/test.wma</file>
+    </qresource>
+</RCC>

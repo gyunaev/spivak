@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Spivak Karaoke Player</string>
+  </property>
+  <widget class="QWidget" name="centralWidget"/>
+  <widget class="QMenuBar" name="mainMenuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>400</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_File">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="actionPlay_file"/>
+    <addaction name="separator"/>
+    <addaction name="actionSettings"/>
+    <addaction name="separator"/>
+    <addaction name="action_Quit"/>
+   </widget>
+   <widget class="QMenu" name="menu_Help">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionSend_the_feedback"/>
+    <addaction name="action_About"/>
+    <addaction name="separator"/>
+    <addaction name="actionRun_First_Time_Wizard"/>
+   </widget>
+   <widget class="QMenu" name="menuPlayer">
+    <property name="title">
+     <string>&amp;Control</string>
+    </property>
+    <addaction name="actionStart_playing"/>
+    <addaction name="actionPause"/>
+    <addaction name="actionStop"/>
+    <addaction name="separator"/>
+    <addaction name="actionNext_song_in_queue"/>
+    <addaction name="actionPrevious_song_in_queue"/>
+    <addaction name="separator"/>
+    <addaction name="actionToggle_full_screen"/>
+   </widget>
+   <widget class="QMenu" name="menuWindows">
+    <property name="title">
+     <string>Windows</string>
+    </property>
+    <addaction name="actionShow_karaoke_queue_window"/>
+    <addaction name="actionShow_music_queue_window"/>
+   </widget>
+   <addaction name="menu_File"/>
+   <addaction name="menuPlayer"/>
+   <addaction name="menuWindows"/>
+   <addaction name="menu_Help"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionPlay_file">
+   <property name="text">
+    <string>&amp;Play file...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="action_Quit">
+   <property name="text">
+    <string>&amp;Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="action_About">
+   <property name="text">
+    <string>&amp;About...</string>
+   </property>
+  </action>
+  <action name="actionStart_playing">
+   <property name="text">
+    <string>&amp;Start playing</string>
+   </property>
+  </action>
+  <action name="actionPause">
+   <property name="text">
+    <string>&amp;Pause</string>
+   </property>
+  </action>
+  <action name="actionStop">
+   <property name="text">
+    <string>St&amp;op</string>
+   </property>
+  </action>
+  <action name="actionNext_song_in_queue">
+   <property name="text">
+    <string>&amp;Next song in queue</string>
+   </property>
+  </action>
+  <action name="actionPrevious_song_in_queue">
+   <property name="text">
+    <string>Previous song &amp;in queue</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>P&amp;references...</string>
+   </property>
+  </action>
+  <action name="actionShow_karaoke_queue_window">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Karaoke queue window</string>
+   </property>
+  </action>
+  <action name="actionShow_music_queue_window">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Music queue window</string>
+   </property>
+  </action>
+  <action name="actionToggle_full_screen">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Toggle full screen</string>
+   </property>
+   <property name="shortcut">
+    <string>F11</string>
+   </property>
+  </action>
+  <action name="actionRun_First_Time_Wizard">
+   <property name="text">
+    <string>&amp;Run First Time Wizard</string>
+   </property>
+  </action>
+  <action name="actionSend_the_feedback">
+   <property name="text">
+    <string>&amp;Send the feedback...</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>WelcomeWizard</class>
+ <widget class="QWizard" name="WelcomeWizard">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>751</width>
+    <height>412</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Welcome!</string>
+  </property>
+  <property name="wizardStyle">
+   <enum>QWizard::ClassicStyle</enum>
+  </property>
+  <widget class="QWizardPage" name="wizardWelcome">
+   <property name="title">
+    <string>Welcome!</string>
+   </property>
+   <property name="subTitle">
+    <string/>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This tutorial will help you to configure Ulduzsoft Karaoke Player, and to learn about major player features.&lt;/p&gt;&lt;p&gt;Every screen will ask you to try something, this text will be in &lt;span style=&quot; color:#0000ff;&quot;&gt;blue color&lt;/span&gt; to help you distinguish it from the rest of the text.&lt;/p&gt;&lt;p&gt;The black screen window you see is the player's main screen window. This screen will show Karaoke when it is played. You can make it fullscreen by going into Control menu and choosing &amp;quot;Toggle Full Screen&amp;quot; option. Press F11 or Esc key to get back to the windowed screen.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#0000ff;&quot;&gt;Practice: please try to switch to full screen, and then switch back to window (by pressing F11), then click Next.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Advanced users: you can start in full screen by passing the -fs command-line option.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWizardPage" name="wizardTestSound">
+   <property name="title">
+    <string>Testing your sound system</string>
+   </property>
+   <property name="subTitle">
+    <string/>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_2"/>
+  </widget>
+  <widget class="QWizardPage" name="wizardPlaySingleFile">
+   <property name="title">
+    <string>Let's play a Karaoke file</string>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_3">
+    <item>
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Karaoke files consist of music and lyrics. Some files contain both music and lyrics (and other things such as images and videos) in a single file. Those are KaraFun files (with .KFN extension), KAR/MIDI files (typically with .KAR extension), and ZIP archives containing both a music and lyric file.&lt;/p&gt;&lt;p&gt;However it is more typical to have a music file and a lyric file separately. A music file is a typical MP3, OGG or WMA file. A lyric file usually has CDG or LRC extension. In this case the player expects both files to have the same file name, such as &amp;quot;a-ha take on me.mp3&amp;quot; and &amp;quot;a-ha take on me.cdg&amp;quot;, and to be stored in the same directory.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt;You can play a single Karaoke file by going into File menu, and choosing the &amp;quot;Play file&amp;quot; option. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt;Choose either a music or a lyric file (you can also choose a ZIP archive containing both), and it will start playing.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic; color:#000000;&quot;&gt;Player supports following Karaoke formats: CDG, LRC, KAR, KaraFun, Encore Lyric, KOK, Ultrastar. It also supports AVI, MKV, MP4 and WMV videos, and ZIP archives with the above.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWizardPage" name="wizardSetupCollection">
+   <property name="title">
+    <string>Setting up your Karaoke collection</string>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_4">
+    <item>
+     <widget class="QLabel" name="lblCollection">
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Most Karaoke fans have tons of Karaoke songs, which are in most cases organized as collections. The player has full support for song collections, and supports some extra cool features once you set up the collection.&lt;/p&gt;&lt;p&gt;Typically your collection is organized by having all the songs in a directory, or a set of directories, such as {PLATFORMDIR}. You need to tell the player where it is.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt;1. Please open {PREFERENCES}. In this menu please go to Collection tab and add the root directory of your collection (such as {PLATFORMDIR}) in &amp;quot;Root directory of local Karaoke collection&amp;quot;. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt;2. Configure the other options as you please (click on Help link next to option if you don't understand it). Make sure you properly configure the artist-title recognition; test it in the Test window right there.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt;3 Click Update button to scan your files. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt;4. Wait until the scan finishes (you can stop it early if you're eager, but don't forget to rescan it later).&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;If you want to start your collection from scratch, just click on Erase button down there.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWizardPage" name="wizardQueueWindow">
+   <property name="title">
+    <string>Queue management window</string>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_5">
+    <item>
+     <widget class="QLabel" name="label_3">
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Now once you have set up a collection, you can use the Queue window to add songs into the queue. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt;Go to Windows menu and click on Karaoke Queue item. A new window will open.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;There you will see:&lt;/p&gt;&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Singer Queue&lt;/span&gt; on the left, showing the queue of singers, and the chosen songs.&lt;/li&gt;&lt;li style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Player controls&lt;/span&gt; at the botton, letting you to start, stop or pause the song, and move forward/backward in the queue&lt;/li&gt;&lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Search for the song&lt;/span&gt; in collection on the right side, with the search field at bottom, allowing you to search in your collection. The songs then could be dragged then into the Singer Queue window.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt;Please add at least three songs to the queue:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt;1. Add first song by clicking on &lt;/span&gt;&lt;span style=&quot; font-weight:600; color:#0000ff;&quot;&gt;Add&lt;/span&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt; button, and clicking on &lt;/span&gt;&lt;span style=&quot; font-weight:600; color:#0000ff;&quot;&gt;File from disk&lt;/span&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt;2. Add second song by clicking on &lt;/span&gt;&lt;span style=&quot; font-weight:600; color:#0000ff;&quot;&gt;Add&lt;/span&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt; button, and clicking on &lt;/span&gt;&lt;span style=&quot; font-weight:600; color:#0000ff;&quot;&gt;Search in collection&lt;/span&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt; (note you need to double-click on a song to select it)&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt;3. Add a third song by searching for it in the right panel, and drag it &lt;/span&gt;&lt;span style=&quot; font-weight:600; color:#0000ff;&quot;&gt;into the empty space&lt;/span&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt; in Singer Queue.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWizardPage" name="wizardManagingQueue">
+   <property name="title">
+    <string>Controlling the queue</string>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_6">
+    <item>
+     <widget class="QLabel" name="label_4">
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;You can also charge the order the singers will sing, by dragging the singers in the queue, and dropping it where they would sing.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt;In your queue please try to drag singers around. Note that when dragging, you must drop a singer at the exact line between the singers, which will take some practice.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;You can also drop songs from the search panel between the singers (which will add a new song). However you can also drop songs from the search panel on the singers, which will replace the song currently queued.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt;Please seach for songs in the right search panel, and drop them between singers. Then drop a song on the singer. See the difference?&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt;Now you can start the queue by pressing Play button on a player. Try to press Pause or Stop buttons, and use Forward and Back player buttons to move in queue. See how the bold item in the Singer Queue moves back and forth.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;When main window has focus, you can use arrows (up/down does next/previous item, left-right seeks in a song, X stops the song, Space pauses it, Enter starts playing.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWizardPage" name="wizardPageInternet">
+   <property name="title">
+    <string>Adding songs through Web browser</string>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_8">
+    <item>
+     <widget class="QLabel" name="label_6">
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Setting up a collection makes it possible for your Karaoke party to add the songs into queue themselves, making it essentially self-managing. For this you need to enable the internal Web service.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt;Open Preferences menu, go to Misc tab, click the &lt;/span&gt;&lt;span style=&quot; font-weight:600; color:#0000ff;&quot;&gt;Enable Web interface&lt;/span&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt; checkbox. Then click Ok and close the Preferences. &lt;/span&gt;Notice that the once the player is stopped, the &amp;quot;Please select song&amp;quot; text is replaced by a string &lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://your-IP-address:8000&lt;/span&gt;.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt;Please open a Web browser and enter this string (including the :8000) into the address bar of your Web browser, and enjoy access through the Web interface.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Web interface allows your friends to:&lt;/p&gt;&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Search the song collection by song title and artist;&lt;/li&gt;&lt;li style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Browse the song collection by letter;&lt;/li&gt;&lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Automatically add themselves with chosen songs as singers (this could be disabled in Settings/Misc/Allow queuing songs)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When adding songs, the player uses Smart Queue and enforces &lt;span style=&quot; font-weight:600;&quot;&gt;fair rotation.&lt;/span&gt; If one user adds many songs at once, they will not be queued together, but would be spread letting other singers sing in a fair rotation.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Note: in some cases your network configuration may prevent connecting to the device. In this case please make sure the firewall on a machine allows remote connections to this port.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWizardPage" name="wizardPageBackground">
+   <property name="title">
+    <string>Making it look cool - adding background</string>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_7">
+    <item>
+     <widget class="QLabel" name="label_5">
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lyrics against black screen don't look cool, so it is time to add background. A player can use one of the following backgrounds:&lt;/p&gt;&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Images&lt;/span&gt; - you specify a directory containing multiple images, which will be shown in a zoomed animation, and transition from one image to another.&lt;/li&gt;&lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Videos&lt;/span&gt; - you specify a directory containing one or more videos, which will be played muted in a loop, one after another.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt;To use this functonality, please open the Preferences menu and go to Background tab. Select image or video background in a dropdown list, and specify the directory containing images or videos, at your preference. Click Ok, and you should see your background starting playing, even if no songs are playing.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Sometime songs come with their own supplied background (Ultrastar supports this), in which case the player will show the song background, unless the relevant setting in Background tab is selected.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Best background videos are slow-moving videos of nature or landmark views (such as many National Geographic videos). Best background images are large, darker colors nature images. Fast-action videos and images with many bright details make it harder to focus on lyrics, or even see them.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWizardPage" name="wizardMusic">
+   <property name="title">
+    <string>Background Music</string>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_9">
+    <item>
+     <widget class="QLabel" name="label_7">
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sometime the party goes slow, singers come and go, and there are periods of silence between songs. Wouldn't it be nice to fill them up with music, which would only play when nobody is singing, would automatically pause when someone starts a song, and once all singers finish, it would resume?&lt;/p&gt;&lt;p&gt;The player supports this functionality. To enable it:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt;1. Create a directory, and copy there the music files you would like to be played as fillers;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt;2. Open Preferences menu, and go to Music tab.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt;3. Check the box &amp;quot;Enable the music player...&amp;quot; at top&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#0000ff;&quot;&gt;4. Select your music directory as Music files directory root, and choose the order.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Once you finish settings, the music will be loaded. &lt;span style=&quot; color:#0000ff;&quot;&gt;Now if you press &amp;quot;Play&amp;quot; when the queue is empty, the music will start playing.&lt;/span&gt; It will automatically fade out when the Karaoke song is started, and will resume once the song is finished if no more songs are started.&lt;/p&gt;&lt;p&gt;You can also control music through a Music Queue window available in &lt;span style=&quot; font-weight:600;&quot;&gt;Windows/Music Queue&lt;/span&gt; menu.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWizardPage" name="wizardFinal">
+   <property name="title">
+    <string>You are finished!</string>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_10">
+    <item>
+     <widget class="QLabel" name="label_8">
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This overview focused on most important functionality. There is however much more, for example LIRC support or lyrics text encoding autodetection.&lt;/p&gt;&lt;p&gt;And there is a professional version focused on Karaoke DJs. That version is not free, but has more functionality, such as:&lt;/p&gt;&lt;p&gt;1.&lt;span style=&quot; font-weight:600;&quot;&gt; Users can search and add songs directly through your Web site&lt;/span&gt;, which means:&lt;/p&gt;&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;You are not depending on open WiFi being available;&lt;/li&gt;&lt;li style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;You can require registration and maintain the user base of your fans;&lt;/li&gt;&lt;li style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;You can incorporate various content such as promotions;&lt;/li&gt;&lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;You can sell various perks such as ability to &amp;quot;skip the line&amp;quot;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;2. &lt;span style=&quot; font-weight:600;&quot;&gt;Secure, remote song collection&lt;/span&gt;, so you do not need to equip every DJ station with a 2Tb hard drive to store the songs, 90% of which will never be sung, and you do not need to keep them in sync;&lt;/p&gt;&lt;p&gt;3. &lt;span style=&quot; font-weight:600;&quot;&gt;Better search, allowing search by words in lyrics&lt;/span&gt;, for those singers who know &amp;quot;those words were there&amp;quot;, but can't remember a singer nor artist;&lt;/p&gt;&lt;p&gt;4. &lt;span style=&quot; font-weight:600;&quot;&gt;Dedicated Android application&lt;/span&gt; with your branding (iOS in progress);&lt;/p&gt;&lt;p&gt;5. &lt;span style=&quot; font-weight:600;&quot;&gt;Premium support&lt;/span&gt;, access to play statistics for the management, and many more.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

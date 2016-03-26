@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Karaoke Song Selector</title>
+    <style>
+        body { background-color: linen; font: 16px Helvetica, Verdana, sans-serif;   }
+        input { font-size: 125% }
+        input[type=text] { width: 80%; }
+        div { text-align: center; }
+        .hiddendiv {display:none; width: 100% }
+        .visiblediv {display:block; width: 100% }
+
+        ul { list-style-type: none; margin: 0; padding: 0; }
+        li {  font-size: 125%;  border-bottom: 1px solid #ccc; }
+        .info {  font-size: 50%  }
+        li:last-child { border: none; }
+
+    </style>
+
+    <script type="text/javascript">
+    
+        // http://www.w3schools.com/ajax/tryit.asp?filename=tryajax_callback
+        function runAPI( url, params, cfunc )
+        {
+            var xhttp = new XMLHttpRequest();
+    
+            xhttp.onreadystatechange = function()
+            {
+                if (xhttp.readyState == 4 && xhttp.status == 200)
+                {
+                    cfunc(xhttp);
+                }
+            };
+    
+            xhttp.open("POST", url, true);
+            xhttp.setRequestHeader( "Content-Type", "application/json; charset=UTF-8" );
+            xhttp.send( JSON.stringify( params ) );
+        }
+            
+        function searchSucceed( xhttp )
+        {
+            var obj = JSON.parse( xhttp.responseText );
+            
+            if ( obj["results"] )
+                obj = obj["results"]
+            
+            if ( obj.length > 0 )
+            {
+                var list = "<ul>";
+                
+                for ( var i = 0; i < obj.length; i++ )
+                {
+                    var item = obj[i].artist + " - " + obj[i].title;
+                    list += "<li><a href='#' onclick=\"addsong( " + obj[i].id + ");\">" + item + "</a>" + "<span class=\"info\">    " + obj[i].type;
+                    
+                    if ( obj[i].language != "Unknown" )
+		      list += " in " +  obj[i].language;
+		      
+		    list += "</span></li>";
+                }
+                
+                list += "</ul>"
+                document.getElementById("songlist").innerHTML = "Please click on a song to queue it" + list;
+            }
+            else
+            {
+                document.getElementById("songlist").innerHTML = "Nothing found";
+            }
+        }
+
+        function search()
+        {
+            runAPI( '/api/search', { query : document.getElementById("song").value }, searchSucceed );
+        }
+
+        function browseSucceed( xhttp )
+        {
+            var obj = JSON.parse( xhttp.responseText );
+            
+            if ( obj.results.length > 0 )
+            {
+                var list = "<ul>";
+                
+                if ( obj.type == "initials" )
+                    callback = "browseSucceed";
+                else
+                    callback = "searchSucceed";
+                
+                for ( var i = 0; i < obj.results.length; i++ )
+                {
+                    list += "<li><a href='#' onclick=\"browseArtist( '" + obj.results[i] + "', " + callback + " );\">" + obj.results[i] + "</a></li>";
+                }
+                
+                list += "</ul>"
+                document.getElementById("songlist").innerHTML = list;
+            }
+            else
+            {
+                document.getElementById("songlist").innerHTML = "No such artist";
+            }
+        }
+     
+        function browseArtist( artist, callback )
+        {
+            runAPI( '/api/browse', { artist: artist }, callback );
+        }        
+        
+        function browse()
+        {
+            runAPI( '/api/browse', {}, browseSucceed );
+        }        
+        
+        function addsongSucceed( xhttp )
+        {
+            var data = JSON.parse( xhttp.responseText );
+
+            if ( data["result"] == 1 )
+                document.getElementById("songlist").innerHTML = "<b>" + data["title"] + "</b> by <b>" + data["artist"] + "</b> is successfully enqueued";
+            else
+                document.getElementById("songlist").innerHTML = "Failed to add to queue";
+
+            document.getElementById("song").value = ""
+        }
+        
+        function addsong( id )
+        {
+            name = document.cookie.substring( 5 );
+            runAPI( '/api/addsong', { id : id, singer: name }, addsongSucceed );
+        }
+
+        function nameEntered()
+        {
+            var name = document.getElementById("name").value;
+
+            var d = new Date();
+            d.setTime( d.getTime() + 86400000 );
+            document.cookie = "name=" + name + "; expires=" + d.toUTCString() + "; path=/";
+            checkCookie();
+        }
+
+        function clearCookie()
+        {
+            document.cookie = "name=; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+            checkCookie();
+        }        
+        
+        function checkCookie()
+        {
+            var n = document.cookie;
+
+            if ( n )
+            {
+                name = document.cookie.substring( 5 );
+                document.getElementById("hello").innerHTML = "Hello, <b>" + name + "!</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='#' onclick=\"clearCookie();\">not " + name + "?</a>";
+                document.getElementById('searchfield').className='visiblediv';
+                document.getElementById('namefield').className='hiddendiv';
+            }
+            else
+            {
+                document.getElementById('searchfield').className='hiddendiv';
+                document.getElementById('namefield').className='visiblediv';
+            }
+        }
+        
+    </script>
+    </head>
+     <body onload="checkCookie()">
+    
+        <div id="namefield">
+            <input type=text id="name" placeholder="Please enter your name..." onkeydown="if (event.keyCode == 13) nameEntered();"><input type=button value="Ok" autofocus onclick="nameEntered()">
+        </div>
+
+        <div class="hiddendiv" id="searchfield">
+            <p id="hello"></p>
+        
+            <div>
+                <input type=text id="song" placeholder="Song or artist name..." onkeydown="if (event.keyCode == 13) search();"><input type=button value="Find" autofocus onclick="search()">
+            </div>
+            <div>
+                <a href='#' onclick='browse();'>Or browse the collection</a>
+            </div>    
+
+            <p id="songlist"></p>
+
+        </div>
+    </body>
+</html>
