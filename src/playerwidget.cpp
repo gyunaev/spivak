@@ -119,20 +119,32 @@ void PlayerWidget::applyCapabilities()
 
     if ( pCurrentState->playerCapabilities & MediaPlayer::CapChangePitch )
     {
-        // Move it 50 up, as our range is 0-100 and we have 50% in the middle
         spinPitch->setEnabled( true );
-        spinPitch->setValue( pCurrentState->playerPitch + 50 );
-        m_spinSets++;
+
+        // Move it 50 up, as our range is 0-100 and we have 50% in the middle
+        if ( spinPitch->value() != pCurrentState->playerPitch + 50 )
+        {
+            // setValue will only trigger a signal (which we guard against with m_spinSets)
+            // if the value is different from the current one
+            spinPitch->setValue( pCurrentState->playerPitch + 50 );
+            m_spinSets++;
+        }
     }
     else
         spinPitch->setEnabled( false );
 
     if ( pCurrentState->playerCapabilities & MediaPlayer::CapChangeTempo )
     {
-        // Move it 50 up, as our range is 0-100 and we have 50% in the middle
         spinTempo->setEnabled( true );
-        spinTempo->setValue( pCurrentState->playerTempo + 50 );
-        m_spinSets++;
+
+        // Move it 50 up, as our range is 0-100 and we have 50% in the middle
+        if ( spinTempo->value() != pCurrentState->playerTempo + 50 )
+        {
+            // setValue will only trigger a signal (which we guard against with m_spinSets)
+            // if the value is different from the current one
+            spinTempo->setValue( pCurrentState->playerTempo + 50 );
+            m_spinSets++;
+        }
     }
     else
         spinTempo->setEnabled( false );
