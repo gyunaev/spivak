@@ -104,6 +104,15 @@ void MusicCollectionManager::initCollection()
     Util::enumerateDirectory( m_musicDirectories[0], supportedExtensions(), m_musicFiles );
     Logger::debug( "Music collection: %d music files found", m_musicFiles.size() );
 
+    // If there are no music files, disable the player
+    if ( m_musicFiles.isEmpty() )
+    {
+        m_musicDirectories.clear();
+        delete m_player;
+        m_player = 0;
+        return;
+    }
+
     // Load temporary parameters and validate them
     QSettings settings;
 
