@@ -19,6 +19,7 @@
 #include "midisyntheser.h"
 #include "logger.h"
 
+#include <gst/gst.h>
 
 // EAS file i/o callbacks
 int MIDISyntheser::EAS_FILE_readAt( void *handle, void *buf, int offset, int size )
@@ -137,11 +138,9 @@ qint64 MIDISyntheser::pos() const
 bool MIDISyntheser::seek(qint64 pos)
 {
     // What is requested seek position in the MIDI stream?
-    int timing = (pos / (44100 * 4)) * 1000;
+    EAS_I32 timing = gst_util_uint64_scale( pos, GST_USECOND, 44100 * 2 );
 
-    qDebug("seek %ld -> %d", pos, timing );
-
-    if ( (EAS_Locate( m_easData, m_easHandle, timing, true )) != EAS_SUCCESS )
+    if ( (EAS_Locate( m_easData, m_easHandle, timing, EAS_FALSE )) != EAS_SUCCESS )
     {
         Logger::error( "MIDISyntheser: seek to %ld (%ld) failed", (long) pos, timing );
         return false;

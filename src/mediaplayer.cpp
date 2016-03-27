@@ -648,7 +648,6 @@ void MediaPlayer::setupSource()
     if ( m_mediaIODevice )
     {
         m_gst_source = createElement("appsrc", "source");
-        g_object_set( m_gst_source, "format", GST_FORMAT_BYTES, NULL);
 
         if ( m_mediaIODevice->isSequential() )
         {
@@ -682,6 +681,9 @@ void MediaPlayer::setupSource()
             g_object_set( m_gst_source, "caps", audio_caps, NULL);
             gst_caps_unref( audio_caps );
 
+            // Our format for this source type is time
+            g_object_set( m_gst_source, "format", GST_FORMAT_TIME, NULL);
+
             m_gst_decoder = m_gst_source;
 
             // Set the song duration from the size as appsrc won't do that for us
@@ -689,7 +691,12 @@ void MediaPlayer::setupSource()
                 m_duration = (m_mediaIODevice->size() / (m_rawAudioSampleRate * m_rawAudioChannels * 2)) * 1000;
         }
         else
+        {
+            // Other sources have bytes format
+            g_object_set( m_gst_source, "format", GST_FORMAT_BYTES, NULL);
+
             m_gst_decoder = createElement ("decodebin", "decoder");
+        }
     }
     else
     {
@@ -714,13 +721,16 @@ void MediaPlayer::cb_source_need_data(GstAppSrc *src, guint length, gpointer use
 
         GstMapInfo map;
         gst_buffer_map( buffer, &map, GST_MAP_WRITE );
-        buffer->offset = self->m_mediaIODevice->pos();
+
+        // Set its timestamp and duration
+        GST_BUFFER_TIMESTAMP (buffer) = gst_util_uint64_scale( self->m_mediaIODevice->pos(), GST_SECOND, self->m_rawAudioSampleRate * self->m_rawAudioChannels );
+
         totalread = self->m_mediaIODevice->read( (char*) map.data, length );
         gst_buffer_unmap( buffer, &map );
 
         if ( totalread > 0)
         {
-            buffer->offset_end =  buffer->offset + totalread - 1;
+            GST_BUFFER_DURATION (buffer) = gst_util_uint64_scale (totalread, GST_SECOND, self->m_rawAudioSampleRate * self->m_rawAudioChannels );
 
             GstFlowReturn ret = gst_app_src_push_buffer( src, buffer );
 
@@ -741,7 +751,13 @@ gboolean MediaPlayer::cb_source_seek_data(GstAppSrc *, guint64 offset, gpointer 
 {
     MediaPlayer * self = reinterpret_cast<MediaPlayer*>( user_data );
 
-    return self->m_mediaIODevice->seek( offset );
+    // If we operate in raw mode, the offset is time - we should convert to the file offset
+    if ( self->m_rawAudioSampleRate > 0 )
+    {
+        return self->m_mediaIODevice->seek( gst_util_uint64_scale (offset, self->m_rawAudioSampleRate * self->m_rawAudioChannels, GST_SECOND ) );
+    }
+    else
+        return self->m_mediaIODevice->seek( offset );
 }
 
 GstFlowReturn MediaPlayer::cb_new_sample(GstAppSink *appsink, gpointer user_data)
