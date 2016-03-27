@@ -411,7 +411,18 @@ bool Database::search(const QString &substr, QList<Database_SongInfo> &results, 
 
     Database_Statement stmt;
 
-    if ( !stmt.prepareSongQuery( m_sqlitedb, "WHERE search LIKE ? ORDER BY artist,title", QStringList() << "%" + substr.toUpper() + "%" ) )
+    // Tokenize and process the search substring
+    QString searchstr;
+
+    Q_FOREACH( QString s, substr.split( " ", QString::SkipEmptyParts ) )
+    {
+        if ( !searchstr.isEmpty() )
+            searchstr += " ";
+
+        searchstr += s.toUpper() + "%";
+    }
+
+    if ( !stmt.prepareSongQuery( m_sqlitedb, "WHERE search LIKE ? ORDER BY artist,title", QStringList() << searchstr ) )
         return false;
 
     while ( stmt.step() == SQLITE_ROW )
