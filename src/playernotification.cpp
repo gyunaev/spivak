@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  **************************************************************************/
 
+#include <math.h>
+
 #include "settings.h"
 #include "currentstate.h"
 #include "songqueue.h"
@@ -68,18 +70,17 @@ qint64 PlayerNotification::drawTop( KaraokePainter &p )
 
     if ( remainingms == -1 || remainingms > 5000 )
     {
-        if ( m_scrollOffset >= p.fontMetrics().width( m_notificationLine[m_textOffset] ) )
+        if ( m_scrollOffset >= p.fontMetrics().width( m_notificationLine ) )
         {
             m_scrollOffset = 0;
-            m_textOffset++;
-
-            if ( m_textOffset >= m_notificationLine.length() )
-                m_textOffset = 0;
         }
         else
-            m_scrollOffset++;
+        {
+            int speed = qMax( 1, int( ceil( p.fontMetrics().width( m_notificationLine ) / (double) p.rect().width() ) ) );
+            m_scrollOffset += speed;
+        }
 
-        p.drawText( -m_scrollOffset, p.fontMetrics().ascent(), m_notificationLine.mid( m_textOffset ) + "      " + m_notificationLine );
+        p.drawText( -m_scrollOffset, p.fontMetrics().ascent(), m_notificationLine );
     }
     else
         p.drawText( 0, p.fontMetrics().ascent(), m_firstItem );
