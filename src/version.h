@@ -33,18 +33,6 @@
 // - Video + voice recording
 
 
-// DONE
-// - CDG, KFN, MID, LRC, Ultrastar, ZIP
-// - Video karaoke
-// - Timidity
-// - Video background
-// - LIRC support
-// - Smart queue w/intelligent management
-// - Song collection
-// - Full ZIP support is now there, working not only with MP3+G, but others such as packed Ultrastar archives
-// - Remote management through Web site and Android app
-
-
 #define APP_VERSION_MAJOR	1
 #define APP_VERSION_MINOR	0
 
