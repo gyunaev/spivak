@@ -412,17 +412,24 @@ bool Database::search(const QString &substr, QList<Database_SongInfo> &results, 
     Database_Statement stmt;
 
     // Tokenize and process the search substring
-    QString searchstr;
+    QStringList searchdata;
+    QString query;
 
     Q_FOREACH( QString s, substr.split( " ", QString::SkipEmptyParts ) )
     {
-        if ( !searchstr.isEmpty() )
-            searchstr += " ";
+        searchdata << "% " + s.toUpper() + "%";
 
-        searchstr += s.toUpper() + "%";
+        if ( !query.isEmpty() )
+            query += " AND ' ' || search || ' ' LIKE ?";
+        else
+            query = "WHERE ' ' || search || ' ' LIKE ?";
     }
 
-    if ( !stmt.prepareSongQuery( m_sqlitedb, "WHERE search LIKE ? ORDER BY artist,title", QStringList() << searchstr ) )
+    // Credits for the word boundary search: http://stackoverflow.com/questions/16450568/query-sqlite-to-like-but-whole-words
+    query += " ORDER BY artist,title";
+
+    //if ( !stmt.prepareSongQuery( m_sqlitedb, "WHERE ' ' || search || ' ' LIKE ? ORDER BY artist,title", QStringList() << searchstr ) )
+    if ( !stmt.prepareSongQuery( m_sqlitedb, query, searchdata ) )
         return false;
 
     while ( stmt.step() == SQLITE_ROW )
