@@ -2,7 +2,7 @@
 
 Spivak is a free, cross-platform (Linux/Windows/OS X) Karaoke player based on GStreamer and Qt5. It supports a wide range of Karaoke formats, with the goal of playing all more or less widespread Karaoke formats on all popular platforms. It also has strong support for foreign languages, so playing Karaoke in Japanese, Russian or Hindu is fully supported.
 
-Currently Spivak is in alpha stage, but already has an good enough set of features, and is stable enough to survive a party without a single crash or hang.
+Currently Spivak is in alpha stage, but already has impressive set of features, and is stable enough to survive a party without a single crash or hang.
 
 Spivak is licensed under GNU GPL version 3, and is written by George Yunaev.
 
