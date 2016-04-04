@@ -32,7 +32,7 @@
 class Background;
 class KaraokeSong;
 class PlayerRenderer;
-class PlayerNotification;
+class Notifications;
 class MusicCollectionManager;
 
 class KaraokeWidget : public QWidget

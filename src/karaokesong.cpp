@@ -30,7 +30,7 @@
 #include "karaokepainter.h"
 #include "actionhandler.h"
 #include "database.h"
-#include "playernotification.h"
+#include "notification.h"
 #include "currentstate.h"
 #include "util.h"
 #include "karaokeplayable.h"

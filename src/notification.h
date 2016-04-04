@@ -29,13 +29,13 @@
 class Background;
 
 // Renders a notification on top of the screen
-class PlayerNotification : public QObject
+class Notifications : public QObject
 {
     Q_OBJECT
 
     public:
-        PlayerNotification( QObject * parent );
-        ~PlayerNotification();
+        Notifications( QObject * parent );
+        ~Notifications();
 
         // Draws the notification on the painter. Returns time for the next update
         // when the image will change.
@@ -97,6 +97,6 @@ class PlayerNotification : public QObject
         QTime           m_smallMessageExpires;
 };
 
-extern PlayerNotification * pNotification;
+extern Notifications * pNotification;
 
 #endif // PLAYERNOTIFICATION_H

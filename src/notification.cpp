@@ -24,11 +24,11 @@
 #include "background.h"
 #include "eventor.h"
 #include "actionhandler.h"
-#include "playernotification.h"
+#include "notification.h"
 
-PlayerNotification * pNotification;
+Notifications * pNotification;
 
-PlayerNotification::PlayerNotification(QObject *parent)
+Notifications::Notifications(QObject *parent)
     : QObject( parent )
 {
     m_scrollStep = 3;
@@ -38,20 +38,20 @@ PlayerNotification::PlayerNotification(QObject *parent)
     m_customMessageAnimationValue = 0.0;
     m_customMessageAnimationAdder = 0.025;
 
-    connect( pEventor, &Eventor::karaokeStarted, this, &PlayerNotification::songStarted );
-    connect( pEventor, &Eventor::karaokeStopped, this, &PlayerNotification::songStopped );
-    connect( pEventor, &Eventor::queueChanged, this, &PlayerNotification::queueUpdated );
-    connect( pEventor, &Eventor::webserverUrlChanged, this, &PlayerNotification::webServerUrlChanged, Qt::QueuedConnection );
+    connect( pEventor, &Eventor::karaokeStarted, this, &Notifications::songStarted );
+    connect( pEventor, &Eventor::karaokeStopped, this, &Notifications::songStopped );
+    connect( pEventor, &Eventor::queueChanged, this, &Notifications::queueUpdated );
+    connect( pEventor, &Eventor::webserverUrlChanged, this, &Notifications::webServerUrlChanged, Qt::QueuedConnection );
 
     reset();
     updateWelcomeMessage();
 }
 
-PlayerNotification::~PlayerNotification()
+Notifications::~Notifications()
 {
 }
 
-qint64 PlayerNotification::drawTop( KaraokePainter &p )
+qint64 Notifications::drawTop( KaraokePainter &p )
 {
     // If the height change, see how large the font we could fit height-wise
     if ( m_lastScreenHeight != p.notificationRect().height() )
@@ -88,7 +88,7 @@ qint64 PlayerNotification::drawTop( KaraokePainter &p )
     return 0;
 }
 
-qint64 PlayerNotification::drawRegular(KaraokePainter &p)
+qint64 Notifications::drawRegular(KaraokePainter &p)
 {
     QTime now = QTime::currentTime();
 
@@ -165,7 +165,7 @@ qint64 PlayerNotification::drawRegular(KaraokePainter &p)
     return 0;
 }
 
-void PlayerNotification::queueUpdated()
+void Notifications::queueUpdated()
 {
     // Get the song list and currently scheduled song
     QList<SongQueue::Song> queue = pSongQueue->exportQueue();
@@ -217,38 +217,38 @@ void PlayerNotification::queueUpdated()
     reset();
 }
 
-void PlayerNotification::songStarted()
+void Notifications::songStarted()
 {
     QMutexLocker m( &m_mutex );
     m_karaokePlaying = true;
 }
 
-void PlayerNotification::songStopped()
+void Notifications::songStopped()
 {
     QMutexLocker m( &m_mutex );
     m_karaokePlaying = false;
     updateWelcomeMessage();
 }
 
-void PlayerNotification::settingsChanged()
+void Notifications::settingsChanged()
 {
     QMutexLocker m( &m_mutex );
     updateWelcomeMessage();
 }
 
-void PlayerNotification::setOnScreenMessage(const QString &message)
+void Notifications::setOnScreenMessage(const QString &message)
 {
     QMutexLocker m( &m_mutex );
     m_customMessage = message;
 }
 
-void PlayerNotification::clearOnScreenMessage()
+void Notifications::clearOnScreenMessage()
 {
     QMutexLocker m( &m_mutex );
     m_customMessage.clear();
 }
 
-void PlayerNotification::showMessage(const QString &message, int show)
+void Notifications::showMessage(const QString &message, int show)
 {
     QMutexLocker m( &m_mutex );
     m_smallMessage = message;
@@ -256,7 +256,7 @@ void PlayerNotification::showMessage(const QString &message, int show)
     m_smallMessageExpires = QTime::currentTime().addMSecs( show );
 }
 
-void PlayerNotification::showMessage(int percentage, const QString &message, int show)
+void Notifications::showMessage(int percentage, const QString &message, int show)
 {
     QMutexLocker m( &m_mutex );
     m_smallMessage = message;
@@ -264,18 +264,18 @@ void PlayerNotification::showMessage(int percentage, const QString &message, int
     m_smallMessageExpires = QTime::currentTime().addMSecs( show );
 }
 
-void PlayerNotification::webServerUrlChanged(QString newurl)
+void Notifications::webServerUrlChanged(QString newurl)
 {
     m_webserverURL = newurl;
     updateWelcomeMessage();
 }
 
-void PlayerNotification::updateWelcomeMessage()
+void Notifications::updateWelcomeMessage()
 {
     m_customMessage = m_webserverURL.isEmpty() ? "Please select a song" : m_webserverURL;
 }
 
-void PlayerNotification::reset()
+void Notifications::reset()
 {
     m_textOffset = 0;
     m_scrollOffset = 0;

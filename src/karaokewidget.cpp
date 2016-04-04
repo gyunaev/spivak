@@ -29,7 +29,7 @@
 #include "actionhandler.h"
 #include "currentstate.h"
 #include "playerrenderer.h"
-#include "playernotification.h"
+#include "notification.h"
 #include "musiccollectionmanager.h"
 
 

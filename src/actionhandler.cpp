@@ -26,7 +26,7 @@
 #include "mainwindow.h"
 #include "songdatabasescanner.h"
 #include "musiccollectionmanager.h"
-#include "playernotification.h"
+#include "notification.h"
 #include "logger.h"
 #include "eventor.h"
 

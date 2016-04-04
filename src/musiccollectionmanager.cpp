@@ -21,7 +21,7 @@
 
 #include "settings.h"
 #include "musiccollectionmanager.h"
-#include "playernotification.h"
+#include "notification.h"
 #include "currentstate.h"
 #include "actionhandler.h"
 #include "eventor.h"

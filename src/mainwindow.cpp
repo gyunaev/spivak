@@ -30,7 +30,7 @@
 #include "karaokesong.h"
 #include "songqueue.h"
 #include "database.h"
-#include "playernotification.h"
+#include "notification.h"
 #include "actionhandler.h"
 #include "currentstate.h"
 #include "version.h"
@@ -76,7 +76,7 @@ MainWindow::MainWindow(QWidget *parent) :
     pActionHandler = new ActionHandler();
 
     // Then notification
-    pNotification = new PlayerNotification( 0 );
+    pNotification = new Notifications( 0 );
 
     // Current state doesn't connect to anything
     pCurrentState = new CurrentState( this );

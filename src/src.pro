@@ -20,7 +20,6 @@ SOURCES += main.cpp\
     playerlyricstext.cpp \
     playerlyrictext_line.cpp \
     karaokepainter.cpp \
-    playernotification.cpp \
     playerrenderer.cpp \
     logger.cpp \
     karaokewidget.cpp \
@@ -62,7 +61,8 @@ SOURCES += main.cpp\
     mediaplayer.cpp \
     midisyntheser.cpp \
     midistripper.cpp \
-    pluginmanager.cpp
+    pluginmanager.cpp \
+    notification.cpp
 
 HEADERS  += mainwindow.h \
     settings.h \
@@ -72,7 +72,6 @@ HEADERS  += mainwindow.h \
     playerlyricstext.h \
     playerlyrictext_line.h \
     karaokepainter.h \
-    playernotification.h \
     playerrenderer.h \
     logger.h \
     util.h \
@@ -118,7 +117,8 @@ HEADERS  += mainwindow.h \
     midistripper.h \
     pluginmanager.h \
     interface_languagedetector.h \
-    interface_mediaplayer.h
+    interface_mediaplayer.h \
+    notification.h
 
 FORMS    += mainwindow.ui \
     playerwidget.ui \
