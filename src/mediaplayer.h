@@ -81,6 +81,9 @@ class MediaPlayer : public QObject
         // Media tags are available
         void    tagsChanged( QString artist, QString title );
 
+        // Media duration changed/became available
+        void    durationChanged();
+
     public slots:
 
         // Loads the media file, and plays audio, video or both

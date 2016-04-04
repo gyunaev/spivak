@@ -59,6 +59,7 @@ KaraokeSong::KaraokeSong( KaraokeWidget *w, const SongQueue::Song &song )
     connect( &m_player, SIGNAL( finished() ), w, SLOT(karaokeSongFinished()) );
     connect( &m_player, SIGNAL( loaded() ), this, SLOT(songLoaded()) );
     connect( &m_player, SIGNAL( error(QString) ), w, SLOT(karaokeSongError(QString)) );
+    connect( &m_player, SIGNAL( durationChanged()), this, SLOT(durationChanged()) );
 
     // Use Karaoke actions here
     connect( pActionHandler, &ActionHandler::actionPlayerVolumeDown, this, &KaraokeSong::volumeDown );
@@ -415,6 +416,11 @@ void KaraokeSong::volumeUp()
 void KaraokeSong::volumeSet(int newvalue)
 {
     setVolume( newvalue );
+}
+
+void KaraokeSong::durationChanged()
+{
+    pCurrentState->playerDuration = m_player.duration();
 }
 
 void KaraokeSong::pitchLower()

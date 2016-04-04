@@ -853,6 +853,11 @@ GstBusSyncReply MediaPlayer::cb_busMessageDispatcher( GstBus *bus, GstMessage *m
     {
         Logger::debug( "GstMediaPlayer: duration changed message" );
         self->m_duration = -1;
+
+        // Call the signal invoker
+        QMetaObject::invokeMethod( self,
+                                   "durationChanged",
+                                   Qt::QueuedConnection );
     }
     else if ( GST_MESSAGE_TYPE (msg) == GST_MESSAGE_EOS )
     {
@@ -928,6 +933,7 @@ GstBusSyncReply MediaPlayer::cb_busMessageDispatcher( GstBus *bus, GstMessage *m
             g_free( value );
         }
 
+        // Call the signal invoker if both tags are present
         if ( !self->m_mediaTitle.isEmpty() && !self->m_mediaArtist.isEmpty() )
             QMetaObject::invokeMethod( self,
                                        "tagsChanged",

@@ -77,6 +77,7 @@ class KaraokeSong : public QObject
         void    volumeDown();
         void    volumeUp();
         void    volumeSet( int newvalue );
+        void    durationChanged();
 
         // Those might not be available depending on player capabilities
         void    pitchLower();
