@@ -37,9 +37,19 @@ PluginManager::PluginManager( const QString& pluginPath )
     if ( qEnvironmentVariableIsSet("SPIVAK_PLUGIN_PATH") )
         m_pluginPath = QString::fromUtf8( qgetenv("SPIVAK_PLUGIN_PATH") );
 
-    // If invalid or empty - use default one
+    // If invalid or empty - use the local path
     if ( m_pluginPath.isEmpty() || !QFile::exists( m_pluginPath ) )
         m_pluginPath = QApplication::applicationDirPath() + "/plugins";
+
+#ifdef Q_OS_LINUX
+    // Linux: and if this is invalid, use the system one
+    if ( m_pluginPath.isEmpty() || !QFile::exists( m_pluginPath ) )
+#ifdef Q_PROCESSOR_X86_64
+        m_pluginPath = "/usr/lib64/spivak/plugins";
+#else
+        m_pluginPath = "/usr/lib/spivak/plugins";
+#endif
+#endif
 }
 
 Interface_LanguageDetector *PluginManager::loadLanguageDetector()
