@@ -16,7 +16,3 @@ mac: {
     QMAKE_LFLAGS_PLUGIN += -bundle
     QMAKE_EXTENSION_SHLIB = bundle
 }
-
-unix: {
-    QMAKE_LFLAGS += -Wl,--no-undefined
-}
