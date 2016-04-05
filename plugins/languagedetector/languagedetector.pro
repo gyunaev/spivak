@@ -7,6 +7,9 @@ SOURCES += languagedetector.cpp
 HEADERS += languagedetector.h
 LIBS += -lcld2
 
+LIBS += -L$$PWD/../extralibs/lib
+INCLUDEPATH += $$PWD/../extralibs/include
+
 mac: {
     CONFIG += plugin
     QMAKE_LFLAGS_PLUGIN -= -dynamiclib
