@@ -143,7 +143,7 @@ GOOGLEBREAKPAD {
 
 LIBS += -L$$PWD/../extralibs/lib -lsonivox
 INCLUDEPATH += $$PWD/.. $$PWD/../extralibs/include
-DEPENDPATH += $$PWD/../libkaraokelyrics $$PWD/../libcld2
+DEPENDPATH += $$PWD/../libkaraokelyrics
 
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libkaraokelyrics/release/ -lkaraokelyrics
@@ -170,3 +170,4 @@ unix:!mac:{
 
 win32:!win32-g++: QMAKE_CXXFLAGS+=/Zi
 win32:!win32-g++: QMAKE_LFLAGS+= /INCREMENTAL:NO /Debug
+win32:RC_ICONS += images/application.ico

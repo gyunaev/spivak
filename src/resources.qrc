@@ -19,5 +19,6 @@
         <file>sounds/test.m4a</file>
         <file>sounds/test.ogg</file>
         <file>sounds/test.wma</file>
+        <file>images/application.ico</file>
     </qresource>
 </RCC>

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Spivak
+Categories=Qt;AudioVideo;
+Terminal=false
+Type=Application
+Exec=spivak
+Icon=spivak
+GenericName=Spivak Karaoke Player
+Comment=Portable free Karaoke Player
+MimeType=application/x-kfn;
