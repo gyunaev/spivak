@@ -11,14 +11,14 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Welcome!</string>
+   <string>Welcome to Spivak!</string>
   </property>
   <property name="wizardStyle">
    <enum>QWizard::ClassicStyle</enum>
   </property>
   <widget class="QWizardPage" name="wizardWelcome">
    <property name="title">
-    <string>Welcome!</string>
+    <string>Welcome to Spivak!</string>
    </property>
    <property name="subTitle">
     <string/>
@@ -27,7 +27,7 @@
     <item>
      <widget class="QLabel" name="label">
       <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This tutorial will help you to configure Ulduzsoft Karaoke Player, and to learn about major player features.&lt;/p&gt;&lt;p&gt;Every screen will ask you to try something, this text will be in &lt;span style=&quot; color:#0000ff;&quot;&gt;blue color&lt;/span&gt; to help you distinguish it from the rest of the text.&lt;/p&gt;&lt;p&gt;The black screen window you see is the player's main screen window. This screen will show Karaoke when it is played. You can make it fullscreen by going into Control menu and choosing &amp;quot;Toggle Full Screen&amp;quot; option. Press F11 or Esc key to get back to the windowed screen.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#0000ff;&quot;&gt;Practice: please try to switch to full screen, and then switch back to window (by pressing F11), then click Next.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Advanced users: you can start in full screen by passing the -fs command-line option.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This tutorial will help you to configure Spivak, and to learn about major player features.&lt;/p&gt;&lt;p&gt;Every screen will ask you to try something, this text will be in &lt;span style=&quot; color:#0000ff;&quot;&gt;blue color&lt;/span&gt; to help you distinguish it from the rest of the text.&lt;/p&gt;&lt;p&gt;The black screen window you see is the player's main screen window. This screen will show Karaoke when it is played. You can make it fullscreen by going into Control menu and choosing &amp;quot;Toggle Full Screen&amp;quot; option. Press F11 or Esc key to get back to the windowed screen.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#0000ff;&quot;&gt;Practice: please try to switch to full screen, and then switch back to window (by pressing F11), then click Next.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Advanced users: you can start in full screen by passing the -fs command-line option.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
