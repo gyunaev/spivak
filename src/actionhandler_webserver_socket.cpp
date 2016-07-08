@@ -42,7 +42,7 @@ ActionHandler_WebServer_Socket::ActionHandler_WebServer_Socket(QTcpSocket *https
     connect( m_httpsock, &QTcpSocket::readyRead, this, &ActionHandler_WebServer_Socket::readyRead );
 
     // Song addition
-    connect( this, SIGNAL(queueAdd(QString,int)), pSongQueue, SLOT(addSong(QString,int)) );
+    connect( this, SIGNAL(queueAdd(QString,int)), pActionHandler, SLOT(enqueueSong(QString,int)), Qt::QueuedConnection );
 }
 
 ActionHandler_WebServer_Socket::~ActionHandler_WebServer_Socket()
