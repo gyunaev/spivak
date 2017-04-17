@@ -3,6 +3,6 @@
 }
 
 
-SUBDIRS += libkaraokelyrics plugins src
+SUBDIRS += libsonivox libkaraokelyrics plugins src
 TEMPLATE = subdirs
 src.depends = libkaraokelyrics

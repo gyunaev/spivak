@@ -22,7 +22,7 @@
 #include <QFile>
 #include <QIODevice>
 
-#include "sonivox/eas.h"
+#include "libsonivox/include/eas.h"
 
 // This class represents a playable WAV file which is rendered through the MIDI
 // synthesis while being played.
