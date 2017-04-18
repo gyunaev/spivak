@@ -62,7 +62,7 @@ void CurrentState::loadBackgroundObjects()
     QStringList extensions;
 
     if ( pSettings->playerBackgroundType == Settings::BACKGROUND_TYPE_IMAGE )
-        extensions << "jpg" << "png" << "gif" << "bmp" << "webp";
+        extensions << "jpg" << "png" << "gif" << "bmp" << "webp" << "jpeg";
     else
         extensions << "avi" << "mkv" << "mp4" << "3gp" << "mov" << "webm";
 
