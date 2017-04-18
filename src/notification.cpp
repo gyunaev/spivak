@@ -70,7 +70,7 @@ qint64 Notifications::drawTop( KaraokePainter &p )
 
     if ( remainingms == -1 || remainingms > 5000 )
     {
-        if ( m_scrollOffset >= p.fontMetrics().width( m_notificationLine ) )
+        if ( m_scrollOffset >= p.notificationRect().width() )
         {
             m_scrollOffset = 0;
         }
@@ -80,7 +80,11 @@ qint64 Notifications::drawTop( KaraokePainter &p )
             m_scrollOffset += speed;
         }
 
-        p.drawText( -m_scrollOffset, p.fontMetrics().ascent(), m_notificationLine );
+        p.drawText( p.notificationRect().width() - m_scrollOffset, p.fontMetrics().ascent(), m_notificationLine );
+
+        // At least two pixels
+        if ( m_scrollOffset > 2 )
+            p.drawText( -m_scrollOffset, p.fontMetrics().ascent(), m_notificationLine );
     }
     else
         p.drawText( 0, p.fontMetrics().ascent(), m_firstItem );
