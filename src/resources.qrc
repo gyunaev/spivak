@@ -20,5 +20,17 @@
         <file>sounds/test.ogg</file>
         <file>sounds/test.wma</file>
         <file>images/application.ico</file>
+        <file>html/background.jpg</file>
+        <file>html/karaoke.js</file>
+        <file>html/login.html</file>
+        <file>html/css/font-awesome.css</file>
+        <file>html/css/karaoke.css</file>
+        <file>html/css/w3.css</file>
+        <file>html/fonts/fontawesome-webfont.eot</file>
+        <file>html/fonts/fontawesome-webfont.svg</file>
+        <file>html/fonts/fontawesome-webfont.ttf</file>
+        <file>html/fonts/fontawesome-webfont.woff</file>
+        <file>html/fonts/fontawesome-webfont.woff2</file>
+        <file>html/fonts/FontAwesome.otf</file>
     </qresource>
 </RCC>
