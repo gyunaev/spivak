@@ -40,6 +40,9 @@ ActionHandler_WebServer::ActionHandler_WebServer( QObject * parent )
 
     // Everything should be owned by our thread
     moveToThread( this );
+
+    // Learn when a new song is started, so we can remember this information
+    connect( pEventor, &Eventor::karaokeStarted, this, &ActionHandler_WebServer::karaokeStarted, Qt::QueuedConnection );
 }
 
 void ActionHandler_WebServer::run()
@@ -141,10 +144,15 @@ void ActionHandler_WebServer::sessionOpened()
     }
 }
 
+void ActionHandler_WebServer::karaokeStarted(SongQueue::Song song)
+{
+    m_currentSong = song;
+}
+
 void ActionHandler_WebServer::newHTTPconnection()
 {
     Logger::debug( "WebServer: new HTTP connection" );
 
     // Handle the new connection - it will be deleted by the connection itself via deleteLater
-    new ActionHandler_WebServer_Socket( m_httpServer->nextPendingConnection() );
+    new ActionHandler_WebServer_Socket( m_httpServer->nextPendingConnection(), m_currentSong );
 }

@@ -53,7 +53,7 @@ static inline void StoreDwordBE( void * ptr, unsigned int value )
 }
 
 MIDISyntheser::MIDISyntheser(QObject *parent)
-    : QIODevice( parent ), m_audioBuffer(16384, 0)
+    : QIODevice( parent ), m_audioBuffer(4*16384, 0)
 {
     m_easHandle = 0;
     m_easData = 0;

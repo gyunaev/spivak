@@ -22,18 +22,22 @@
 #include <QJsonObject>
 #include <QJsonParseError>
 
+#include "util.h"
 #include "settings.h"
 #include "logger.h"
+#include "eventor.h"
 #include "database.h"
 #include "songqueue.h"
 #include "actionhandler.h"
+#include "currentstate.h"
 #include "actionhandler_webserver_socket.h"
 
-
-ActionHandler_WebServer_Socket::ActionHandler_WebServer_Socket(QTcpSocket *httpsock)
+#include <QApplication>
+ActionHandler_WebServer_Socket::ActionHandler_WebServer_Socket(QTcpSocket *httpsock, const SongQueue::Song& currentSong)
     : QObject()
 {
     m_httpsock = httpsock;
+    m_currentSong = "\"" + currentSong.title + "\" by " + currentSong.artist;
 
     // Autodelete the client once it is disconnected
     connect( m_httpsock, &QTcpSocket::disconnected, this, &ActionHandler_WebServer_Socket::deleteLater );
@@ -41,8 +45,12 @@ ActionHandler_WebServer_Socket::ActionHandler_WebServer_Socket(QTcpSocket *https
     // Read notification
     connect( m_httpsock, &QTcpSocket::readyRead, this, &ActionHandler_WebServer_Socket::readyRead );
 
-    // Song addition
+    // Song addition and removal
     connect( this, SIGNAL(queueAdd(QString,int)), pActionHandler, SLOT(enqueueSong(QString,int)), Qt::QueuedConnection );
+    connect( this, SIGNAL(queueRemove(int)), pActionHandler, SLOT(dequeueSong(int)), Qt::QueuedConnection );
+
+    // Command actions
+    connect( this, SIGNAL(commandAction(int)), pActionHandler, SLOT(cmdAction(int)), Qt::QueuedConnection );
 }
 
 ActionHandler_WebServer_Socket::~ActionHandler_WebServer_Socket()
@@ -97,8 +105,11 @@ void ActionHandler_WebServer_Socket::readyRead()
             QString hdr = regex.cap( 1 );
             QString value = regex.cap( 2 );
 
-            if ( hdr.compare( "cookie", Qt::CaseInsensitive) == 0 )
-                m_cookie = value;
+            if ( hdr.compare( "cookie", Qt::CaseInsensitive) == 0 && value.startsWith( "name=") )
+            {
+                // Parse the name
+                m_cookie = QUrl::fromPercentEncoding( value.mid( 5 ).toLatin1() );
+            }
             else if ( hdr.compare( "content-length", Qt::CaseInsensitive) == 0 )
                 content_length = value.toInt();
             else if ( hdr.compare( "expect", Qt::CaseInsensitive) == 0 && value.startsWith( "100") )
@@ -161,6 +172,14 @@ void ActionHandler_WebServer_Socket::readyRead()
             res = listqueue(  document );
         else if ( m_url == "/api/browse" )
             res = listDatabase( document );
+        else if ( m_url == "/api/queue/remove" )
+            res = removeSongFromQueue( document );
+        else if ( m_url == "/api/control/status" )
+            res = controlStatus( document );
+        else if ( m_url == "/api/control/adjust" )
+            res = controlAdjust( document );
+        else if ( m_url == "/api/control/action" )
+            res = controlAction( document );
 
         if ( !res )
         {
@@ -268,11 +287,11 @@ bool ActionHandler_WebServer_Socket::addsong( QJsonDocument& document )
     {
         QJsonObject obj = document.object();
 
-        if ( !obj.contains( "id" ) || !obj.contains( "singer" ) )
+        if ( !obj.contains( "id" ) || m_cookie.isEmpty() )
             return false;
 
         int id = obj["id"].toInt();
-        QString singer = obj["singer"].toString();
+        QString singer = m_cookie;
 
         Database_SongInfo info;
 
@@ -328,11 +347,31 @@ bool ActionHandler_WebServer_Socket::listqueue(QJsonDocument &)
         rec[ "title"] = queue[i].title;
         rec[ "state"] = queue[i].stateText();
 
+        if ( queue[i].singer == m_cookie )
+            rec[ "removable"] = true;
+
         out.append( rec );
     }
 
     sendData( QJsonDocument( out ).toJson() );
     return true;
+}
+
+bool ActionHandler_WebServer_Socket::removeSongFromQueue(QJsonDocument &document)
+{
+    if ( pSettings->httpEnableAddQueue )
+    {
+        QJsonObject obj = document.object();
+
+        if ( !obj.contains( "id" ) )
+            return false;
+
+        int id = obj.value( "id" ).toInt();
+        emit queueRemove( id );
+        Logger::debug("WebServer: queued the removal of ID %d from queue", id );
+    }
+
+    return listqueue(document);
 }
 
 bool ActionHandler_WebServer_Socket::listDatabase(QJsonDocument &document)
@@ -403,4 +442,129 @@ bool ActionHandler_WebServer_Socket::listDatabase(QJsonDocument &document)
 
     sendData( QJsonDocument( outobj ).toJson() );
     return true;
+}
+
+bool ActionHandler_WebServer_Socket::controlStatus(QJsonDocument &)
+{
+    QJsonObject outobj;
+
+    if ( pCurrentState->playerState == CurrentState::PLAYERSTATE_PLAYING || pCurrentState->playerState == CurrentState::PLAYERSTATE_PAUSED )
+    {
+        if ( pCurrentState->playerState == CurrentState::PLAYERSTATE_PAUSED )
+            outobj["state"] = "paused";
+        else
+            outobj["state"] = "playing";
+
+        outobj["pos"] = Util::tickToString( pCurrentState->playerPosition );
+        outobj["duration"] = Util::tickToString( pCurrentState->playerDuration );
+        outobj["volume"] = pCurrentState->playerVolume;
+        outobj["delay"] = pCurrentState->playerLyricsDelay;
+
+        if ( pCurrentState->playerCapabilities & MediaPlayer::CapChangePitch )
+            outobj["pitch"] = pCurrentState->playerPitch;
+        else
+            outobj["pitch"] = "disabled";
+
+        if ( pCurrentState->playerCapabilities & MediaPlayer::CapChangeTempo )
+            outobj["tempo"] = pCurrentState->playerTempo + 50;
+        else
+            outobj["tempo"] = "disabled";
+
+        if ( pCurrentState->playerCapabilities & MediaPlayer::CapVoiceRemoval )
+            outobj["voiceremoval"] = pCurrentState->playerVoiceRemovalEnabled;
+        else
+            outobj["voiceremoval"] = "disabled";
+
+        outobj["song"] = m_currentSong;
+    }
+    else
+        outobj["state"] = "stopped";
+
+    outobj["type"] = "controlstatus";
+
+    sendData( QJsonDocument( outobj ).toJson() );
+    return true;
+
+}
+
+bool ActionHandler_WebServer_Socket::controlAdjust(QJsonDocument &document)
+{
+    QJsonObject obj = document.object();
+
+    if ( !obj.contains( "a" ) || !obj.contains( "v" ) )
+        return false;
+
+    QString action = obj.value( "a" ).toString();
+    int p  = obj.value( "v" ).toInt();
+    int useaction = -1;
+
+    if ( action == "volume" )
+    {
+        if ( p > 0 )
+            useaction = ActionHandler::ACTION_PLAYER_VOLUME_UP;
+        else
+            useaction = ActionHandler::ACTION_PLAYER_VOLUME_DOWN;
+    }
+    else if ( action == "tempo" )
+    {
+        if ( p > 0 )
+            useaction = ActionHandler::ACTION_PLAYER_TEMPO_INCREASE;
+        else
+            useaction = ActionHandler::ACTION_PLAYER_TEMPO_DECREASE;
+    }
+    else if ( action == "pitch" )
+    {
+        if ( p > 0 )
+            useaction = ActionHandler::ACTION_PLAYER_PITCH_INCREASE;
+        else
+            useaction = ActionHandler::ACTION_PLAYER_PITCH_DECREASE;
+
+    }
+    else if ( action == "voice" )
+    {
+        useaction = ActionHandler::ACTION_PLAYER_TOGGLE_VOICE_REMOVAL;
+    }
+    else if ( action == "delay" )
+    {
+        if ( p > 0 )
+            useaction = ActionHandler::ACTION_LYRIC_EARLIER;
+        else
+            useaction = ActionHandler::ACTION_LYRIC_LATER;
+    }
+
+    if ( useaction == -1 )
+        return false;
+
+    // Send the action to the thread
+    emit commandAction( useaction );
+
+    return controlStatus( document );
+}
+
+bool ActionHandler_WebServer_Socket::controlAction(QJsonDocument &document)
+{
+    QJsonObject obj = document.object();
+
+    if ( !obj.contains( "a" ) )
+        return false;
+
+    QString action = obj.value( "a" ).toString();
+
+    if ( action == "stop" )
+        emit pActionHandler->actionKaraokePlayerStop();
+    else if ( action == "prev" )
+        emit pActionHandler->cmdAction( ActionHandler::ACTION_QUEUE_PREVIOUS );
+    else if ( action == "next" )
+        emit pActionHandler->cmdAction( ActionHandler::ACTION_QUEUE_NEXT );
+    else if ( action == "playpause" )
+    {
+        if ( pCurrentState->playerState == CurrentState::PLAYERSTATE_PLAYING || pCurrentState->playerState == CurrentState::PLAYERSTATE_PAUSED )
+            emit pActionHandler->actionKaraokePlayerPauseResume();
+        else
+            emit pActionHandler->actionKaraokePlayerStart();
+    }
+    else
+        return false;
+
+    return controlStatus( document );
 }

@@ -40,6 +40,7 @@
 #include "settingsdialog.h"
 #include "musiccollectionmanager.h"
 #include "welcome_wizard.h"
+#include "songqueue.h"
 #include "logger.h"
 #include "eventor.h"
 #include "feedbackdialog.h"
@@ -63,7 +64,9 @@ MainWindow::MainWindow(QWidget *parent) :
     m_settings = 0;
     m_welcomeWizard = 0;
 
-    // We don't need any specific crypto
+    qRegisterMetaType<SongQueue::Song>();
+
+    // We don't use any crypto
     qsrand( (unsigned int) (long) pMainWindow * (unsigned int) QDateTime::currentMSecsSinceEpoch() );
 
     // Eventor is created first as it does not connect to anything, and others connect to it

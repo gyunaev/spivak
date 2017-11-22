@@ -22,6 +22,8 @@
 #include <QObject>
 #include <QTcpSocket>
 
+#include "songqueue.h"
+
 class QTcpSocket;
 
 class ActionHandler_WebServer_Socket : public QObject
@@ -29,12 +31,14 @@ class ActionHandler_WebServer_Socket : public QObject
     Q_OBJECT
 
     public:
-        ActionHandler_WebServer_Socket( QTcpSocket * httpsock );
+        ActionHandler_WebServer_Socket( QTcpSocket * httpsock, const SongQueue::Song& m_currentSong );
         ~ActionHandler_WebServer_Socket();
 
     signals:
         // This runs in a different thread, so QueuedConnection is must
         void    queueAdd( QString singer, int id );
+        void    queueRemove( int id );
+        void    commandAction( int id );
 
     private slots:
         void    readyRead();
@@ -47,7 +51,11 @@ class ActionHandler_WebServer_Socket : public QObject
         bool    search( QJsonDocument& document );
         bool    addsong( QJsonDocument& document);
         bool    listqueue( QJsonDocument& document );
+        bool    removeSongFromQueue( QJsonDocument& document );
         bool    listDatabase( QJsonDocument& document );
+        bool    controlStatus( QJsonDocument& document );
+        bool    controlAdjust( QJsonDocument& document );
+        bool    controlAction( QJsonDocument& document );
 
         void    sendData( const QByteArray& data, const QByteArray &type = "application/json" );
 
@@ -61,6 +69,7 @@ class ActionHandler_WebServer_Socket : public QObject
         QString         m_cookie;
         QString         m_method;
         unsigned int    m_contentLength;
+        QString         m_currentSong;
 
 };
 

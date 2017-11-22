@@ -44,6 +44,7 @@ bool PlayerLyrics::draw(KaraokePainter &p)
 void PlayerLyrics::setDelay(int delayms)
 {
     m_timeDelay = delayms;
+    pCurrentState->playerLyricsDelay = delayms;
 }
 
 int PlayerLyrics::delay() const

@@ -64,6 +64,7 @@ class CurrentState : public QObject
         int                     playerPitch;
         int                     playerTempo;
         bool                    playerVoiceRemovalEnabled;
+        int                     playerLyricsDelay;
 
         // For video only, stores last position
         qint64                  playerBackgroundLastVideoPosition;

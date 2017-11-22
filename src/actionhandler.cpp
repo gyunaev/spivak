@@ -152,6 +152,15 @@ void ActionHandler::enqueueSong(QString singer, QString path)
         emit actionKaraokePlayerStart();
 }
 
+void ActionHandler::dequeueSong(int id)
+{
+    // If the first song is removed, and its being played, skip it
+    bool current = pSongQueue->removeSongById( id );
+
+    if ( current && pCurrentState->playerState != CurrentState::PLAYERSTATE_STOPPED )
+        nextQueueAction();
+}
+
 void ActionHandler::error(QString message)
 {
     qDebug("ERROR: %s", qPrintable(message));

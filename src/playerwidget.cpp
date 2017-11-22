@@ -22,7 +22,7 @@
 #include "playerwidget.h"
 #include "currentstate.h"
 #include "actionhandler.h"
-
+#include "util.h"
 
 PlayerWidget::PlayerWidget(QWidget *parent)
     : QWidget(parent), Ui::PlayerWidget()
@@ -103,8 +103,8 @@ void PlayerWidget::setProgress(qint64 pos, qint64 duration)
     int percent = (pos * 100) / total;
     int remaining = total - pos;
 
-    lblTimeCur->setText( tr("<b>%1</b>") .arg( tickToString( pos ) ) );
-    lblTimeRemaining->setText( tr("<b>-%1</b>") .arg( tickToString( remaining ) ) );
+    lblTimeCur->setText( tr("<b>%1</b>") .arg( Util::tickToString( pos ) ) );
+    lblTimeRemaining->setText( tr("<b>-%1</b>") .arg( Util::tickToString( remaining ) ) );
     seekBar->setValue( percent );
 }
 
@@ -178,14 +178,3 @@ void PlayerWidget::spinTempoChanged(int val)
     else
         emit tempoSpinChanged( val - 50 );
 }
-
-QString PlayerWidget::tickToString( qint64 tickvalue )
-{
-	int minute = tickvalue / 60000;
-	int second = (tickvalue-minute*60000)/1000;
-	int msecond = (tickvalue-minute*60000-second*1000) / 100; // round milliseconds to 0-9 range}
-
-	QTime ct( 0, minute, second, msecond );
-    return ct.toString( "mm:ss" );
-}
-

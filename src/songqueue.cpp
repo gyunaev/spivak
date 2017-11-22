@@ -229,6 +229,22 @@ void SongQueue::removeSong(unsigned int position)
     queueUpdated();
 }
 
+bool SongQueue::removeSongById(int id)
+{
+    for ( int i = 0; i < m_queue.size(); i++ )
+    {
+        if ( m_queue[i].id == id )
+        {
+            m_queue.removeAt( i );
+            queueUpdated();
+
+            return i == (int) m_currentSong;
+        }
+    }
+
+    return false;
+}
+
 void SongQueue::moveSong(unsigned int from, unsigned int to)
 {
     // Song queue is exported from m_currentSong, so we need to adjust the items

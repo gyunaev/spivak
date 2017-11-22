@@ -48,6 +48,9 @@ class Util
         // We can see if we need QDir::separator later
         static QString  separator() { return "/"; }
 
+        // Convert ticks (int64 ms) to a proper time string
+        static QString tickToString( qint64 tickvalue );
+
     private:
         Util();
 };

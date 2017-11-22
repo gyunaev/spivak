@@ -104,6 +104,9 @@ class SongQueue : public QObject
         // Removes a song at specific position
         void    removeSong(unsigned int position );
 
+        // Removes a song using specific ID. Returns true if the removed song is current
+        bool    removeSongById(int id );
+
         // Moves a song from position from to position to
         void    moveSong( unsigned int from, unsigned int to );
 

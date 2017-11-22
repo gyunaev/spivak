@@ -82,7 +82,6 @@ class PlayerWidget : public QWidget, public Ui::PlayerWidget
 
 	private:
         int     m_spinSets;
-        QString tickToString(qint64 tickvalue);
 };
 
 

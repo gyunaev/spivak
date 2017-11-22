@@ -76,7 +76,7 @@ qint64 Notifications::drawTop( KaraokePainter &p )
         }
         else
         {
-            int speed = 5; //qMax( 3, int( ceil( p.fontMetrics().width( m_notificationLine ) / (double) p.rect().width() ) ) );
+            int speed = 3; //qMax( 3, int( ceil( p.fontMetrics().width( m_notificationLine ) / (double) p.rect().width() ) ) );
             m_scrollOffset += speed;
         }
 

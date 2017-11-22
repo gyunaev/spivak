@@ -18,6 +18,7 @@
 
 #include <QDir>
 #include <QFile>
+#include <QTime>
 #include <QFileInfo>
 #include <QCryptographicHash>
 #include <QFileInfo>
@@ -64,6 +65,16 @@ QString Util::fileExtension(const QString &filename)
         return "";
 
     return filename.mid( p + 1 );
+}
+
+QString Util::tickToString(qint64 tickvalue)
+{
+    int minute = tickvalue / 60000;
+    int second = (tickvalue-minute*60000)/1000;
+    int msecond = (tickvalue-minute*60000-second*1000) / 100; // round milliseconds to 0-9 range}
+
+    QTime ct( 0, minute, second, msecond );
+    return ct.toString( "mm:ss" );
 }
 
 void Util::enumerateDirectory(const QString &rootPaths, const QStringList &extensions, QStringList &files)

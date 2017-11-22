@@ -259,7 +259,7 @@ bool KaraokeSong::open()
 void KaraokeSong::start()
 {
     // Indicate that we started
-    pEventor->karaokeStarted( m_song );
+    emit pEventor->karaokeStarted( m_song );
 
     pCurrentState->playerDuration = m_player.duration();
     pCurrentState->playerState = CurrentState::PLAYERSTATE_PLAYING;
@@ -472,6 +472,7 @@ void KaraokeSong::songLoaded()
     pCurrentState->playerPitch = 50;
     pCurrentState->playerTempo = 50;
     pCurrentState->playerVoiceRemovalEnabled = false;
+    pCurrentState->playerLyricsDelay = 0;
 
     pCurrentState->playerCapabilities = m_player.capabilities();
     m_widget->karaokeSongLoaded();

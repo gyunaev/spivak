@@ -128,6 +128,7 @@ class ActionHandler : public QObject
         // Those slots enqueue the song and start the queue automatically
         void    enqueueSong( QString singer, int id );
         void    enqueueSong( QString singer, QString path );
+        void    dequeueSong(int id );
 
         // Reports an error or warning
         void    error( QString message );
