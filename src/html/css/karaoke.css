@@ -1,0 +1,267 @@
+#browseback {
+    display: none;
+    padding: 7px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    text-align: center;
+    background-color: #00AAAA;
+    color: black;
+    cursor:pointer;
+}
+
+.letter {
+    display: inline-block;
+    cursor:pointer;
+    padding: 7px;
+    margin: 5px;
+    color: black;
+    background-color: #00cc66;
+    border: 1px solid black;
+}
+
+.songentry {
+    display: block;
+    padding: 7px;
+    margin-bottom: 5px;
+    color: black;
+    background-color: #00cc66;
+    cursor:pointer;
+    text-align: center;
+}
+
+.artist {
+    display: inline-block;
+    font-weight: bold;
+}
+
+.title {
+    display: inline-block;
+    color: black;
+    padding-left: 10px;
+}
+
+.type {
+    display: inline-block;
+    font-size: 70%;
+    padding-left: 10px;
+}
+
+.lang {
+    display: inline-block;
+    font-size: 70%;
+    padding-left: 10px;
+}
+
+
+.queueentry-ours {
+    display: block;
+    padding: 7px;
+    margin-bottom: 5px;
+    color: black;
+    background-color: #00cc66;
+    cursor:pointer;
+    text-align: center;
+}
+
+.queueentry {
+    display: block;
+    padding: 7px;
+    margin-bottom: 5px;
+    color: black;
+    background-color: #00cc66;
+    text-align: center;
+}
+
+.qnumber {
+    display: inline-block;
+    font-weight: bold;
+    padding-left: 20px;
+}
+
+.qsinger {
+    display: inline-block;
+    font-weight: bold;
+    padding-left: 10px;
+}
+
+.qtitle {
+    display: inline-block;
+    color: black;
+    padding-left: 10px;
+}
+
+.qstatus {
+    display: inline-block;
+    font-size: 70%;
+    padding-left: 10px;
+}
+
+
+
+#error {
+    display: none;
+    color: white;
+    font-weight: bold;
+    background-color: red;
+    padding: 10px;
+}
+
+#snackbar
+{
+    visibility: hidden; /* Hidden by default. Visible on click */
+    min-width: 250px; /* Set a default minimum width */
+    margin-left: -125px; /* Divide value of min-width by 2 */
+    background-color: #333; /* Black background color */
+    color: #fff; /* White text color */
+    text-align: center; /* Centered text */
+    border-radius: 2px; /* Rounded borders */
+    padding: 16px; /* Padding */
+    position: fixed; /* Sit on top of the screen */
+    z-index: 1; /* Add a z-index if needed */
+    left: 50%; /* Center the snackbar */
+    bottom: 30px; /* 30px from the bottom */
+}
+
+/* Show the snackbar when clicking on a button (class added with JavaScript) */
+#snackbar.show {
+    visibility: visible; /* Show the snackbar */
+
+/* Add animation: Take 0.5 seconds to fade in and out the snackbar.
+However, delay the fade out process for 2.5 seconds */
+    -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+/* Animations to fade the snackbar in and out */
+@-webkit-keyframes fadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 30px; opacity: 1;}
+}
+
+@keyframes fadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 30px; opacity: 1;}
+}
+
+@-webkit-keyframes fadeout {
+    from {bottom: 30px; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
+}
+
+@keyframes fadeout {
+    from {bottom: 30px; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
+}
+
+.buttonrow {
+    display: block;
+    font-size: 400%;
+    border: 1px solid black;
+    margin-bottom: 10%;
+}
+
+.playerbutton {
+    display: inline-block;
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+.controlrow {
+    display: block;
+    margin: 5%;
+}
+    
+.control {
+    display: inline-block;
+    border: 2px solid grey;
+    border-radius: 10px;
+    padding: 1%;
+    margin: 2%;
+    width: 20%;
+}
+
+.controlblock {
+    display: inline-block;
+    text-align: center;
+    padding-right: 20px;
+}
+
+.ctrlname {
+    display: block;
+    font-size: 2.5vw;
+}
+
+.ctrlvalue {
+    display: block;
+    font-size: 3vw;
+    font-weight: bold;
+}
+
+.controlbuttongroup {
+    display: inline-block;
+}
+
+.controlbutton {
+    display: block;
+    font-size: 300%;
+    cursor:pointer;
+}
+
+#soundstatus {
+    display: block;
+    font-size: 1.5vw;
+    margin: 0.5%;
+}
+
+
+#confirmdialog {
+    display: none;
+    position: fixed;
+    z-index: 5; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+    font-size: 1.5vw;
+    text-align: center;
+}
+
+
+#confirmdialog-content
+{
+    display: block;
+    background-color: #fefefe;
+    border-radius: 10px;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 30%;
+    text-align: center;
+}
+
+#confirmdialog-content button {
+    background-color: #ccc;
+    display: inline-block;
+    border-radius: 10px;
+    border: 1px solid #aaa;
+    padding: 2px;
+    text-align: center;
+    width: 80px;
+    cursor: pointer;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#confirmdialog button:hover
+{
+    background-color: #ddd;
+}
+
+#confirmdialogtext
+{
+    text-align: left;
+    margin-bottom: 8px;
+}

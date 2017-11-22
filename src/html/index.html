@@ -1,189 +1,144 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Karaoke Song Selector</title>
-    <style>
-        body { background-color: linen; font: 16px Helvetica, Verdana, sans-serif;   }
-        input { font-size: 125% }
-        input[type=text] { width: 80%; }
-        div { text-align: center; }
-        .hiddendiv {display:none; width: 100% }
-        .visiblediv {display:block; width: 100% }
+<title>George's Karaoke</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/w3.css">
+<link rel="stylesheet" href="css/font-awesome.css">
+<link rel="stylesheet" href="css/karaoke.css">
+<style>
+html,body,h1,h2,h3,h4,h5 {font-family: "RobotoDraft", "Roboto", sans-serif}
+.w3-bar-block .w3-bar-item {padding: 16px}
+</style>
+<script src="karaoke.js"></script>
+<body onload="checkLogin(); openTab('browse'); setTimeout( function(){ browse(); }, 100 );">
 
-        ul { list-style-type: none; margin: 0; padding: 0; }
-        li {  font-size: 125%;  border-bottom: 1px solid #ccc; }
-        .info {  font-size: 50%  }
-        li:last-child { border: none; }
+<!-- Side Navigation -->
+<nav class="w3-sidebar w3-bar-block w3-collapse w3-white w3-animate-left w3-card" style="z-index:3;width:320px;" id="mySidebar">
+    <a href="javascript:void(0)" onclick="w3_close()" title="Close Sidemenu" class="w3-bar-item w3-button w3-hide-large w3-large">Close <i class="fa fa-remove"></i></a>
+    <p class="w3-bar-item w3-button w3-border-bottom w3-large" id="hello">Karaoke Control</p>
+  
+    <!-- Browse collection  -->
+    <a href="#" id="menu_browse" class="w3-bar-item w3-button menuentry" onclick="openTab('browse'); browse(); w3_close();"><i class="fa fa-list w3-margin-right" ></i>Browse collection</a>
 
-    </style>
-
-    <script type="text/javascript">
+    <!-- Song search  -->
+    <a href="#" id="menu_search" class="w3-bar-item w3-button menuentry" onclick="openTab('search');w3_close();"><i class="fa fa-search w3-margin-right"></i>Search for a song</a>
     
-        // http://www.w3schools.com/ajax/tryit.asp?filename=tryajax_callback
-        function runAPI( url, params, cfunc )
-        {
-            var xhttp = new XMLHttpRequest();
+    <!-- Singer queue -->
+    <a href="#" id="menu_queue" class="w3-bar-item w3-button menuentry" onclick="openTab('queue'); updateSingerQueue(); w3_close();"><i class="fa fa-reorder w3-margin-right"></i>Singer queue</a>
     
-            xhttp.onreadystatechange = function()
-            {
-                if (xhttp.readyState == 4 && xhttp.status == 200)
-                {
-                    cfunc(xhttp);
-                }
-            };
+    <!-- Sound control -->
+    <a href="#" id="menu_control" class="w3-bar-item w3-button menuentry" onclick="openTab('control'); soundControlUpdate(); w3_close();"><i class="fa fa-music w3-margin-right"></i>Sound Control</a>
     
-            xhttp.open("POST", url, true);
-            xhttp.setRequestHeader( "Content-Type", "application/json; charset=UTF-8" );
-            xhttp.send( JSON.stringify( params ) );
-        }
-            
-        function searchSucceed( xhttp )
-        {
-            var obj = JSON.parse( xhttp.responseText );
-            
-            if ( obj["results"] )
-                obj = obj["results"]
-            
-            if ( obj.length > 0 )
-            {
-                var list = "<ul>";
-                
-                for ( var i = 0; i < obj.length; i++ )
-                {
-                    var item = obj[i].artist + " - " + obj[i].title;
-                    list += "<li><a href='#' onclick=\"addsong( " + obj[i].id + ");\">" + item + "</a>" + "<span class=\"info\">    " + obj[i].type;
-                    
-                    if ( obj[i].language != "Unknown" )
-		      list += " in " +  obj[i].language;
-		      
-		    list += "</span></li>";
-                }
-                
-                list += "</ul>"
-                document.getElementById("songlist").innerHTML = "Please click on a song to queue it" + list;
-            }
-            else
-            {
-                document.getElementById("songlist").innerHTML = "Nothing found";
-            }
-        }
+    <br>
+    <br>
+    <hr class="w3-border-grey" style="margin:auto;width:90%">
+    <br>
+    
+    <a href="#" id="menu_signout" class="w3-bar-item w3-button menuentry" onclick="logout();w3_close();"><i class="fa fa-beer w3-margin-right"></i>Sign out</a>
+</nav>
 
-        function search()
-        {
-            runAPI( '/api/search', { query : document.getElementById("song").value }, searchSucceed );
-        }
+<!-- Overlay effect when opening the side navigation on small screens -->
+<div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="Close Sidemenu" id="myOverlay"></div>
 
-        function browseSucceed( xhttp )
-        {
-            var obj = JSON.parse( xhttp.responseText );
-            
-            if ( obj.results.length > 0 )
-            {
-                var list = "<ul>";
-                
-                if ( obj.type == "initials" )
-                    callback = "browseSucceed";
-                else
-                    callback = "searchSucceed";
-                
-                for ( var i = 0; i < obj.results.length; i++ )
-                {
-                    list += "<li><a href='#' onclick=\"browseArtist( '" + obj.results[i] + "', " + callback + " );\">" + obj.results[i] + "</a></li>";
-                }
-                
-                list += "</ul>"
-                document.getElementById("songlist").innerHTML = list;
-            }
-            else
-            {
-                document.getElementById("songlist").innerHTML = "No such artist";
-            }
-        }
+<!-- Page content -->
+<div class="w3-main" style="margin-left:320px;">
+<i class="fa fa-bars w3-button w3-white w3-hide-large w3-xlarge w3-margin-left w3-margin-top" onclick="w3_open()"></i>
+<p id="error"></p>
+<!-- <a href="javascript:void(0)" class="w3-hide-large w3-red w3-button w3-right w3-margin-top w3-margin-right" onclick="document.getElementById('id01').style.display='block'"><i class="fa fa-pencil"></i></a> -->
+
+<div id="browse" class="w3-container activity">
+  <br>
+  <h3 class="w3-opacity">Browse the collection</h3>
+  <div id="browseback" onclick='browseback()'></div>
+  <div id="browsedata"></div>
+</div>
+
+<div id="search" class="w3-container activity">
+  <br>
+  <h3 class="w3-opacity">Search the collection</h3>
+  <p class="w3-large w3-center"><input id="song" autofocus placeholder="Title or artist..." onkeydown="if (event.keyCode == 13) search();"><input type=button value="Find" autofocus onclick="search()"></p>
+  <div id="searchdata"></div>
+</div>
+
+<div id="queue" class="w3-container activity">
+  <br>
+  <h3 class="w3-opacity">Singer queue</h3>
+  <div id="queuedata"></div>
+</div>
      
-        function browseArtist( artist, callback )
-        {
-            runAPI( '/api/browse', { artist: artist }, callback );
-        }        
-        
-        function browse()
-        {
-            runAPI( '/api/browse', {}, browseSucceed );
-        }        
-        
-        function addsongSucceed( xhttp )
-        {
-            var data = JSON.parse( xhttp.responseText );
 
-            if ( data["result"] == 1 )
-                document.getElementById("songlist").innerHTML = "<b>" + data["title"] + "</b> by <b>" + data["artist"] + "</b> is successfully enqueued";
-            else
-                document.getElementById("songlist").innerHTML = "Failed to add to queue";
-
-            document.getElementById("song").value = ""
-        }
-        
-        function addsong( id )
-        {
-            name = document.cookie.substring( 5 );
-            runAPI( '/api/addsong', { id : id, singer: name }, addsongSucceed );
-        }
-
-        function nameEntered()
-        {
-            var name = document.getElementById("name").value;
-
-            var d = new Date();
-            d.setTime( d.getTime() + 86400000 );
-            document.cookie = "name=" + name + "; expires=" + d.toUTCString() + "; path=/";
-            checkCookie();
-        }
-
-        function clearCookie()
-        {
-            document.cookie = "name=; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-            checkCookie();
-        }        
-        
-        function checkCookie()
-        {
-            var n = document.cookie;
-
-            if ( n )
-            {
-                name = document.cookie.substring( 5 );
-                document.getElementById("hello").innerHTML = "Hello, <b>" + name + "!</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='#' onclick=\"clearCookie();\">not " + name + "?</a>";
-                document.getElementById('searchfield').className='visiblediv';
-                document.getElementById('namefield').className='hiddendiv';
-            }
-            else
-            {
-                document.getElementById('searchfield').className='hiddendiv';
-                document.getElementById('namefield').className='visiblediv';
-            }
-        }
-        
-    </script>
-    </head>
-     <body onload="checkCookie()">
+<div id="control" class="w3-container activity">
+  <br>
+  <h3 class="w3-opacity">Sound control</h3>
+    <div id="soundstatus"></div>
+    <div class="buttonrow">
+        <div class="playerbutton" id="controlstatus">Play controls:</div>
+        <div class="playerbutton"><a href="#" id="btnbwd" onclick="controlAction( 'prev' )"><i class="fa fa-step-backward"></i></a></div>
+        <div class="playerbutton"><a href="#" id="btnplaypause" onclick="controlAction( 'playpause' )"><i class="fa fa-play"></i></a></div>
+        <div class="playerbutton"><a href="#" id="btnstop" onclick="controlAction( 'stop' )"><i class="fa fa-stop"></i></a></div>
+        <div class="playerbutton"><a href="#" id="btnfwd" onclick="controlAction( 'next' )"><i class="fa fa-step-forward"></i></a></div>
+    </div>
     
-        <div id="namefield">
-            <input type=text id="name" placeholder="Please enter your name..." onkeydown="if (event.keyCode == 13) nameEntered();"><input type=button value="Ok" autofocus onclick="nameEntered()">
-        </div>
-
-        <div class="hiddendiv" id="searchfield">
-            <p id="hello"></p>
-        
-            <div>
-                <input type=text id="song" placeholder="Song or artist name..." onkeydown="if (event.keyCode == 13) search();"><input type=button value="Find" autofocus onclick="search()">
+    <div class="controlrow">
+        <div class="control">
+            <div class="controlblock">
+                <div class="ctrlname">Volume</div>
+                <div class="ctrlvalue" id="value_volume">55%</div>
             </div>
-            <div>
-                <a href='#' onclick='browse();'>Or browse the collection</a>
-            </div>    
-
-            <p id="songlist"></p>
-
+            <div class="controlbuttongroup">
+                <div class="controlbutton" onclick="controlAdjust( 'volume', 1 )"><i class="fa fa-plus-circle"></i></div>
+                <div class="controlbutton" onclick="controlAdjust( 'volume', -1 )"><i class="fa fa-minus-circle"></i></div>
+            </div>
         </div>
-    </body>
-</html>
+    
+        <div class="control">
+            <div class="controlblock">
+                <div class="ctrlname">Tempo</div>
+                <div class="ctrlvalue" id="value_tempo">100%</div>
+            </div>
+            <div class="controlbuttongroup">
+                <div class="controlbutton" onclick="controlAdjust( 'tempo', 1 )"><i class="fa fa-plus-circle"></i></div>
+                <div class="controlbutton" onclick="controlAdjust( 'tempo', -1 )"><i class="fa fa-minus-circle"></i></div>
+            </div>
+        </div>
+
+        <div class="control">
+            <div class="controlblock">
+                <div class="ctrlname">Pitch</div>
+                <div class="ctrlvalue" id="value_pitch">100%</div>
+            </div>
+            <div class="controlbuttongroup">
+                <div class="controlbutton" onclick="controlAdjust( 'pitch', 1 )"><i class="fa fa-plus-circle"></i></div>
+                <div class="controlbutton" onclick="controlAdjust( 'pitch', -1 )"><i class="fa fa-minus-circle"></i></div>
+            </div>
+        </div>
+
+        <div class="control">
+            <div class="controlblock">
+                <div class="ctrlname">L. Delay</div>
+                <div class="ctrlvalue" id="value_delay">0ms</div>
+            </div>
+            <div class="controlbuttongroup">
+                <div class="controlbutton" onclick="controlAdjust( 'delay', 1 )"><i class="fa fa-plus-circle"></i></div>
+                <div class="controlbutton" onclick="controlAdjust( 'delay', -1 )"><i class="fa fa-minus-circle"></i></div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+</div>
+<div id="snackbar"></div>
+
+
+<div id="confirmdialog">
+    <div id="confirmdialog-content" class="w3-animate-zoom">
+        <div id="confirmdialogtext"></div>
+        <button onclick="confirmDialogButton( true )">Yes</button>
+        <button onclick="confirmDialogButton( false )">No</button>
+    </div>
+</div>
+
+</body>
+</html> 

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<title>Welcome to George's Karaoke!</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/w3.css">
+<style>
+body,h1 {font-family: "Roboto", sans-serif}
+body, html {height: 100%}
+.bgimg {
+    background-image: url('background.jpg');
+    min-height: 100%;
+    background-position: center;
+    background-size: cover;
+}
+</style>
+<script src="karaoke.js"></script>
+<body>
+<div class="bgimg w3-display-container w3-animate-opacity w3-text-black">
+  <div class="w3-display-topleft w3-padding-large w3-xlarge">Welcome to George's Karaoke!</div>
+  <div class="w3-display-middle">
+    <h1 class="w3-jumbo w3-animate-top">HELLO STRANGER!</h1>
+    <hr class="w3-border-grey" style="margin:auto;width:40%">
+    <p class="w3-large w3-center">Please introduce yourself:</p>
+    <p class="w3-large w3-center"><input id="name" autofocus placeholder="My name is..." onkeydown="if (event.keyCode == 13) login();"><input type="button" name="submit" value="Go!" onclick="login()"></p>
+  </div>
+</div>
+
+</body>
+</html>
