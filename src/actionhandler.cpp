@@ -158,7 +158,13 @@ void ActionHandler::dequeueSong(int id)
     bool current = pSongQueue->removeSongById( id );
 
     if ( current && pCurrentState->playerState != CurrentState::PLAYERSTATE_STOPPED )
-        nextQueueAction();
+    {
+        // If we have more songs in queue, switch the next one - otherwise stop
+        if ( !pSongQueue->isEmpty() )
+            playerStartAction();
+        else
+            playerStopAction();
+    }
 }
 
 void ActionHandler::error(QString message)
