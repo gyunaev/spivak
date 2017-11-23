@@ -30,6 +30,7 @@
 #include "songqueue.h"
 #include "actionhandler.h"
 #include "currentstate.h"
+#include "mainwindow.h"
 #include "actionhandler_webserver_socket.h"
 
 #include <QApplication>
@@ -168,18 +169,23 @@ void ActionHandler_WebServer_Socket::readyRead()
             res = search( document );
         else if ( m_url == "/api/addsong" )
             res = addsong( document );
-        else if ( m_url == "/api/listqueue" )
-            res = listqueue(  document );
+        else if ( m_url == "/api/queue/list" )
+            res = queueList(  document );
         else if ( m_url == "/api/browse" )
             res = listDatabase( document );
         else if ( m_url == "/api/queue/remove" )
-            res = removeSongFromQueue( document );
+            res = queueControl( document );
         else if ( m_url == "/api/control/status" )
             res = controlStatus( document );
         else if ( m_url == "/api/control/adjust" )
             res = controlAdjust( document );
         else if ( m_url == "/api/control/action" )
             res = controlAction( document );
+        else if ( m_url == "/api/collection/info" )
+            res = collectionInfo( document );
+        else if ( m_url == "/api/collection/action" )
+            res = collectionControl( document );
+
 
         if ( !res )
         {
@@ -267,11 +273,11 @@ bool ActionHandler_WebServer_Socket::search( QJsonDocument& document )
             QJsonObject rec;
 
             rec[ "id" ] = res.id;
-            rec[ "artist" ] = res.artist;
-            rec[ "title"] = res.title;
+            rec[ "artist" ] = res.artist.toHtmlEscaped();
+            rec[ "title"] = res.title.toHtmlEscaped();
             rec[ "type"] = res.type;
             rec[ "rating"] = res.rating;
-            rec[ "language"] = res.language;
+            rec[ "language"] = res.language.toHtmlEscaped();
 
             out.append( rec );
         }
@@ -312,8 +318,8 @@ bool ActionHandler_WebServer_Socket::addsong( QJsonDocument& document )
 
         QJsonObject out;
         out["result"] = 1;
-        out["title"] = info.title;
-        out["artist"] = info.artist;
+        out["title"] = info.title.toHtmlEscaped();
+        out["artist"] = info.artist.toHtmlEscaped();
 
         sendData( QJsonDocument( out ).toJson() );
     }
@@ -330,7 +336,7 @@ bool ActionHandler_WebServer_Socket::addsong( QJsonDocument& document )
     return true;
 }
 
-bool ActionHandler_WebServer_Socket::listqueue(QJsonDocument &)
+bool ActionHandler_WebServer_Socket::queueList(QJsonDocument &)
 {
     // Get the song list and currently scheduled song
     QList<SongQueue::Song> queue = pSongQueue->exportQueue();
@@ -343,9 +349,9 @@ bool ActionHandler_WebServer_Socket::listqueue(QJsonDocument &)
         QJsonObject rec;
 
         rec[ "id" ] = queue[i].id;
-        rec[ "singer" ] = queue[i].singer;
-        rec[ "title"] = queue[i].title;
-        rec[ "state"] = queue[i].stateText();
+        rec[ "singer" ] = queue[i].singer.toHtmlEscaped();
+        rec[ "title"] = queue[i].title.toHtmlEscaped();
+        rec[ "state"] = queue[i].stateText().toHtmlEscaped();
 
         if ( queue[i].singer == m_cookie )
             rec[ "removable"] = true;
@@ -357,7 +363,7 @@ bool ActionHandler_WebServer_Socket::listqueue(QJsonDocument &)
     return true;
 }
 
-bool ActionHandler_WebServer_Socket::removeSongFromQueue(QJsonDocument &document)
+bool ActionHandler_WebServer_Socket::queueControl(QJsonDocument &document)
 {
     if ( pSettings->httpEnableAddQueue )
     {
@@ -371,7 +377,7 @@ bool ActionHandler_WebServer_Socket::removeSongFromQueue(QJsonDocument &document
         Logger::debug("WebServer: queued the removal of ID %d from queue", id );
     }
 
-    return listqueue(document);
+    return queueList(document);
 }
 
 bool ActionHandler_WebServer_Socket::listDatabase(QJsonDocument &document)
@@ -393,7 +399,7 @@ bool ActionHandler_WebServer_Socket::listDatabase(QJsonDocument &document)
 
             Q_FOREACH( const QString& a, artists )
             {
-                out.append( a );
+                out.append( a.toHtmlEscaped() );
             }
 
             type = "artists";
@@ -409,11 +415,11 @@ bool ActionHandler_WebServer_Socket::listDatabase(QJsonDocument &document)
                 QJsonObject rec;
 
                 rec[ "id" ] = res.id;
-                rec[ "artist" ] = res.artist;
-                rec[ "title"] = res.title;
+                rec[ "artist" ] = res.artist.toHtmlEscaped();
+                rec[ "title"] = res.title.toHtmlEscaped();
                 rec[ "type"] = res.type;
                 rec[ "rating"] = res.rating;
-                rec[ "language"] = res.language;
+                rec[ "language"] = res.language.toHtmlEscaped();
 
                 out.append( rec );
             }
@@ -475,7 +481,7 @@ bool ActionHandler_WebServer_Socket::controlStatus(QJsonDocument &)
         else
             outobj["voiceremoval"] = "disabled";
 
-        outobj["song"] = m_currentSong;
+        outobj["song"] = m_currentSong.toHtmlEscaped();
     }
     else
         outobj["state"] = "stopped";
@@ -551,20 +557,66 @@ bool ActionHandler_WebServer_Socket::controlAction(QJsonDocument &document)
     QString action = obj.value( "a" ).toString();
 
     if ( action == "stop" )
-        emit pActionHandler->actionKaraokePlayerStop();
+        emit commandAction( ActionHandler::ACTION_PLAYER_STOP );
     else if ( action == "prev" )
-        emit pActionHandler->cmdAction( ActionHandler::ACTION_QUEUE_PREVIOUS );
+        emit commandAction( ActionHandler::ACTION_QUEUE_PREVIOUS );
     else if ( action == "next" )
-        emit pActionHandler->cmdAction( ActionHandler::ACTION_QUEUE_NEXT );
+        emit commandAction( ActionHandler::ACTION_QUEUE_NEXT );
     else if ( action == "playpause" )
     {
         if ( pCurrentState->playerState == CurrentState::PLAYERSTATE_PLAYING || pCurrentState->playerState == CurrentState::PLAYERSTATE_PAUSED )
-            emit pActionHandler->actionKaraokePlayerPauseResume();
+            emit commandAction( ActionHandler::ACTION_PLAYER_PAUSERESUME );
         else
-            emit pActionHandler->actionKaraokePlayerStart();
+            emit commandAction( ActionHandler::ACTION_PLAYER_START );
     }
     else
         return false;
 
     return controlStatus( document );
+}
+
+bool ActionHandler_WebServer_Socket::collectionInfo(QJsonDocument &)
+{
+    QJsonObject outobj;
+
+    outobj["songs"] = (int) pCurrentState->m_databaseSongs;
+    outobj["artists"] = (int) pCurrentState->m_databaseArtists;
+    outobj["updated"] = pCurrentState->m_databaseUpdatedDateTime;
+
+    sendData( QJsonDocument( outobj ).toJson() );
+    return true;
+}
+
+bool ActionHandler_WebServer_Socket::collectionControl(QJsonDocument &document)
+{
+    QJsonObject obj = document.object();
+
+    if ( !obj.contains( "a" ) )
+        return false;
+
+    // We connect it now as we would use it only in this member
+    connect( this, SIGNAL( startKaraokeScan()), pMainWindow, SLOT(karaokeDatabaseStartScan()), Qt::QueuedConnection );
+
+    QString action = obj.value( "a" ).toString();
+
+    if ( action == "rescan" )
+    {
+        QJsonObject outobj;
+
+        if ( pMainWindow->karaokeDatabaseIsScanning() )
+        {
+            outobj["success"] = false;
+            outobj["error"] = "scan in progress";
+        }
+        else
+        {
+            emit startKaraokeScan();
+            outobj["success"] = true;
+        }
+
+        sendData( QJsonDocument( outobj ).toJson() );
+        return true;
+    }
+
+    return false;
 }

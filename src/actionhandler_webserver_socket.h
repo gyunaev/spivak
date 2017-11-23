@@ -39,6 +39,7 @@ class ActionHandler_WebServer_Socket : public QObject
         void    queueAdd( QString singer, int id );
         void    queueRemove( int id );
         void    commandAction( int id );
+        void    startKaraokeScan();
 
     private slots:
         void    readyRead();
@@ -50,12 +51,14 @@ class ActionHandler_WebServer_Socket : public QObject
     private:
         bool    search( QJsonDocument& document );
         bool    addsong( QJsonDocument& document);
-        bool    listqueue( QJsonDocument& document );
-        bool    removeSongFromQueue( QJsonDocument& document );
+        bool    queueList( QJsonDocument& document );
+        bool    queueControl( QJsonDocument& document );
         bool    listDatabase( QJsonDocument& document );
         bool    controlStatus( QJsonDocument& document );
         bool    controlAdjust( QJsonDocument& document );
         bool    controlAction( QJsonDocument& document );
+        bool    collectionInfo( QJsonDocument& document );
+        bool    collectionControl( QJsonDocument& document );
 
         void    sendData( const QByteArray& data, const QByteArray &type = "application/json" );
 
