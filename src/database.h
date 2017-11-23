@@ -70,14 +70,8 @@ class Database : public QObject
         // Empty the database
         bool    clearDatabase();
 
-        // Get last update timestamp
-        qint64  lastDatabaseUpdate() const;
-
         // Reset the last update timestamp
         void    resetLastDatabaseUpdate();
-
-        // Returns the song count
-        qint64  getSongCount() const;
 
         // For collections
         QList<Database_CollectionInfo>  getCollections();
@@ -86,7 +80,17 @@ class Database : public QObject
         // Goes through all collections and removes the songs which are missing from disk. Takes a while, run in a separate thread!
         bool    cleanupCollections();
 
+        // Gets the database information to current state
+        void    getDatabaseCurrentState();
+
+        // Get last update timestamp
+        qint64  lastDatabaseUpdate() const;
+
     private:
+        // Returns the song or artist count
+        qint64  getSongCount() const;
+        qint64  getArtistCount() const;
+
         bool    verifyDatabaseVersion();
         bool    recreateSongTable();
         bool    execute( const QString& sql, const QStringList& args = QStringList() );

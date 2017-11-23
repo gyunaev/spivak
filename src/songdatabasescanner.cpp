@@ -504,6 +504,7 @@ void SongDatabaseScanner::submittingThread()
     if ( !m_abortScanning )
     {
         pDatabase->updateLastScan();
+        pDatabase->getDatabaseCurrentState();
         emit pEventor->scanCollectionFinished();
 
         Logger::debug( "SongDatabaseScanner: submitter thread finished, scan completed" );

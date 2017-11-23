@@ -25,6 +25,7 @@
 #include "interface_languagedetector.h"
 #include "songdatabasescanner.h"
 #include "actionhandler.h"
+#include "currentstate.h"
 #include "settingsdialog.h"
 #include "settings.h"
 #include "eventor.h"
@@ -394,19 +395,16 @@ void SettingsDialog::scanCollectionProgress(unsigned long directoriesScanned, un
 
 void SettingsDialog::refreshDatabaseInformation()
 {
-    qint64 count = pDatabase->getSongCount();
-
-    if ( count == 0 )
+    if ( pCurrentState->m_databaseSongs == 0 )
     {
-        ui->lblCollectionInfo->setText( tr("Song collection is empty") );
+        ui->lblCollectionInfo->setText( tr("Database is empty") );
     }
     else
     {
-        ui->lblCollectionInfo->setText( tr("Song collection: %1 songs, last updated %2")
-                            .arg( count )
-                            .arg( pDatabase->lastDatabaseUpdate() > 0 ?
-                                      QDateTime::fromMSecsSinceEpoch( pDatabase->lastDatabaseUpdate() * 1000).toString( "yyyy-MM-dd hh:mm:ss")
-                                        : tr("never") ) );
+        ui->lblCollectionInfo->setText( tr("Database: %1 songs, %2 artists, last updated %3")
+                                        .arg( pCurrentState->m_databaseSongs )
+                                        .arg( pCurrentState->m_databaseArtists )
+                                        .arg( pCurrentState->m_databaseUpdatedDateTime ) );
     }
 
     // Enable the Erase button and change the update back

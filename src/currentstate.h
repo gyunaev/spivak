@@ -53,6 +53,12 @@ class CurrentState : public QObject
         // mseconds per frame
         unsigned int            msecPerFrame;
 
+        // Current database info (0 if not initialized)
+        // May be accessed from another thread - move to concurrent storage when fixing this!
+        unsigned int            m_databaseSongs;
+        unsigned int            m_databaseArtists;
+        QString                 m_databaseUpdatedDateTime;
+
         // Current player state
         QAtomicInt              playerState;
 

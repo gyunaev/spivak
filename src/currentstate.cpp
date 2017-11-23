@@ -50,6 +50,8 @@ CurrentState::CurrentState(QObject *parent)
 
     m_playerBackgroundLastObject = 0;
     playerBackgroundLastVideoPosition = 0;
+    m_databaseSongs = 0;
+    m_databaseArtists = 0;
 
     // Validate settings
     applySettingsBackground();

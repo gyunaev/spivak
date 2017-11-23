@@ -26,6 +26,7 @@
 #include "sqlite3.h"
 
 #include "actionhandler.h"
+#include "currentstate.h"
 #include "settings.h"
 #include "database.h"
 #include "database_statement.h"
@@ -229,6 +230,16 @@ qint64 Database::getSongCount() const
     return 0;
 }
 
+qint64 Database::getArtistCount() const
+{
+    Database_Statement songstmt;
+
+    if ( songstmt.prepare( m_sqlitedb, "SELECT COUNT(DISTINCT artist) from songs" ) && songstmt.step() == SQLITE_ROW )
+        return songstmt.columnInt64( 0 );
+
+    return 0;
+}
+
 QList<Database_CollectionInfo> Database::getCollections()
 {
     Database_Statement stmt;
@@ -335,6 +346,18 @@ bool Database::cleanupCollections()
     }
 
     return execute( "COMMIT TRANSACTION" );
+}
+
+void Database::getDatabaseCurrentState()
+{
+    pCurrentState->m_databaseSongs = getSongCount();
+    pCurrentState->m_databaseArtists = getArtistCount();
+
+    qint64 updated = lastDatabaseUpdate();
+
+    pCurrentState->m_databaseUpdatedDateTime = updated > 0 ?
+                QDateTime::fromMSecsSinceEpoch( updated ).toString( "yyyy-MM-dd hh:mm:ss")
+                  : tr("never");
 }
 
 

@@ -102,15 +102,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Load the song database
     pDatabase->init();
+    pDatabase->getDatabaseCurrentState();
 
-    int songcount = pDatabase->getSongCount();
-
-    if ( songcount > 0 )
-        statusbar->showMessage( tr("Song database: %1 songs, last updated %2")
-                                .arg( pDatabase->getSongCount() )
-                                .arg( pDatabase->lastDatabaseUpdate() > 0 ?
-                                          QDateTime::fromMSecsSinceEpoch( pDatabase->lastDatabaseUpdate() * 1000).toString( "yyyy-MM-dd hh:mm:ss")
-                                            : tr("never") ),
+    if ( pCurrentState->m_databaseSongs > 0 )
+        statusbar->showMessage( tr("Song database: %1 songs, %2 artists, last updated %3")
+                                .arg( pCurrentState->m_databaseSongs )
+                                .arg( pCurrentState->m_databaseArtists )
+                                .arg( pCurrentState->m_databaseUpdatedDateTime ),
                                 20000 );
 
     // Initialize the controller
