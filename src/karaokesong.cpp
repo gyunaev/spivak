@@ -134,32 +134,6 @@ bool KaraokeSong::open()
 
         Logger::debug( "KaraokeSong: found music file %s and lyric file %s", qPrintable(m_musicFileName), qPrintable(lyricFile) );
 
-        // Load the lyrics first, because musicPlayer loads asynchronously, and we might end up in a situation where
-        // the music is loaded and we got the load callback, but the lyrics couldn't be loaded, resulting in error
-
-        // Get the pointer to the device the lyrics are stored in (will be deleted after the pointer out-of-scoped)
-        QScopedPointer<QIODevice> lyricDevice( karaoke->openObject( lyricFile ) );
-
-        if ( lyricDevice == 0 )
-            throw QString( "Cannot read a lyric file %1" ) .arg( lyricFile );
-
-        // Now we can load the lyrics
-        if ( lyricFile.endsWith( ".cdg", Qt::CaseInsensitive ) )
-            m_lyrics = new PlayerLyricsCDG();
-        else
-            m_lyrics = new PlayerLyricsText( info.artist, info.title );
-
-        if ( !m_lyrics->load( lyricDevice.data(), lyricFile ) )
-            throw( QObject::tr("Can't load lyrics file %1: %2") .arg( lyricFile ) .arg( m_lyrics->errorMsg() ) );
-
-        // Destroy the object right away
-        lyricDevice.reset( 0 );
-
-        // Set the lyric delay
-        m_lyrics->setDelay( info.lyricDelay );
-
-        Logger::debug( "KaraokeSong: lyrics loaded" );
-
         // If this is MIDI file, try to find a cached file which must be there
         if ( KaraokePlayable::isMidiFile( m_musicFileName ) )
         {
@@ -220,6 +194,29 @@ bool KaraokeSong::open()
             Logger::debug( "KaraokeSong: music file is being loaded" );
         }
 
+        // Get the pointer to the device the lyrics are stored in (will be deleted after the pointer out-of-scoped)
+        QScopedPointer<QIODevice> lyricDevice( karaoke->openObject( lyricFile ) );
+
+        if ( lyricDevice == 0 )
+            throw QString( "Cannot read a lyric file %1" ) .arg( lyricFile );
+
+        // Now we can load the lyrics
+        if ( lyricFile.endsWith( ".cdg", Qt::CaseInsensitive ) )
+            m_lyrics = new PlayerLyricsCDG();
+        else
+            m_lyrics = new PlayerLyricsText( info.artist, info.title );
+
+        if ( !m_lyrics->load( lyricDevice.data(), lyricFile ) )
+            throw( QObject::tr("Can't load lyrics file %1: %2") .arg( lyricFile ) .arg( m_lyrics->errorMsg() ) );
+
+        // Destroy the object right away
+        lyricDevice.reset( 0 );
+
+        // Set the lyric delay
+        m_lyrics->setDelay( info.lyricDelay );
+
+        Logger::debug( "KaraokeSong: lyrics loaded" );
+
         // Now check if we got custom background (Ultrastar or KFN)
         if ( !pSettings->playerIgnoreBackgroundFromFormats )
         {
@@ -259,7 +256,7 @@ bool KaraokeSong::open()
 void KaraokeSong::start()
 {
     // Indicate that we started
-    emit pEventor->karaokeStarted( m_song );
+    pEventor->karaokeStarted( m_song );
 
     pCurrentState->playerDuration = m_player.duration();
     pCurrentState->playerState = CurrentState::PLAYERSTATE_PLAYING;
@@ -472,7 +469,6 @@ void KaraokeSong::songLoaded()
     pCurrentState->playerPitch = 50;
     pCurrentState->playerTempo = 50;
     pCurrentState->playerVoiceRemovalEnabled = false;
-    pCurrentState->playerLyricsDelay = 0;
 
     pCurrentState->playerCapabilities = m_player.capabilities();
     m_widget->karaokeSongLoaded();
