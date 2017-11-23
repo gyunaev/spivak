@@ -75,7 +75,7 @@ void SongQueue::addSong( Song song )
         singeridx = 0;
 
     int songidx = m_currentSong + 1;
-    Logger::debug( "Queue: Adding file %d %s by %s into queue: %s", song.songid, qPrintable(song.file), qPrintable(song.singer), qPrintable( song.stateText() ) );
+    Logger::debug( "Queue: Adding file %d %s by %s into queue id %d: %s", song.songid, qPrintable(song.file), qPrintable(song.singer), song.id, qPrintable( song.stateText() ) );
 /*
     for ( int i = 0; i < m_singers.size(); i++ )
         qDebug() << "Singer " << i << ": " << m_singers[i];
