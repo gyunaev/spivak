@@ -8,6 +8,19 @@ var backToLetter = false;
 // For confirmation dialog
 var confirmDialogCallback = null;
 
+
+// https://stackoverflow.com/questions/6234773/can-i-escape-html-special-chars-in-javascript
+function escapeHtml(unsafe) {
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+ }
+
+
+
 function runAPI( url, params, cfunc )
 {
     var xhttp = new XMLHttpRequest();
@@ -78,7 +91,7 @@ function listSongs( xhttp )
         
         for ( var i = 0; i < obj.length; i++ )
         {
-            list += "<div class='songentry' onclick='addsong( " + obj[i].id + ");'>"
+            list += "<div class='songentry' onclick='addsong( " + obj[i].id + ", \"" + obj[i].title + "\");'>"
                 + "<div class='artist'>" + obj[i].artist + "</div>"
                 + "<div class='title'>" + obj[i].title + "</div>"
                 + "<div class='type'>" + obj[i].type + "</div>";
@@ -194,15 +207,15 @@ function addsongSucceed( xhttp )
 }
 
 
-function addsong( id )
+function addsong( id, title )
 {
-    confirmDialog( "Do you want to queue this song?", function() { runAPI( '/api/addsong', { id : id }, addsongSucceed ); } );
+    confirmDialog( "Queue the song \"" + title + "\" ?", function() { runAPI( '/api/addsong', { id : id }, addsongSucceed ); } );
 }
 
 // Remembers the user name so it could be logged in
 function login()
 {
-    var name = document.getElementById("name").value;
+    var name = escapeHtml( document.getElementById("name").value );
 
     var d = new Date();
     d.setTime( d.getTime() + 86400000 );
@@ -276,7 +289,7 @@ function receivedSingerQueue( xhttp )
     for ( var i = 0; i < obj.length; i++ )
     {
         if ( typeof obj[i].removable !== 'undefined' )
-            list += "<div class='queueentry-ours'><a href='#' onclick='removeQueue(" + obj[i].id + ")'><i class='fa fa-remove'></i></a>";
+            list += "<div class='queueentry-ours'><a href='#' onclick='removeQueue(" + obj[i].id + ",\"" + obj[i].title + "\")'><i class='fa fa-remove'></i></a>";
         else
             list += "<div class='queueentry'>";
         
@@ -296,15 +309,15 @@ function receivedSingerQueue( xhttp )
 }
 
 // Removes a song from the singer queue
-function removeQueue( id )
+function removeQueue( id, song )
 {
-    confirmDialog( "Do you want to remove this song from queue?", function() { runAPI( '/api/queue/remove', { id : id }, receivedSingerQueue ); } );
+    confirmDialog( "Remove \"" + song + "\" from the queue?", function() { runAPI( '/api/queue/remove', { id : id }, receivedSingerQueue ); } );
 }
 
 // Initiates the update
 function updateSingerQueue()
 {
-    runAPI( '/api/listqueue', {}, receivedSingerQueue );
+    runAPI( '/api/queue/list', {}, receivedSingerQueue );
 }
 
 
@@ -337,10 +350,11 @@ function soundControlUpdateReceived( xhttp )
         else
             document.getElementById( "value_delay" ).innerHTML = (obj.delay / 1000) + "s";
 
+        // Pitch is 0-100; 50 is normal with step 5
         if ( obj.pitch === 'disabled' )
             document.getElementById( "value_pitch" ).innerHTML = "---";
         else
-            document.getElementById( "value_pitch" ).innerHTML = obj.pitch;
+            document.getElementById( "value_pitch" ).innerHTML = (obj.pitch - 50) / 5;
 
         if ( obj.tempo === 'disabled' )
             document.getElementById( "value_tempo" ).innerHTML = "---";
