@@ -17,10 +17,9 @@ function escapeHtml(unsafe) {
          .replace(/>/g, "&gt;")
          .replace(/"/g, "&quot;")
          .replace(/'/g, "&#039;");
- }
+}
 
-
-
+// AJAX runner
 function runAPI( url, params, cfunc )
 {
     var xhttp = new XMLHttpRequest();
