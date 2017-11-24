@@ -45,6 +45,8 @@ To build, please comment out the line "CONFIG += GOOGLEBREAKPAD" in src/src.pro,
 
     qmake (or qmake-qt5)
     make
+    
+Apologies for the "make -jX" build being still broken.
 
 Copy the player executable from src/spivak somewhere, and copy all the plugins into the "plugins" subdirectory where spivak executable is located.
 
