@@ -1,2 +1,2 @@
-SUBDIRS += src testapp
+SUBDIRS += src
 TEMPLATE = subdirs
