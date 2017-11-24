@@ -17,6 +17,7 @@
  **************************************************************************/
 
 #include <math.h>
+#include <stdint.h>
 
 #include "settings.h"
 #include "currentstate.h"
