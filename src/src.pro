@@ -153,7 +153,10 @@ win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libkara
 else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libkaraokelyrics/debug/libkaraokelyrics.a $$OUT_PWD/../libsonivox/src/debug/libsonivox.a
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libkaraokelyrics/release/karaokelyrics.lib $$OUT_PWD/../libsonivox/src/release/sonivox.lib
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libkaraokelyrics/debug/karaokelyrics.lib $$OUT_PWD/../libsonivox/src/debug/sonivox.lib
-else:unix: PRE_TARGETDEPS += $$OUT_PWD/../libkaraokelyrics/libkaraokelyrics.a $$OUT_PWD/../libsonivox/src/libsonivox.a
+else:unix: {
+    LIBS += -L$$PWD/../extralibs/lib -lsonivox
+    PRE_TARGETDEPS += $$OUT_PWD/../libkaraokelyrics/libkaraokelyrics.a $$OUT_PWD/../libsonivox/src/libsonivox.a
+}
 
 mac: {
     INCLUDEPATH += /Library/Frameworks/GStreamer.framework/Headers
@@ -164,7 +167,6 @@ mac: {
 unix:!mac:{
    CONFIG += link_pkgconfig
    PKGCONFIG += sqlite3 libzip uchardet gstreamer-1.0 gstreamer-app-1.0
-   LIBS += -L$$PWD/../extralibs/lib -lsonivox
 } else: {
     LIBS += -lzip -lsqlite3 -luchardet -lgstapp-1.0 -lgstreamer-1.0 -lglib-2.0 -lgobject-2.0
 }
