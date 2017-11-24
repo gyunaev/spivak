@@ -6,6 +6,8 @@ Currently Spivak is in alpha stage, but already has impressive set of features, 
 
 Spivak is licensed under GNU GPL version 3, and is written by George Yunaev.
 
+Version 1.1 has been released on Nov 23, 2017.
+
 ## Features
 
 - Supports the most popular Karaoke lyric formats: MIDI/KAR, KaraFun, CDG, LRC (v1 and v2), Encore! Lyric, KOK, Ultrastar (TXT);
