@@ -55,7 +55,7 @@ QVariant TableModelQueue::headerData(int section, Qt::Orientation orientation, i
             return "Song";
     }
     else
-        return QString("%1").arg(section);
+        return QString("%1").arg(section+1);
 }
 
 QVariant TableModelQueue::data(const QModelIndex &index, int role) const
