@@ -2,7 +2,7 @@
 
 Spivak is a free, cross-platform (Linux/Windows/OS X) Karaoke player based on GStreamer and Qt5. It supports a wide range of Karaoke formats, with the goal of playing all more or less widespread Karaoke formats on all popular platforms. It also has strong support for foreign languages, so playing Karaoke in Japanese, Russian or Hindu is fully supported.
 
-Currently Spivak is in alpha stage, but already has impressive set of features, and is stable enough to survive a party without a single crash or hang.
+Currently Spivak is in alpha stage, but already has impressive set of features, and is stable enough to survive a party without a single crash or hang. Its web interface has been redesigned and looks much better.
 
 Spivak is licensed under GNU GPL version 3, and is written by George Yunaev.
 
@@ -32,11 +32,10 @@ Currently the only way to test the player is to build it from source, which shou
 - GStreamer 1.0 (will NOT work on 0.10) and related libraries, notably Glib;
 - uchardet2 (for automatic charset decoding);
 - libzip (for handling ZIP and old KFN files);
-- libsonivox (to render MIDI in software) - you can get it from here: https://github.com/gyunaev/libsonivox ;
 - libcld2 (to build Karaoke language detector plugin; optional);
 - sqlite3 (for karaoke database);
 
-Please do not build with google breakpad, as this would enable automatic crash reporting which is useless for me because I do not have your symbols file.
+**Please do not build your builds with Google breakpad module enabled**, as this would enable automatic crash reporting which is useless for me because I do not have your symbols file.
 
 To build, please comment out the line "CONFIG += GOOGLEBREAKPAD" in src/src.pro, and then build as usual:
 
@@ -47,4 +46,5 @@ Copy the player executable from src/spivak somewhere, and copy all the plugins i
 
 ## Contacts
 
-At this moment please use gyunaev@ulduzsoft.com to send the bugs and feature requests. Please only do so if you're willing to actively participate in bugfixing, such as testing proposed patches, and are able to compile the player yourself from the source code. If you cannot, please wait until the first beta is available, when the official builds would be available.
+Please use Github issue tracker for feature requests.
+
