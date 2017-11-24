@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>735</width>
-    <height>475</height>
+    <width>768</width>
+    <height>504</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1287,7 +1287,7 @@
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;background&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Help&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="buddy">
-             <cstring>spinMaxLyricFontLines</cstring>
+             <cstring>boxWebEnable</cstring>
             </property>
            </widget>
           </item>
@@ -1320,7 +1320,7 @@
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;background&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Help&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="buddy">
-             <cstring>boxWebEnable</cstring>
+             <cstring>boxWebAllowAddSong</cstring>
             </property>
            </widget>
           </item>
@@ -1545,8 +1545,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>179</x>
-     <y>444</y>
+     <x>185</x>
+     <y>497</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -1561,8 +1561,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>179</x>
-     <y>444</y>
+     <x>185</x>
+     <y>497</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -1577,8 +1577,8 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>134</x>
-     <y>304</y>
+     <x>153</x>
+     <y>326</y>
     </hint>
     <hint type="destinationlabel">
      <x>504</x>
@@ -1593,8 +1593,8 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>113</x>
-     <y>174</y>
+     <x>131</x>
+     <y>200</y>
     </hint>
     <hint type="destinationlabel">
      <x>567</x>
