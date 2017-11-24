@@ -236,8 +236,8 @@ void MainWindow::menuAbout()
 
     ui_about.setupUi( &dlg );
 
-    ui_about.labelAbout->setText( tr("<b>Spivak Karaoke Player version %1 beta%2</b><br><br>"
-            "Copyright (C) George Yunaev 2015-2016, <a href=\"mailto:support@ulduzsoft.com\">support@ulduzsoft.com</a><br><br>"
+    ui_about.labelAbout->setText( tr("<b>Spivak Karaoke Player version %1.%2</b><br><br>"
+            "Copyright (C) George Yunaev 2015-2017, <a href=\"mailto:support@ulduzsoft.com\">support@ulduzsoft.com</a><br><br>"
             "Web site: <a href=\"http://www.ulduzsoft.com\">www.ulduzsoft.com/karplayer</a><br><br>"
             "This program is licensed under terms of GNU General Public License "
             "version 3; see LICENSE file for details.") .arg(APP_VERSION_MAJOR) .arg(APP_VERSION_MINOR) );
