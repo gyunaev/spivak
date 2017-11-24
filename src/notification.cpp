@@ -58,6 +58,7 @@ qint64 Notifications::drawTop( KaraokePainter &p )
     {
         m_lastScreenHeight = p.notificationRect().height();
         p.tallestFontSize( m_font, m_lastScreenHeight );
+        m_scrollOffset = INT32_MAX;
     }
 
     p.setPen( pSettings->notificationTopColor );
@@ -70,21 +71,35 @@ qint64 Notifications::drawTop( KaraokePainter &p )
 
     if ( remainingms == -1 || remainingms > 5000 )
     {
-        if ( m_scrollOffset >= p.notificationRect().width() )
+        int textwidth = p.fontMetrics().width( m_notificationLine );
+
+        int drawpos = 0;
+
+        // If the notification text fits into the line, we need no scrolling, so we only handle when it doesn't
+        if ( textwidth > p.notificationRect().width() )
         {
-            m_scrollOffset = 0;
+            // We allow showing up to the whole width of the notification line minus 3/4 of the screen
+            int maxshownwidth = p.fontMetrics().width( m_notificationLine ) - ((p.notificationRect().width() * 3) / 4 );
+
+            // If scroll offset was reset or we scrolled past 3/4 of the last part, reset it
+            if ( m_scrollOffset == INT32_MAX || (qAbs(m_scrollOffset) >= maxshownwidth ) )
+            {
+                // We start at 1/4 width
+                m_scrollOffset = p.notificationRect().width() / 4;
+            }
+            else
+            {
+                // Speed is constant 3 here
+                m_scrollOffset -= 3;
+            }
+
+            drawpos = m_scrollOffset;
         }
         else
-        {
-            int speed = 3; //qMax( 3, int( ceil( p.fontMetrics().width( m_notificationLine ) / (double) p.rect().width() ) ) );
-            m_scrollOffset += speed;
-        }
+            m_scrollOffset = INT32_MAX;
 
-        p.drawText( p.notificationRect().width() - m_scrollOffset, p.fontMetrics().ascent(), m_notificationLine );
-
-        // At least two pixels
-        if ( m_scrollOffset > 2 )
-            p.drawText( -m_scrollOffset, p.fontMetrics().ascent(), m_notificationLine );
+        // Draw the notification line
+        p.drawText( drawpos, p.fontMetrics().ascent(), m_notificationLine );
     }
     else
         p.drawText( 0, p.fontMetrics().ascent(), m_firstItem );
@@ -281,6 +296,5 @@ void Notifications::updateWelcomeMessage()
 
 void Notifications::reset()
 {
-    m_textOffset = 0;
-    m_scrollOffset = 0;
+    m_scrollOffset = INT32_MAX;
 }

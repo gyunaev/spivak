@@ -77,7 +77,6 @@ class Notifications : public QObject
         QString         m_notificationLine;
         QString         m_textQueueSize;
 
-        int             m_textOffset;
         int             m_scrollOffset;
         int             m_scrollStep;
 
