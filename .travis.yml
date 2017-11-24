@@ -40,19 +40,18 @@ matrix:
      - QT_VERSION="qt59"
      
 before_install:
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
          sudo add-apt-repository "$QT_REPO" -y;
          sudo apt-get update -qq;
          sudo apt-get install -qq ${QT_VERSION}base ${QT_VERSION}translations ${QT_VERSION}tools;
          sudo apt-get install -qq libsqlite3-dev libzip-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libuchardet-dev libgl1-mesa-dev;
          source /opt/qt55/bin/qt55-env.sh ; export QTHOME=/opt/qt55; 
-         git clone https://github.com/datasift/libcld2; cd libcld2 && make && sudo make install;
+         git clone https://github.com/datasift/libcld2; pushd libcld2 && make && sudo make install; popd;
     fi
 
 install:
   - source /opt/${QT_VERSION}/bin/${QT_VERSION}-env.sh; 
 
 script:
-  - qmake -v
   - qmake -r
   - make
