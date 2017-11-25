@@ -380,7 +380,11 @@ void ActionHandler::nextQueueItemKaraoke()
         emit actionKaraokePlayerStart();
     }
     else
-        pNotification->showMessage( tr("No more songs in queue") );
+    {
+        // If there are no more songs, we stop the current song and clear the queue
+        pSongQueue->clear();
+        emit actionKaraokePlayerStop();
+    }
 }
 
 void ActionHandler::settingsChanged()
