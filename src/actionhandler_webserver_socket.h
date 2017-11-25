@@ -59,6 +59,7 @@ class ActionHandler_WebServer_Socket : public QObject
         bool    controlAction( QJsonDocument& document );
         bool    collectionInfo( QJsonDocument& document );
         bool    collectionControl( QJsonDocument& document );
+        QString escapeHTML( QString orig );
 
         void    sendData( const QByteArray& data, const QByteArray &type = "application/json" );
 

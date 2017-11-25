@@ -33,7 +33,6 @@
 #include "mainwindow.h"
 #include "actionhandler_webserver_socket.h"
 
-#include <QApplication>
 ActionHandler_WebServer_Socket::ActionHandler_WebServer_Socket(QTcpSocket *httpsock, const SongQueue::Song& currentSong)
     : QObject()
 {
@@ -273,11 +272,11 @@ bool ActionHandler_WebServer_Socket::search( QJsonDocument& document )
             QJsonObject rec;
 
             rec[ "id" ] = res.id;
-            rec[ "artist" ] = res.artist.toHtmlEscaped();
-            rec[ "title"] = res.title.toHtmlEscaped();
+            rec[ "artist" ] = escapeHTML( res.artist );
+            rec[ "title"] = escapeHTML( res.title );
             rec[ "type"] = res.type;
             rec[ "rating"] = res.rating;
-            rec[ "language"] = res.language.toHtmlEscaped();
+            rec[ "language"] = escapeHTML( res.language );
 
             out.append( rec );
         }
@@ -318,8 +317,8 @@ bool ActionHandler_WebServer_Socket::addsong( QJsonDocument& document )
 
         QJsonObject out;
         out["result"] = 1;
-        out["title"] = info.title.toHtmlEscaped();
-        out["artist"] = info.artist.toHtmlEscaped();
+        out["title"] = escapeHTML( info.title );
+        out["artist"] = escapeHTML( info.artist );
 
         sendData( QJsonDocument( out ).toJson() );
     }
@@ -349,9 +348,9 @@ bool ActionHandler_WebServer_Socket::queueList(QJsonDocument &)
         QJsonObject rec;
 
         rec[ "id" ] = queue[i].id;
-        rec[ "singer" ] = queue[i].singer.toHtmlEscaped();
-        rec[ "title"] = queue[i].title.toHtmlEscaped();
-        rec[ "state"] = queue[i].stateText().toHtmlEscaped();
+        rec[ "singer" ] = escapeHTML( queue[i].singer );
+        rec[ "title"] = escapeHTML( queue[i].title );
+        rec[ "state"] = escapeHTML( queue[i].stateText() );
 
         if ( queue[i].singer == m_cookie )
             rec[ "removable"] = true;
@@ -399,7 +398,7 @@ bool ActionHandler_WebServer_Socket::listDatabase(QJsonDocument &document)
 
             Q_FOREACH( const QString& a, artists )
             {
-                out.append( a.toHtmlEscaped() );
+                out.append( escapeHTML( a ) );
             }
 
             type = "artists";
@@ -415,11 +414,11 @@ bool ActionHandler_WebServer_Socket::listDatabase(QJsonDocument &document)
                 QJsonObject rec;
 
                 rec[ "id" ] = res.id;
-                rec[ "artist" ] = res.artist.toHtmlEscaped();
-                rec[ "title"] = res.title.toHtmlEscaped();
+                rec[ "artist" ] = escapeHTML( res.artist );
+                rec[ "title"] = escapeHTML( res.title );
                 rec[ "type"] = res.type;
                 rec[ "rating"] = res.rating;
-                rec[ "language"] = res.language.toHtmlEscaped();
+                rec[ "language"] = escapeHTML( res.language );
 
                 out.append( rec );
             }
@@ -481,7 +480,7 @@ bool ActionHandler_WebServer_Socket::controlStatus(QJsonDocument &)
         else
             outobj["voiceremoval"] = "disabled";
 
-        outobj["song"] = m_currentSong.toHtmlEscaped();
+        outobj["song"] = escapeHTML( m_currentSong );
     }
     else
         outobj["state"] = "stopped";
@@ -619,4 +618,15 @@ bool ActionHandler_WebServer_Socket::collectionControl(QJsonDocument &document)
     }
 
     return false;
+}
+
+// We do not take the reference since we modify the string
+QString ActionHandler_WebServer_Socket::escapeHTML( QString orig )
+{
+    // toHtmlEscaped() does not escape '
+    return orig.replace( '&', "&amp;" )
+            .replace( '<', "&lt;" )
+            .replace( '>', "&gt;" )
+            .replace( '"', "&quot;" )
+            .replace( '\'', "&#039;" );
 }
