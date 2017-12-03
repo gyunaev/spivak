@@ -31,6 +31,7 @@ class ColorButton : public QPushButton
 		ColorButton( QWidget * parent );
 
 		void	setColor( const QColor& color );
+        void    allowSetAlpha( bool allow );
 		QColor	color() const;
 
 	protected:
@@ -41,6 +42,7 @@ class ColorButton : public QPushButton
 
 	private:
 		QColor	m_selectedColor;
+        bool    m_allowSetAlpha;
 };
 
 #endif // COLORBUTTON_H

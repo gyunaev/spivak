@@ -93,6 +93,9 @@ void Settings::load()
     playerVolumeStep = settings.value( "player/VolumeStep", 10 ).toInt();
     playerUseBuiltinMidiSynth = settings.value( "player/UseBuiltinMidiSynth", true ).toBool();
 
+    // Default background color should be black and almost fully transparent
+    playerLyricsTextBackgroundColor = QColor( settings.value( "player/LyricsTextBackgroundColor", "#C0000000" ).toString() );
+
     queueAddNewSingersNext = settings.value( "queue/AddNewSingersNext", false ).toBool();
     queueSaveOnExit = settings.value( "queue/SaveOnExit", false ).toBool();
 
@@ -138,6 +141,7 @@ void Settings::save()
     settings.setValue( "player/LyricsTextBeforeColor", playerLyricsTextBeforeColor.name() );
     settings.setValue( "player/LyricsTextAfterColor", playerLyricsTextAfterColor.name() );
     settings.setValue( "player/LyricsTextSpotColor", playerLyricsTextSpotColor.name() );
+    settings.setValue( "player/LyricsTextBackgroundColor", playerLyricsTextBackgroundColor.name( QColor::HexArgb ) );
     settings.setValue( "player/LyricsFontMaximumSize", playerLyricsFontMaxSize );
     settings.setValue( "player/LyricsFontFitLines", playerLyricsFontFitLines );
 

@@ -78,6 +78,8 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
         ui->boxCollectionDetectLang->setChecked( false );
     }
 
+    // Only the background lyrics color can have alpha
+    ui->btnPlayerLyricsBgColor->allowSetAlpha( true );
 
     //
     // Init the parameters
@@ -170,6 +172,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui->btnPlayerLyricsInfo->setColor( pSettings->notificationCenterColor );
     ui->btnPlayerLyricsSpotlight->setColor( pSettings->playerLyricsTextSpotColor );
     ui->btnPlayerLyricsNotification->setColor( pSettings->notificationTopColor );
+    ui->btnPlayerLyricsBgColor->setColor( pSettings->playerLyricsTextBackgroundColor );
 
     ui->spinLyricDelay->setValue( pSettings->playerMusicLyricDelay );
 
@@ -433,19 +436,28 @@ void SettingsDialog::updateLyricsPreview()
     QImage img( ui->lblTextRenderingExample->size(), QImage::Format_RGB32 );
     img.fill( Qt::gray );
     KaraokePainter p( &img );
+    p.fillRect( 0,
+                0,
+                ui->lblTextRenderingExample->size().width(),
+                ui->lblTextRenderingExample->size().height(),
+                QBrush( Qt::white, Qt::CrossPattern ) );
 
     QFont font = ui->fontPlayerLyrics->font();
-    font.setPointSize( p.tallestFontSize( font, img.height() ) );
+
+    // Use a bit smaller font to show the background gradient
+    font.setPointSize( p.tallestFontSize( font, img.height() ) - 1 );
     p.setFont( font );
 
     // Make copies of the values as we're replacing them temporarily
     QColor before = pSettings->playerLyricsTextBeforeColor;
     QColor after = pSettings->playerLyricsTextAfterColor;
     QColor spot = pSettings->playerLyricsTextSpotColor;
+    QColor background = pSettings->playerLyricsTextBackgroundColor;
 
     pSettings->playerLyricsTextAfterColor = ui->btnPlayerLyricsFuture->color();
     pSettings->playerLyricsTextBeforeColor = ui->btnPlayerLyricsPast->color();
     pSettings->playerLyricsTextSpotColor = ui->btnPlayerLyricsSpotlight->color();
+    pSettings->playerLyricsTextBackgroundColor = ui->btnPlayerLyricsBgColor->color();
 
     p.drawOutlineTextGradient( (img.width() - p.fontMetrics().width( sampleLine )) / 2,
                                p.fontMetrics().ascent(),
@@ -458,6 +470,7 @@ void SettingsDialog::updateLyricsPreview()
     pSettings->playerLyricsTextBeforeColor = before;
     pSettings->playerLyricsTextAfterColor = after;
     pSettings->playerLyricsTextSpotColor = spot;
+    pSettings->playerLyricsTextBackgroundColor = background;
 
     m_lyricAnimationValue += 0.05;
 
@@ -642,6 +655,7 @@ void SettingsDialog::accept()
     pSettings->playerLyricsTextAfterColor = ui->btnPlayerLyricsFuture->color();
     pSettings->playerLyricsTextBeforeColor = ui->btnPlayerLyricsPast->color();
     pSettings->playerLyricsTextSpotColor = ui->btnPlayerLyricsSpotlight->color();
+    pSettings->playerLyricsTextBackgroundColor = ui->btnPlayerLyricsBgColor->color();
     pSettings->notificationCenterColor = ui->btnPlayerLyricsInfo->color();
     pSettings->notificationTopColor = ui->btnPlayerLyricsNotification->color();
     pSettings->playerMusicLyricDelay = ui->spinLyricDelay->value();

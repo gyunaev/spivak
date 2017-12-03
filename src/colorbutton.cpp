@@ -24,6 +24,7 @@
 ColorButton::ColorButton( QWidget * parent )
     : QPushButton( parent ), m_selectedColor( Qt::black )
 {
+    m_allowSetAlpha = false;
 	connect( this, SIGNAL(clicked()), this, SLOT(btnClicked()) );
 }
 
@@ -33,7 +34,12 @@ void ColorButton::setColor( const QColor& color )
 	setText( tr("") );
 
 	m_selectedColor = color;
-	update();
+    update();
+}
+
+void ColorButton::allowSetAlpha(bool allow)
+{
+    m_allowSetAlpha = allow;
 }
 
 QColor ColorButton::color() const
@@ -43,7 +49,12 @@ QColor ColorButton::color() const
 
 void ColorButton::btnClicked()
 {
-	QColor newcolor = QColorDialog::getColor( color() );
+    QColor newcolor = QColorDialog::getColor( color(),
+                                              this,
+                                              text(),
+                                              m_allowSetAlpha ?
+                                                  QColorDialog::ShowAlphaChannel :
+                                                  QColorDialog::ColorDialogOptions() );
 
 	if ( newcolor.isValid() )
 		setColor( newcolor );
