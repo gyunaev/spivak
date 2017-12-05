@@ -394,11 +394,11 @@ bool ActionHandler_WebServer_Socket::authinfo(QJsonDocument &)
 
     if ( !m_loggedName.isEmpty() )
     {
-        out["status"] = true;
+        out["loggedin"] = true;
         out["name"] = m_loggedName;
     }
     else
-        out["status"] = false;
+        out["loggedin"] = false;
 
     sendData( QJsonDocument( out ).toJson() );
     return true;
@@ -415,7 +415,7 @@ bool ActionHandler_WebServer_Socket::login(QJsonDocument &document)
     m_loggedName = obj.value( "name" ).toString();
 
     QJsonObject out;
-    out["status"] = true;
+    out["loggedin"] = true;
     out["source"] = obj.value( "source" );
     out["name"] = m_loggedName;
 
@@ -434,7 +434,7 @@ bool ActionHandler_WebServer_Socket::logout(QJsonDocument &)
 {
     QJsonObject out;
 
-    out["status"] = false;
+    out["loggedin"] = false;
     out["name"] = m_loggedName;
 
     QNetworkCookie cookie;

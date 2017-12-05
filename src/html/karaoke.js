@@ -224,7 +224,7 @@ function checkLoginResult( xhttp )
 {
     var data = JSON.parse( xhttp.responseText );
 
-    if ( data.status )
+    if ( data.loggedin )
     {
         // We are logged in; redirect to main page if we are not there
         if ( data.source == "login" )
@@ -234,7 +234,7 @@ function checkLoginResult( xhttp )
         }
 
         loggedName = data.name;
-        document.getElementById("hello").innerHTML = "Hello, <b>" + escapeHtml( loggedNameHTML ) + "</b>!";
+        document.getElementById("hello").innerHTML = "Hello, <b>" + escapeHtml( loggedName ) + "</b>!";
     }
     else
     {
