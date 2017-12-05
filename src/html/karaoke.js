@@ -1,9 +1,6 @@
 // This is HTML-unescaped logged in name; should only be used in JSON!
 var loggedName = null;
 
-// This is HTML-escaped name; for use in HTML
-var loggedNameHTML = null;
-
 // Currently opened tab
 var currentTab = null;
 
@@ -237,8 +234,7 @@ function checkLoginResult( xhttp )
         }
 
         loggedName = data.name;
-        loggedNameHTML = escapeHtml( loggedName );
-        document.getElementById("hello").innerHTML = "Hello, <b>" + loggedNameHTML + "</b>!";
+        document.getElementById("hello").innerHTML = "Hello, <b>" + escapeHtml( loggedNameHTML ) + "</b>!";
     }
     else
     {
