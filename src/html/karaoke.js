@@ -1,4 +1,10 @@
+// This is HTML-unescaped logged in name; should only be used in JSON!
 var loggedName = null;
+
+// This is HTML-escaped name; for use in HTML
+var loggedNameHTML = null;
+
+// Currently opened tab
 var currentTab = null;
 
 // Handling back button
@@ -214,7 +220,7 @@ function addsong( id, title )
 // Remembers the user name so it could be logged in
 function login()
 {
-    var name = escapeHtml( document.getElementById("name").value );
+    var name = document.getElementById("name").value;
 
     var d = new Date();
     d.setTime( d.getTime() + 86400000 );
@@ -237,7 +243,8 @@ function checkLogin()
     if ( document.cookie )
     {
         loggedName = decodeURIComponent( document.cookie.substring( 5 ) );
-        document.getElementById("hello").innerHTML = "Hello, <b>" + loggedName + "</b>!";
+        loggedNameHTML = escapeHtml( loggedName );
+        document.getElementById("hello").innerHTML = "Hello, <b>" + loggedNameHTML + "</b>!";
     }
     else
     {
