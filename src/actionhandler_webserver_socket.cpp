@@ -21,6 +21,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonParseError>
+#include <QNetworkCookie>
 
 #include "util.h"
 #include "settings.h"
@@ -107,14 +108,26 @@ void ActionHandler_WebServer_Socket::readyRead()
 
             if ( hdr.compare( "cookie", Qt::CaseInsensitive) == 0 )
             {
-                // Parse the cookies - separated by comma
-                QStringList cookies = value.split( ';' );
-
-                // Look up the name cookie
-                foreach ( QString rawcookie, cookies )
+                // Parse the cookies.
+                // Unfortunately QNetworkCookie::parseCookies does not support multiple cookies on a single line.
+                // Thus we have to preprocess it ourselves
+                foreach ( QString rawcookie, value.split( ';' ) )
                 {
-                    if ( rawcookie.trimmed().startsWith( "name=") )
-                        m_loggedName = QUrl::fromPercentEncoding( rawcookie.trimmed().section( '=', 1 ).toLatin1() );
+                    QList<QNetworkCookie> cookies = QNetworkCookie::parseCookies( rawcookie.toLatin1() );
+
+                    if ( cookies.length() != 1 )
+                    {
+                        qWarning( "Cookie parser error: invalid number returned" );
+                        continue;
+                    }
+
+                    // Only one cookie here
+                    QNetworkCookie cookie = cookies.first();
+
+                    // Security issue: currently no checks are performed, so the user could modify cookie.
+                    // In home use scenario however this is ok.
+                    if ( cookie.name() == "token" && !cookie.value().isEmpty() )
+                        m_loggedName = QByteArray::fromBase64( cookie.value() );
                 }
             }
             else if ( hdr.compare( "content-length", Qt::CaseInsensitive) == 0 )
@@ -141,26 +154,22 @@ void ActionHandler_WebServer_Socket::readyRead()
         return;
 
     QByteArray requestbody = m_httpRequest.mid( bodyidx + 4 );
-    Logger::debug( "WwwServer: %s %s, cookie %s, body %s", qPrintable(m_method), qPrintable(m_url), qPrintable(m_loggedName), requestbody.constData() );
+    Logger::debug( "WwwServer: %s %s, logged: %s, body %s", qPrintable(m_method), qPrintable(m_url), qPrintable(m_loggedName), requestbody.constData() );
 
     // If we're asked for an HTML page which is not login.html,
     // and we are not logged in, redirect it to load login.html
     // (even without logging in we should allow loading css/js)
     if ( m_loggedName.isEmpty() && m_url.endsWith( ".html") && m_url != "/login.html" )
     {
-        // Redirect to the login page
-        QByteArray header = "HTTP/1.1 302 Moved\r\n"
-                  "Location: /login.html\r\n"
-                  "Expires: Thu, 01 Jan 1970 00:00:01 GMT"
-                  "\r\n\r\n";
-
-        m_httpsock->write( header );
-        m_httpsock->disconnectFromHost();
+        redirect( "/login.html" );
         return;
     }
 
     if ( m_url == "/" )
-        m_url = "/index.html";
+    {
+        redirect( "/index.html" );
+        return;
+    }
 
     // Handle API requests
     if ( m_url.startsWith( "/api" ) )
@@ -191,8 +200,6 @@ void ActionHandler_WebServer_Socket::readyRead()
             res = search( document );
         else if ( m_url == "/api/addsong" )
             res = addsong( document );
-        else if ( m_url == "/api/auth" )
-            res = authinfo( document );
         else if ( m_url == "/api/queue/list" )
             res = queueList(  document );
         else if ( m_url == "/api/browse" )
@@ -209,7 +216,12 @@ void ActionHandler_WebServer_Socket::readyRead()
             res = collectionInfo( document );
         else if ( m_url == "/api/collection/action" )
             res = collectionControl( document );
-
+        else if ( m_url == "/api/auth/status" )
+            res = authinfo( document );
+        else if ( m_url == "/api/auth/login" )
+            res = login( document );
+        else if ( m_url == "/api/auth/logout" )
+            res = logout( document );
 
         if ( !res )
         {
@@ -264,17 +276,33 @@ void ActionHandler_WebServer_Socket::sendError(int code)
     m_httpsock->disconnectFromHost();
 }
 
-void ActionHandler_WebServer_Socket::sendData(const QByteArray &data, const QByteArray &type)
+void ActionHandler_WebServer_Socket::sendData(const QByteArray &data, const QByteArray &type, const QByteArray &extraheader)
 {
     QByteArray header = "HTTP/1.1 200 ok\r\n"
               "Content-Length: " + QByteArray::number( data.length() ) + "\r\n"
             + "Content-Type: " + type + "\r\n"
             + "Connection: Close\r\n"
-            + "Expires: Thu, 01 Jan 1970 00:00:01 GMT"
-            + "\r\n\r\n";
+            + "Expires: Thu, 01 Jan 1970 00:00:01 GMT\r\n";
+
+    if ( !extraheader.isEmpty() )
+        header += extraheader;
+
+    header += "\r\n";
 
     m_httpsock->write( header );
     m_httpsock->write( data );
+    m_httpsock->disconnectFromHost();
+}
+
+void ActionHandler_WebServer_Socket::redirect(const QString &url)
+{
+    // Redirect to the login page
+    QByteArray header = "HTTP/1.1 302 Moved\r\n"
+              "Location: " + url.toLatin1() + "\r\n"
+              "Expires: Thu, 01 Jan 1970 00:00:01 GMT"
+              "\r\n\r\n";
+
+    m_httpsock->write( header );
     m_httpsock->disconnectFromHost();
 }
 
@@ -360,7 +388,7 @@ bool ActionHandler_WebServer_Socket::addsong( QJsonDocument& document )
     return true;
 }
 
-bool ActionHandler_WebServer_Socket::authinfo(QJsonDocument &document)
+bool ActionHandler_WebServer_Socket::authinfo(QJsonDocument &)
 {
     QJsonObject out;
 
@@ -373,6 +401,47 @@ bool ActionHandler_WebServer_Socket::authinfo(QJsonDocument &document)
         out["status"] = false;
 
     sendData( QJsonDocument( out ).toJson() );
+    return true;
+}
+
+bool ActionHandler_WebServer_Socket::login(QJsonDocument &document)
+{
+    QJsonObject obj = document.object();
+
+    if ( !obj.contains( "name" ) )
+        return false;
+
+    // Here we always log the user in
+    m_loggedName = obj.value( "name" ).toString();
+
+    QJsonObject out;
+    out["status"] = true;
+    out["source"] = obj.value( "source" );
+    out["name"] = m_loggedName;
+
+    // Set the cookie to base64 encoding of name
+    QNetworkCookie cookie;
+    cookie.setName( "token" );
+    cookie.setValue( m_loggedName.toUtf8().toBase64() );
+    cookie.setExpirationDate( QDateTime::currentDateTimeUtc().addDays( 1 ) );
+    cookie.setPath( "/" );
+
+    sendData( QJsonDocument( out ).toJson(), "application/json", "Set-Cookie: " + cookie.toRawForm() + "\r\n" );
+    return true;
+}
+
+bool ActionHandler_WebServer_Socket::logout(QJsonDocument &)
+{
+    QJsonObject out;
+
+    out["status"] = false;
+    out["name"] = m_loggedName;
+
+    QNetworkCookie cookie;
+    cookie.setName( "token" );
+    cookie.setPath( "/" );
+
+    sendData( QJsonDocument( out ).toJson(), "application/json", "Set-Cookie: " + cookie.toRawForm() + "\r\n" );
     return true;
 }
 

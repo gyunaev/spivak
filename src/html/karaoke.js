@@ -36,13 +36,18 @@ function runAPI( url, params, cfunc )
         {
             if ( xhttp.status == 200)
             {
-                document.getElementById( "error" ).style.display = "none";
+                if ( document.getElementById( "error" ) != null )
+                    document.getElementById( "error" ).style.display = "none";
+                
                 cfunc(xhttp);
             }
             else
             {
-                document.getElementById( "error" ).style.display = "block";
-                document.getElementById( "error" ).innerHTML = "Error sending request to the server";
+                if ( document.getElementById( "error" ) != null )
+                {
+                    document.getElementById( "error" ).style.display = "block";
+                    document.getElementById( "error" ).innerHTML = "Error sending request to the server";
+                }
             }
         }
     };
@@ -217,40 +222,51 @@ function addsong( id, title )
     confirmDialog( "Queue the song \"" + title + "\" ?", function() { runAPI( '/api/addsong', { id : id }, addsongSucceed ); } );
 }
 
-// Remembers the user name so it could be logged in
-function login()
+// Proceeds the authentication status
+function checkLoginResult( xhttp )
 {
-    var name = document.getElementById("name").value;
+    var data = JSON.parse( xhttp.responseText );
 
-    var d = new Date();
-    d.setTime( d.getTime() + 86400000 );
-    document.cookie = "name=" + encodeURIComponent(name) + "; expires=" + d.toUTCString() + "; path=/";
-    
-    // Redirect back
-    window.location = "index.html";
-}
-
-// Logs the current user out
-function logout()
-{
-    document.cookie = "name=; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    window.location = "login.html";
-}        
-
-// Check if we are logged in already; get the name if we are
-function checkLogin()
-{
-    if ( document.cookie )
+    if ( data.status )
     {
-        loggedName = decodeURIComponent( document.cookie.substring( 5 ) );
+        // We are logged in; redirect to main page if we are not there
+        if ( data.source == "login" )
+        {
+            window.location = "index.html";
+            return;
+        }
+
+        loggedName = data.name;
         loggedNameHTML = escapeHtml( loggedName );
         document.getElementById("hello").innerHTML = "Hello, <b>" + loggedNameHTML + "</b>!";
     }
     else
     {
+        // We are not logged in. Redirect to the login page if we're not there
         window.location = "login.html";
     }
 }
+
+// Remembers the user name so it could be logged in
+// Check if we are logged in already; get the name if we are
+function checkLogin()
+{
+    runAPI( '/api/auth/status', { source : "check" }, checkLoginResult );
+}
+
+function login()
+{
+    var name = document.getElementById("name").value;
+    
+    runAPI( '/api/auth/login', { name : name, source : "login" }, checkLoginResult );
+}
+
+// Logs the current user out
+function logout()
+{
+    runAPI( '/api/auth/logout', {}, checkLoginResult );
+}        
+
 
 function w3_open()
 {

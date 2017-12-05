@@ -51,6 +51,9 @@ class ActionHandler_WebServer_Socket : public QObject
     private:
         bool    search( QJsonDocument& document );
         bool    addsong( QJsonDocument& document);
+        bool    authinfo( QJsonDocument& document);
+        bool    login( QJsonDocument& document);
+        bool    logout( QJsonDocument& document);
         bool    queueList( QJsonDocument& document );
         bool    queueControl( QJsonDocument& document );
         bool    listDatabase( QJsonDocument& document );
@@ -61,7 +64,8 @@ class ActionHandler_WebServer_Socket : public QObject
         bool    collectionControl( QJsonDocument& document );
         QString escapeHTML( QString orig );
 
-        void    sendData( const QByteArray& data, const QByteArray &type = "application/json" );
+        void    sendData( const QByteArray& data, const QByteArray &type = "application/json", const QByteArray &extraheader = QByteArray() );
+        void    redirect( const QString& url );
 
         QTcpSocket *    m_httpsock;
 
