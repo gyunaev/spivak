@@ -105,10 +105,17 @@ void ActionHandler_WebServer_Socket::readyRead()
             QString hdr = regex.cap( 1 );
             QString value = regex.cap( 2 );
 
-            if ( hdr.compare( "cookie", Qt::CaseInsensitive) == 0 && value.startsWith( "name=") )
+            if ( hdr.compare( "cookie", Qt::CaseInsensitive) == 0 )
             {
-                // Parse the name
-                m_cookie = QUrl::fromPercentEncoding( value.mid( 5 ).toLatin1() );
+                // Parse the cookies - separated by comma
+                QStringList cookies = value.split( ';' );
+
+                // Look up the name cookie
+                foreach ( QString rawcookie, cookies )
+                {
+                    if ( rawcookie.trimmed().startsWith( "name=") )
+                        m_loggedName = QUrl::fromPercentEncoding( rawcookie.trimmed().section( '=', 1 ).toLatin1() );
+                }
             }
             else if ( hdr.compare( "content-length", Qt::CaseInsensitive) == 0 )
                 content_length = value.toInt();
@@ -134,7 +141,23 @@ void ActionHandler_WebServer_Socket::readyRead()
         return;
 
     QByteArray requestbody = m_httpRequest.mid( bodyidx + 4 );
-    Logger::debug( "WwwServer: %s %s, cookie %s, body %s", qPrintable(m_method), qPrintable(m_url), qPrintable(m_cookie), requestbody.constData() );
+    Logger::debug( "WwwServer: %s %s, cookie %s, body %s", qPrintable(m_method), qPrintable(m_url), qPrintable(m_loggedName), requestbody.constData() );
+
+    // If we're asked for an HTML page which is not login.html,
+    // and we are not logged in, redirect it to load login.html
+    // (even without logging in we should allow loading css/js)
+    if ( m_loggedName.isEmpty() && m_url.endsWith( ".html") && m_url != "/login.html" )
+    {
+        // Redirect to the login page
+        QByteArray header = "HTTP/1.1 302 Moved\r\n"
+                  "Location: /login.html\r\n"
+                  "Expires: Thu, 01 Jan 1970 00:00:01 GMT"
+                  "\r\n\r\n";
+
+        m_httpsock->write( header );
+        m_httpsock->disconnectFromHost();
+        return;
+    }
 
     if ( m_url == "/" )
         m_url = "/index.html";
@@ -168,6 +191,8 @@ void ActionHandler_WebServer_Socket::readyRead()
             res = search( document );
         else if ( m_url == "/api/addsong" )
             res = addsong( document );
+        else if ( m_url == "/api/auth" )
+            res = authinfo( document );
         else if ( m_url == "/api/queue/list" )
             res = queueList(  document );
         else if ( m_url == "/api/browse" )
@@ -292,11 +317,11 @@ bool ActionHandler_WebServer_Socket::addsong( QJsonDocument& document )
     {
         QJsonObject obj = document.object();
 
-        if ( !obj.contains( "id" ) || m_cookie.isEmpty() )
+        if ( !obj.contains( "id" ) || m_loggedName.isEmpty() )
             return false;
 
         int id = obj["id"].toInt();
-        QString singer = m_cookie;
+        QString singer = m_loggedName;
 
         Database_SongInfo info;
 
@@ -335,6 +360,22 @@ bool ActionHandler_WebServer_Socket::addsong( QJsonDocument& document )
     return true;
 }
 
+bool ActionHandler_WebServer_Socket::authinfo(QJsonDocument &document)
+{
+    QJsonObject out;
+
+    if ( !m_loggedName.isEmpty() )
+    {
+        out["status"] = true;
+        out["name"] = m_loggedName;
+    }
+    else
+        out["status"] = false;
+
+    sendData( QJsonDocument( out ).toJson() );
+    return true;
+}
+
 bool ActionHandler_WebServer_Socket::queueList(QJsonDocument &)
 {
     // Get the song list and currently scheduled song
@@ -352,7 +393,7 @@ bool ActionHandler_WebServer_Socket::queueList(QJsonDocument &)
         rec[ "title"] = escapeHTML( queue[i].title );
         rec[ "state"] = escapeHTML( queue[i].stateText() );
 
-        if ( queue[i].singer == m_cookie )
+        if ( queue[i].singer == m_loggedName )
             rec[ "removable"] = true;
 
         out.append( rec );

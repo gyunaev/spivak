@@ -70,7 +70,7 @@ class ActionHandler_WebServer_Socket : public QObject
 
         // Parsing header results. If url is non-empty, header is parsed
         QString         m_url;
-        QString         m_cookie;
+        QString         m_loggedName;
         QString         m_method;
         unsigned int    m_contentLength;
         QString         m_currentSong;
