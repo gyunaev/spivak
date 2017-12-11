@@ -224,8 +224,7 @@ However, delay the fade out process for 2.5 seconds */
     height: 100%;
     overflow: auto;
     background-color: rgb(0,0,0);
-    background-color: rgba(0,0,0,0.4);
-    font-size: 1.5vw;
+    background-color: rgba(0,0,0,0.4);    
     text-align: center;
 }
 
@@ -235,11 +234,13 @@ However, delay the fade out process for 2.5 seconds */
     display: block;
     background-color: #fefefe;
     border-radius: 10px;
-    margin: 15% auto; /* 15% from the top and centered */
+    margin: 20% auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 30%;
+    width: 60%;
+    min-width: 260px;
     text-align: center;
+    font-size: 1.3em;
 }
 
 #confirmdialog-content button {
