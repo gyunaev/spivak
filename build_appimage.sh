@@ -5,13 +5,15 @@ set -e
 
 FILE_VERSION="spivak/src/version.h"
 
-# Checkout the player
-[ -d spivak ] && rm -rf spivak
-git clone --depth 1 https://github.com/gyunaev/spivak.git
+# Checkout the player if we don't have it here
+if [ ! -f "spivak.pro" ]; then
+    [ -d spivak ] && rm -rf spivak
+    git clone --depth 1 https://github.com/gyunaev/spivak.git
+    cd spivak
+fi
 
 source /opt/qt55/bin/qt55-env.sh || true
 
-cd spivak
 qmake -r "CONGIF+=release"
 make
 cd ..
