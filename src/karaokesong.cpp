@@ -332,10 +332,8 @@ qint64 KaraokeSong::draw(KaraokePainter &p)
     if ( m_background )
         time = qMin( m_background->draw( p ), time );
 
-    // Apply the mask as well
-    p.setPen( pSettings->playerLyricsTextBackgroundColor );
-    p.setBrush( pSettings->playerLyricsTextBackgroundColor );
-    p.drawRect( p.rect() );
+    // And tint it according to percentage
+    p.fillRect( p.rect(), QColor ( 0, 0, 0, int( (double) pSettings->playerLyricBackgroundTintPercentage * 2.55) ) );
 
     if ( m_lyrics )
     {

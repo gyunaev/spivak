@@ -42,6 +42,7 @@ class Settings
         QColor      playerLyricsTextAfterColor;
         QColor      playerLyricsTextSpotColor;
         QColor      playerLyricsTextBackgroundColor;
+        int         playerLyricBackgroundTintPercentage;
         QFont       playerLyricsFont;
         int         playerLyricsFontMaxSize;
         int         playerLyricsFontFitLines;

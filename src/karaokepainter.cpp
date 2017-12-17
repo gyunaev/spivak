@@ -156,12 +156,6 @@ void KaraokePainter::drawCenteredOutlineTextGradient(int ypercentage, double per
 
 void KaraokePainter::drawOutlineTextInternal(int x, int y, const QColor &color, const QString &text, QBrush brush )
 {
-/*    // Background
-    QRect bgrect = QRect( x, y - fontMetrics().ascent(), fontMetrics().width( text ), fontMetrics().height() );
-    setPen( pSettings->playerLyricsTextBackgroundColor );
-    setBrush( pSettings->playerLyricsTextBackgroundColor );
-    drawRect( bgrect );
-*/
     QPainterPath path;
     path.addText( x, y, font(), text );
 

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1167</width>
-    <height>632</height>
+    <width>768</width>
+    <height>504</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -959,7 +959,7 @@
              <item row="2" column="4">
               <widget class="QLabel" name="label_145">
                <property name="text">
-                <string>Background alpha</string>
+                <string>Tint background by</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -985,16 +985,16 @@
              <item row="2" column="5">
               <widget class="QSpinBox" name="lyricBackgroundTransparency">
                <property name="whatsThis">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specifies how much to &amp;quot;tint&amp;quot; the background when playing Karaoke. This helps to see the lyrics better, but makes the background less visible.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specifies how much to &amp;quot;tint&amp;quot; the background when playing Karaoke. This helps you to see the lyrics better, but makes the background less visible. The value could be in range of 0% (background is fully transparent) to 100% (background is fully tinted, i.e. dark).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="suffix">
-                <string/>
+                <string> %</string>
                </property>
                <property name="prefix">
                 <string/>
                </property>
                <property name="maximum">
-                <number>255</number>
+                <number>100</number>
                </property>
               </widget>
              </item>
