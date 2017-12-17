@@ -959,29 +959,13 @@
              <item row="2" column="4">
               <widget class="QLabel" name="label_145">
                <property name="text">
-                <string>Lyrics background</string>
+                <string>Background alpha</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
                <property name="buddy">
-                <cstring>btnPlayerLyricsBgColor</cstring>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="5">
-              <widget class="ColorButton" name="btnPlayerLyricsBgColor">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                 <horstretch>1</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="whatsThis">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Background color under lyrics. Set it to the color contrast to your lyrics color, so you can see them easily on a colored background such as video or image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>PushButton</string>
+                <cstring>lyricBackgroundTransparency</cstring>
                </property>
               </widget>
              </item>
@@ -994,7 +978,23 @@
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;background&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Help&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="buddy">
-                <cstring>btnPlayerLyricsBgColor</cstring>
+                <cstring>lyricBackgroundTransparency</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="5">
+              <widget class="QSpinBox" name="lyricBackgroundTransparency">
+               <property name="whatsThis">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specifies how much to &amp;quot;tint&amp;quot; the background when playing Karaoke. This helps to see the lyrics better, but makes the background less visible.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="suffix">
+                <string/>
+               </property>
+               <property name="prefix">
+                <string/>
+               </property>
+               <property name="maximum">
+                <number>255</number>
                </property>
               </widget>
              </item>
