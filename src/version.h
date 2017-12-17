@@ -22,11 +22,6 @@
 // TODO:
 //
 // Separate gst plugins
-// MIDI seek
-// <link rel="stylesheet" media="screen and (min-width:50px) and (max-width:500px)" href="/portal/css/2screen_layout_small.css" />
-//<link rel="stylesheet" media="screen and (min-width:501px) and (max-width:767px)" href="/portal/css/2screen_layout_medium.css" />
-// - Remote queuing through ulduzsoft
-// - Voice passthrough
 // - Audio recording
 // - Video screen capture/webcam capture
 // - Remote song storage, download (incl encrypted)
@@ -34,6 +29,6 @@
 
 
 #define APP_VERSION_MAJOR	1
-#define APP_VERSION_MINOR	1
+#define APP_VERSION_MINOR	2
 
 #endif // VERSION_H
