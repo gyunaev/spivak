@@ -1,0 +1,160 @@
+This document describes the API calls Spivak Web Interface supports.
+
+## General ##
+
+Most API calls are required to contain the authentication information. This information is provided in a cookie, and is set when the user logs in.
+
+All API calls should use the POST method.
+
+
+## User authentication ##
+
+### /api/auth/login ###
+
+Input: { name : "username" }
+
+Logs in a singer named "name". At this moment the login always succeeds (there's no check for duplicates), and returns:
+
+Returns: { loggedin : true, name : "logged in name" }
+
+This method will also set a cookie containing the authentication information.
+
+This method can be called without the authentication cookie from login.html only
+
+### /api/auth/logout ###
+
+Input: {}
+
+Returns: { loggedin : false }
+
+Logs out the currently logged user and deletes the cookie.
+
+### /api/auth/status ###
+
+Checks whether the user is logged in.
+
+Input: {}
+
+Returns: { loggedin : false } or { loggedin : true, name : "logged in name" }
+
+
+## Queue manipulation ##
+
+### /api/addsong ###
+
+Adds a new song into queue for the logged in singer.
+
+Input: { id : <song id from browse/search> }
+
+Output: { result: 0, reason : "failed to add reason" } 
+     or { result: 1, title: "song title", artist: "song artist" }
+
+
+### /api/queue/list ###
+
+Returns the current singer queue.
+
+Input: {}
+
+Returns: [ { id : 1234, singer: "singername", title: "song title", state: "preparing/queued/playing", removable : true }, ... ]
+
+Songs are returned in the array, in the order queued. If removable : true is present, this user can remove this song by using the remove API.
+
+
+### /api/queue/remove ###
+
+Schedules the removal of the song from the queue. At this moment there are no checks, so using the API anyone can remove anyone's song.
+
+Due to scheduled nature the song might not be removed immediately.
+
+Input: { id : song queue id }
+
+Output: same as from /api/queue/list
+
+
+### Search and browse ###
+
+## /api/search ## 
+
+Searches for the specific query in the song title or artist name, and returns the first 1000 entries found.
+
+Input: { query: "search query" }
+
+Output: array of song elements (could be empty):
+
+    [ { id : <song id to use in addsong>,
+        artist: "artist",
+        title: "song title",
+        type: "song type (KAR, LRC, CDG etc)",
+        rating: "song rating as assigned by users",
+        language: "EN/ES/FR as detected - if enabled"
+      }, ... ]
+
+
+2. Browsing the collection
+
+### /api/browse ###
+
+Input: {}
+
+Output: [ "A", "B", "C" ... ]
+
+Output is an array of letters containing the unique first letter of all artist names in collection, such as [ "A", "B", "C" ... ] - if there are no artists in collection for a specific letter, it will not be returned. Non-English letters could be returned as well.
+
+Input: { artist : "single letter" }
+
+Output: [ "artist1", "artist2", "artist3"... ]
+
+Output returns an array of artist names in collection starting with this letter (must be a single letter). "P" would return [ "Pink Floyd", "Pink", "Pineapple Nuts" ... ]
+
+Input: { artist : "full artist name" }
+
+Output: the array of songs for this artist (could be empty):
+
+    [ { id : <song id to use in addsong>,
+        artist: "artist",
+        title: "song title",
+        type: "song type (KAR, LRC, CDG etc)",
+        rating: "song rating as assigned by users",
+        language: "EN/ES/FR as detected - if enabled"
+      }, ... ]
+
+
+### Karaoke controls ###
+
+## /api/control/status ##
+
+Returns the current status of karaoke controls:
+
+{ 
+  type: controlstatus,
+  state: "playing/paused/stopped",
+  
+  Only if the player is not stopped the following is present:
+  
+  pos: "current player position",
+  duration: "current player duration",
+  volume: current volume percentage (0-100),
+  delay: sound-lyrics delay if any
+  pitch: current pitch value (only if capable of changing pitch), otherwise "disabled"
+  tempo: current tempo value (only if capable of changing tempo), otherwise "disabled"
+  voiceremoval: whether automatic voice removal is on/off (or "disabled" if not supported)
+  song: "current playing song"
+}
+
+### /api/control/adjust ###
+
+Adjusts a sound control.
+
+Input: { a : "controlname", v: "adjust value" }
+
+Control name must be one of: volume, tempo, pitch, delay.
+Adjust value must be 1 (increase) or -1 (decrease)
+
+Output: same as control status
+
+### /api/control/action ###
+
+Input: { a: "action" } 
+
+Action could be: stop, prev, next, playpause
