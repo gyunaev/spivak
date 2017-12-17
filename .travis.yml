@@ -16,14 +16,14 @@ matrix:
     compiler: gcc
     env:
      - QT_REPO="ppa:beineri/opt-qt562-trusty"
-     - QT_VERSION="qt56"
+     - QT_VERSION="qt562"
   - os: linux
     dist: trusty
     sudo: true
     compiler: gcc
     env:
      - QT_REPO="ppa:beineri/opt-qt571-trusty"
-     - QT_VERSION="qt57"
+     - QT_VERSION="qt571"
   - os: linux
     dist: trusty
     sudo: true
