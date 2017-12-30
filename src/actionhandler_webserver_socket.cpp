@@ -77,7 +77,7 @@ void ActionHandler_WebServer_Socket::readyRead()
     {
         QStringList header = QString::fromUtf8( m_httpRequest.left( bodyidx ) ).split( "\r\n" );
 
-        // First line is special (and generally the only one we really care except content-lenght)
+        // First line is formatted differently
         QRegExp regex( "^([A-Za-z]+)\\s+(.+)\\s+HTTP/\\d\\.\\d" );
 
         if ( header.isEmpty() || regex.indexIn( header[0] ) == -1 )
@@ -139,6 +139,15 @@ void ActionHandler_WebServer_Socket::readyRead()
                 // Kick off cURL with its expect 100
                 sendError( 400 );
                 return;
+            }
+            else if ( hdr.compare( "host", Qt::CaseInsensitive ) == 0 && !pSettings->httpForceUseHost.isEmpty() )
+            {
+                // This is useful if player machine has open WiFi and is used as captive portal
+                if ( value.compare( pSettings->httpForceUseHost, Qt::CaseInsensitive ) != 0 )
+                {
+                    redirect( "/login.html" );
+                    return;
+                }
             }
         }
 

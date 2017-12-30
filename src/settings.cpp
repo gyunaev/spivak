@@ -110,6 +110,7 @@ void Settings::load()
     httpDocumentRoot = settings.value( "http/DocumentRoot", "" ).toString();
     httpEnableAddQueue = settings.value( "http/EnableAddQueue", false ).toBool();
     httpAccessCode = settings.value( "http/SecureAccessCode", "" ).toString();
+    httpForceUseHost = settings.value( "http/ForceUseHostname", "" ).toString();
 
     startInFullscreen = settings.value( "mainmenu/StartInFullscreen", false ).toBool();
     firstTimeWizardShown = settings.value( "mainmenu/FirstTimeWizardShown", false ).toBool();
@@ -167,6 +168,7 @@ void Settings::save()
     settings.setValue( "http/DocumentRoot", httpDocumentRoot );
     settings.setValue( "http/EnableAddQueue", httpEnableAddQueue );
     settings.setValue( "http/SecureAccessCode", httpAccessCode );
+    settings.setValue( "http/ForceUseHostname", httpForceUseHost );
 
     // Music collection
     settings.setValue( "musicCollection/Paths", musicCollections );
