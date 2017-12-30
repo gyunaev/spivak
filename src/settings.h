@@ -90,6 +90,7 @@ class Settings
         bool            httpEnableAddQueue;
         unsigned int    httpListenPort;
         QString         httpDocumentRoot;
+        QString         httpAccessCode;
 
         // If true, we should start in a full screen mode (but this doesn't mean NOW is a fullscreen mode)
         bool            startInFullscreen;

@@ -22,6 +22,8 @@
 #include <QJsonObject>
 #include <QJsonParseError>
 #include <QNetworkCookie>
+#include <QHostAddress>
+#include <QCryptographicHash>
 
 #include "util.h"
 #include "settings.h"
@@ -398,7 +400,18 @@ bool ActionHandler_WebServer_Socket::authinfo(QJsonDocument &)
         out["name"] = m_loggedName;
     }
     else
+    {
         out["loggedin"] = false;
+
+        // Is the HTTP access secured by code?
+        if ( !pSettings->httpAccessCode.isEmpty() )
+        {
+            out["secured"] = true;
+            out["challenge"] = generateChallenge();
+        }
+        else
+            out["secured"] = false;
+    }
 
     sendData( QJsonDocument( out ).toJson() );
     return true;
@@ -410,6 +423,19 @@ bool ActionHandler_WebServer_Socket::login(QJsonDocument &document)
 
     if ( !obj.contains( "name" ) )
         return false;
+
+    // If we run a secured server and don't have an access code, or it is not valid, we return the challenge and deny login
+    if ( !pSettings->httpAccessCode.isEmpty()
+         && ( !obj.contains( "code" ) || !verifyChallenge( obj.value( "code" ).toString() ) ) )
+    {
+        QJsonObject out;
+        out["loggedin"] = false;
+        out["secured"] = true;
+        out["challenge"] = generateChallenge();
+
+        sendData( QJsonDocument( out ).toJson() );
+        return true;
+    }
 
     // Here we always log the user in
     m_loggedName = obj.value( "name" ).toString();
@@ -739,4 +765,26 @@ QString ActionHandler_WebServer_Socket::escapeHTML( QString orig )
             .replace( '>', "&gt;" )
             .replace( '"', "&quot;" )
             .replace( '\'', "&#039;" );
+}
+
+QString ActionHandler_WebServer_Socket::generateChallenge()
+{
+    // Generates challenge string based on IP address to kind of encrypt the access code.
+    // This is not secure (only against script kiddies), and in future should be replaced
+    // by IP-based session - which unfortunately needs tight integration with DHCP server
+    // to be secured (otherwise someone can eavesdrop on a user logging in, spoof the creds,
+    // kick the user out of network, spoof MAC and IP, and use the same creds to log in)
+    QString challenge = m_httpsock->peerAddress().toString().toLatin1().toBase64();
+    return challenge;
+}
+
+bool ActionHandler_WebServer_Socket::verifyChallenge(const QString &code)
+{
+    QByteArray valid = QCryptographicHash::hash( (generateChallenge() + pSettings->httpAccessCode).toUtf8(), QCryptographicHash::Md5 ).toHex();
+
+    if ( code.compare( valid, Qt::CaseInsensitive ) == 0 )
+        return true;
+
+    qDebug("Incorrect challenge entereed: %s, must be: %s", qPrintable(code), valid.constData() );
+    return false;
 }

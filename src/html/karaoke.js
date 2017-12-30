@@ -12,6 +12,7 @@ var backToLetter = false;
 var confirmDialogCallback = null;
 
 
+
 // https://stackoverflow.com/questions/6234773/can-i-escape-html-special-chars-in-javascript
 function escapeHtml(unsafe) {
     return unsafe
@@ -224,6 +225,10 @@ function checkLoginResult( xhttp )
 {
     var data = JSON.parse( xhttp.responseText );
 
+    // Here we can have three situations:
+    // 1. We are logged in successfully (data.loggedin is true)
+    // 2. We tried to log in but challenge was required (data.source = "login" and data.challenge is generated
+    // 3. We didn't try to log in
     if ( data.loggedin )
     {
         // We are logged in; redirect to main page if we are not there
@@ -235,6 +240,29 @@ function checkLoginResult( xhttp )
 
         loggedName = data.name;
         document.getElementById("hello").innerHTML = "Hello, <b>" + escapeHtml( loggedName ) + "</b>!";
+    }
+    else if ( data.challenge )
+    {
+        // Is this re-entry of challenge?
+        if ( typeof document.getElementById("code").challenge !== 'undefined' )
+        {
+            document.getElementById("code").classList.add("invalid");
+
+            setTimeout(function(){ document.getElementById("code").classList.remove('invalid'); },500);
+        }
+        else
+        {
+            // This instance is secured, so the code needs to be entered. Store the code and show the challenge entry field
+            document.getElementById("code").challenge = data.challenge;
+            document.getElementById("entername").style.transition = "opacity 500ms";
+            document.getElementById("entername").style.opacity = 0;
+        
+            // Hide the element fully once the transition is done, and show the access code element
+            setTimeout( function() { 
+                document.getElementById("entername").style.height = 0; 
+                document.getElementById("entercode").style.display = 'block'; 
+                }, 300 );
+        }
     }
     else
     {
@@ -252,9 +280,14 @@ function checkLogin()
 
 function login()
 {
-    var name = document.getElementById("name").value;
+    var params = { name : document.getElementById("name").value, source : "login" };
     
-    runAPI( '/api/auth/login', { name : name, source : "login" }, checkLoginResult );
+    var code = document.getElementById("code");
+    
+    if ( typeof code.challenge !== 'undefined' )
+        params.code = md5( code.challenge + code.value );
+    
+    runAPI( '/api/auth/login', params, checkLoginResult );
 }
 
 // Logs the current user out

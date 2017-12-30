@@ -109,6 +109,7 @@ void Settings::load()
     httpListenPort = settings.value( "http/ListeningPort", 8000 ).toInt();
     httpDocumentRoot = settings.value( "http/DocumentRoot", "" ).toString();
     httpEnableAddQueue = settings.value( "http/EnableAddQueue", false ).toBool();
+    httpAccessCode = settings.value( "http/SecureAccessCode", "" ).toString();
 
     startInFullscreen = settings.value( "mainmenu/StartInFullscreen", false ).toBool();
     firstTimeWizardShown = settings.value( "mainmenu/FirstTimeWizardShown", false ).toBool();
@@ -165,6 +166,7 @@ void Settings::save()
     settings.setValue( "http/ListeningPort", httpListenPort );
     settings.setValue( "http/DocumentRoot", httpDocumentRoot );
     settings.setValue( "http/EnableAddQueue", httpEnableAddQueue );
+    settings.setValue( "http/SecureAccessCode", httpAccessCode );
 
     // Music collection
     settings.setValue( "musicCollection/Paths", musicCollections );

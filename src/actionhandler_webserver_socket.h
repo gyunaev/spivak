@@ -64,6 +64,10 @@ class ActionHandler_WebServer_Socket : public QObject
         bool    collectionControl( QJsonDocument& document );
         QString escapeHTML( QString orig );
 
+        // Generates or verifies challenge string based on IP address
+        QString generateChallenge();
+        bool    verifyChallenge( const QString& code );
+
         void    sendData( const QByteArray& data, const QByteArray &type = "application/json", const QByteArray &extraheader = QByteArray() );
         void    redirect( const QString& url );
 
