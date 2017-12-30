@@ -151,9 +151,8 @@ bool KaraokeSong::open()
                 if ( !midi->open( midiData ) )
                     throw QString("Cannot open MIDI file %1").arg( m_musicFileName );
 
-                // We probably should get this data from syntheser, but it is hardcoded there too
-                m_player.loadMedia( midi, 44100, 2 );
-                Logger::debug( "KaraokeSong: MIDI file is being loaded via sequencer" );
+                m_player.loadMedia( midi, MediaPlayer::LoadAudioStream );
+                Logger::debug( "KaraokeSong: MIDI file is being loaded via built-in MIDI sequencer" );
             }
             else
             {

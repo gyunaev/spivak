@@ -93,10 +93,6 @@ class MediaPlayer : public QObject
         // Takes ownership of the device, and will delete it upon end
         void    loadMedia( QIODevice * device, MediaPlayer::LoadOptions options );
 
-        // Loads the raw audio data from the device, and plays audio from it.
-        // This function expects 16-bit LE samples
-        void    loadMedia( QIODevice * device, int samplerate, int channels );
-
         //
         // Player actions
         //
@@ -213,10 +209,6 @@ class MediaPlayer : public QObject
         // Media information from tags
         QString     m_mediaArtist;
         QString     m_mediaTitle;
-
-        // Those are nonzero if we're playing raw audio
-        int         m_rawAudioSampleRate;
-        int         m_rawAudioChannels;
 
         // If pitch changing plugin is available
         Interface_MediaPlayerPlugin *   m_pitchPlugin;

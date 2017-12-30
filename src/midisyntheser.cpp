@@ -137,8 +137,9 @@ qint64 MIDISyntheser::pos() const
 
 bool MIDISyntheser::seek(qint64 pos)
 {
-    // What is requested seek position in the MIDI stream?
-    EAS_I32 timing = gst_util_uint64_scale( pos, GST_USECOND, 44100 * 2 );
+    // Calculate the requested seek position in the MIDI stream.
+    // Since we have two channels and 2 bytes per channel at 44100 samples per second...
+    EAS_I32 timing = gst_util_uint64_scale( pos, GST_USECOND, 44100 * 2 * 2 );
 
     if ( (EAS_Locate( m_easData, m_easHandle, timing, EAS_FALSE )) != EAS_SUCCESS )
     {
@@ -219,6 +220,10 @@ bool MIDISyntheser::fillBuffer()
     EAS_I32 count;
     EAS_STATE state;
 
+    // If current position is zero, we generate and fill the WAV header first
+    if ( m_currentPosition == 0 )
+        fillWAVheader();
+
     while ( m_audioAvailable + m_mixBufferSize * 4 < (unsigned int) m_audioBuffer.size() )
     {
         if ( EAS_Render(m_easData, (EAS_PCM*) (m_audioBuffer.data() + m_audioAvailable), m_mixBufferSize, &count) != EAS_SUCCESS )
@@ -246,4 +251,36 @@ bool MIDISyntheser::fillBuffer()
     }
 
     return true;
+}
+
+// We emulate WAV file for GStreamer to work correctly since providing it with raw capabilities
+// results in jerky sound on OpenSuse and KDE environments.
+void MIDISyntheser::fillWAVheader()
+{
+    // The WAV header is 44 bytes long
+    const unsigned int WAV_HDR_LENGTH = 44;
+
+    // WAV header format - see http://www.topherlee.com/software/pcm-tut-wavformat.html
+    static const unsigned char wavhdr [WAV_HDR_LENGTH] = {
+        0x52, 0x49, 0x46, 0x46,  // RIFF
+        0x00, 0x00, 0x00, 0x00,  // file size, offset 4
+        0x57, 0x41, 0x56, 0x45, 0x66, 0x6d, 0x74, 0x20, // WAVEfmt
+        0x10, 0x00, 0x00, 0x00, // sample lenght in bits
+        0x01, 0x00,             // format type
+        0x02, 0x00,             // number of channels
+        0x44, 0xAC, 0x00, 0x00, // sample rate; AC44 = 44100
+        0x10, 0xb1, 0x02, 0x00, // bytes in file per second of music
+        0x04, 0x00,             // bytes in a single sample for all channels
+        0x10, 0x00,             // bits per sample
+        0x64, 0x61, 0x74, 0x61, // data section start
+        0x00, 0x00, 0x00, 0x00  // data section size (offset 40)
+        };
+
+    memcpy( m_audioBuffer.data(), wavhdr, WAV_HDR_LENGTH );
+
+    // Total data size and total file size (including header)
+    StoreDwordBE( m_audioBuffer.data() + 4, m_totalSize + WAV_HDR_LENGTH );
+    StoreDwordBE( m_audioBuffer.data() + 40, m_totalSize );
+
+    m_audioAvailable = WAV_HDR_LENGTH;
 }

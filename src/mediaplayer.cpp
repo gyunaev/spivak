@@ -49,8 +49,6 @@ MediaPlayer::MediaPlayer()
     m_tempoRate = 1.0;
     m_playState = StateReset;
     m_errorsDetected = false;
-    m_rawAudioSampleRate = 0;
-    m_rawAudioChannels = 0;
     m_pitchPlugin = 0;
 }
 
@@ -81,18 +79,6 @@ void MediaPlayer::loadMedia(QIODevice *device, MediaPlayer::LoadOptions options)
 
     m_loadOptions = options;
     m_mediaIODevice = device;
-
-    QtConcurrent::run( this, &MediaPlayer::threadLoadMedia );
-}
-
-void MediaPlayer::loadMedia(QIODevice *device, int samplerate, int channels)
-{
-    reset();
-
-    m_loadOptions = LoadAudioStream;
-    m_mediaIODevice = device;
-    m_rawAudioChannels = channels;
-    m_rawAudioSampleRate = samplerate;
 
     QtConcurrent::run( this, &MediaPlayer::threadLoadMedia );
 }
@@ -366,8 +352,7 @@ void MediaPlayer::threadLoadMedia()
     }
 
     // If we do not have raw data, connect to the pad-added signal
-    if ( m_rawAudioSampleRate == 0 )
-        g_signal_connect( m_gst_decoder, "pad-added", G_CALLBACK (cb_pad_added), this );
+    g_signal_connect( m_gst_decoder, "pad-added", G_CALLBACK (cb_pad_added), this );
 
     // Pre-create video elements if we need them
     if ( (m_loadOptions & MediaPlayer::LoadVideoStream) != 0 )
@@ -443,10 +428,6 @@ void MediaPlayer::threadLoadMedia()
         if ( linksucceed )
             linksucceed = gst_element_link( last, m_gst_audiosink );
 
-        // Also if we have raw data, we can link the source in right away
-        if ( m_rawAudioSampleRate != 0 && linksucceed )
-            linksucceed = gst_element_link( m_gst_source, m_gst_audioconverter );
-
         if ( !linksucceed )
         {
             reportError( "Audio elements could not be linked." );
@@ -497,8 +478,6 @@ void MediaPlayer::reset()
     m_lastVideoSample = 0;
     m_errorsDetected = false;
     m_mediaLoading = true;
-    m_rawAudioSampleRate = 0;
-    m_rawAudioChannels = 0;
     m_tempoRate = 1.0;
     m_pitchPlugin = 0;
 
@@ -666,37 +645,10 @@ void MediaPlayer::setupSource()
 
         gst_app_src_set_callbacks( GST_APP_SRC(m_gst_source), &callbacks, this, 0 );
 
-        // If we're producing raw WAV data, we do not need decodebin, and we can set the caps already
-        if ( m_rawAudioSampleRate && m_rawAudioChannels )
-        {
-            char buf[256];
+        // Our sources have bytes format
+        g_object_set( m_gst_source, "format", GST_FORMAT_BYTES, NULL);
 
-            // We have more than enough space in the buffer, and we're adding ints so snprintf is not needed
-            sprintf( buf, "audio/x-raw, format=(string)S16LE, "
-                          "layout=(string)interleaved, rate=(int)%d, "
-                          "channels=(int)%d, channel-mask=(bitmask)0x0000000000000003", m_rawAudioSampleRate, m_rawAudioChannels );
-
-            GstCaps *audio_caps = gst_caps_from_string( buf );
-
-            g_object_set( m_gst_source, "caps", audio_caps, NULL);
-            gst_caps_unref( audio_caps );
-
-            // Our format for this source type is time
-            g_object_set( m_gst_source, "format", GST_FORMAT_TIME, NULL);
-
-            m_gst_decoder = m_gst_source;
-
-            // Set the song duration from the size as appsrc won't do that for us
-            if ( !m_mediaIODevice->isSequential() )
-                m_duration = (m_mediaIODevice->size() / (m_rawAudioSampleRate * m_rawAudioChannels * 2)) * 1000;
-        }
-        else
-        {
-            // Other sources have bytes format
-            g_object_set( m_gst_source, "format", GST_FORMAT_BYTES, NULL);
-
-            m_gst_decoder = createElement ("decodebin", "decoder");
-        }
+        m_gst_decoder = createElement ("decodebin", "decoder");
     }
     else
     {
@@ -722,22 +674,11 @@ void MediaPlayer::cb_source_need_data(GstAppSrc *src, guint length, gpointer use
         GstMapInfo map;
         gst_buffer_map( buffer, &map, GST_MAP_WRITE );
 
-        // Set its timestamp and duration
-        if ( self->m_rawAudioSampleRate != 0 )
-        {
-            GST_BUFFER_TIMESTAMP (buffer) = gst_util_uint64_scale( self->m_mediaIODevice->pos(), GST_SECOND, self->m_rawAudioSampleRate * self->m_rawAudioChannels );
-        }
-
         totalread = self->m_mediaIODevice->read( (char*) map.data, length );
         gst_buffer_unmap( buffer, &map );
 
         if ( totalread > 0)
         {
-            if ( self->m_rawAudioSampleRate != 0 )
-            {
-                GST_BUFFER_DURATION (buffer) = gst_util_uint64_scale (totalread, GST_SECOND, self->m_rawAudioSampleRate * self->m_rawAudioChannels );
-            }
-
             GstFlowReturn ret = gst_app_src_push_buffer( src, buffer );
 
             if (ret == GST_FLOW_ERROR) {
@@ -758,12 +699,7 @@ gboolean MediaPlayer::cb_source_seek_data(GstAppSrc *, guint64 offset, gpointer 
     MediaPlayer * self = reinterpret_cast<MediaPlayer*>( user_data );
 
     // If we operate in raw mode, the offset is time - we should convert to the file offset
-    if ( self->m_rawAudioSampleRate > 0 )
-    {
-        return self->m_mediaIODevice->seek( gst_util_uint64_scale (offset, self->m_rawAudioSampleRate * self->m_rawAudioChannels, GST_SECOND ) );
-    }
-    else
-        return self->m_mediaIODevice->seek( offset );
+    return self->m_mediaIODevice->seek( offset );
 }
 
 GstFlowReturn MediaPlayer::cb_new_sample(GstAppSink *appsink, gpointer user_data)

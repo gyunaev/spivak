@@ -53,6 +53,7 @@ class MIDISyntheser : public QIODevice
         static int EAS_FILE_size( void *handle );
 
         bool    fillBuffer();
+        void    fillWAVheader();
 
         QByteArray      m_midiData;
 
