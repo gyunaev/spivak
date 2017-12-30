@@ -723,14 +723,20 @@ void MediaPlayer::cb_source_need_data(GstAppSrc *src, guint length, gpointer use
         gst_buffer_map( buffer, &map, GST_MAP_WRITE );
 
         // Set its timestamp and duration
-        GST_BUFFER_TIMESTAMP (buffer) = gst_util_uint64_scale( self->m_mediaIODevice->pos(), GST_SECOND, self->m_rawAudioSampleRate * self->m_rawAudioChannels );
+        if ( self->m_rawAudioSampleRate != 0 )
+        {
+            GST_BUFFER_TIMESTAMP (buffer) = gst_util_uint64_scale( self->m_mediaIODevice->pos(), GST_SECOND, self->m_rawAudioSampleRate * self->m_rawAudioChannels );
+        }
 
         totalread = self->m_mediaIODevice->read( (char*) map.data, length );
         gst_buffer_unmap( buffer, &map );
 
         if ( totalread > 0)
         {
-            GST_BUFFER_DURATION (buffer) = gst_util_uint64_scale (totalread, GST_SECOND, self->m_rawAudioSampleRate * self->m_rawAudioChannels );
+            if ( self->m_rawAudioSampleRate != 0 )
+            {
+                GST_BUFFER_DURATION (buffer) = gst_util_uint64_scale (totalread, GST_SECOND, self->m_rawAudioSampleRate * self->m_rawAudioChannels );
+            }
 
             GstFlowReturn ret = gst_app_src_push_buffer( src, buffer );
 
