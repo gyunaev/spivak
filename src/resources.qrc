@@ -5,7 +5,6 @@
         <file>images/dryicons_forward.png</file>
         <file>images/dryicons_rewind.png</file>
         <file>images/dryicons_stop.png</file>
-        <file>html/index.html</file>
         <file>images/icon_open_file.png</file>
         <file>sounds/test.mp3</file>
         <file>sounds/test.wav</file>
@@ -20,12 +19,15 @@
         <file>sounds/test.ogg</file>
         <file>sounds/test.wma</file>
         <file>images/application.ico</file>
+        <file>html/index.html</file>
         <file>html/background.jpg</file>
         <file>html/karaoke.js</file>
+        <file>html/md5.js</file>
         <file>html/login.html</file>
         <file>html/css/font-awesome.css</file>
         <file>html/css/karaoke.css</file>
         <file>html/css/w3.css</file>
+        <file>html/css/login.css</file>
         <file>html/fonts/fontawesome-webfont.eot</file>
         <file>html/fonts/fontawesome-webfont.svg</file>
         <file>html/fonts/fontawesome-webfont.ttf</file>
