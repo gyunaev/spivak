@@ -145,7 +145,7 @@ void ActionHandler_WebServer_Socket::readyRead()
                 // This is useful if player machine has open WiFi and is used as captive portal
                 if ( value.compare( pSettings->httpForceUseHost, Qt::CaseInsensitive ) != 0 )
                 {
-                    redirect( "/login.html" );
+                    redirect( "http://" + pSettings->httpForceUseHost + "/login.html" );
                     return;
                 }
             }
