@@ -74,8 +74,9 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     }
     else
     {
-        ui->boxCollectionDetectLang->setEnabled( false );
         ui->boxCollectionDetectLang->setChecked( false );
+        ui->boxCollectionDetectLang->setEnabled( false );
+        ui->boxCollectionLanguage->setEnabled( false );
     }
 
     //
@@ -505,7 +506,7 @@ bool SettingsDialog::validateAndStoreCollection()
     }
 
     col.scanZips = ui->boxColelctionZIP->isChecked();
-    col.detectLanguage = ui->boxCollectionDetectLang->isChecked();
+    col.detectLanguage = m_langdetector && ui->boxCollectionDetectLang->isChecked();
 
     if ( ui->boxCollectionLanguage->currentIndex() > 0 && m_langdetector )
         col.defaultLanguage = ui->boxCollectionLanguage->currentText();
