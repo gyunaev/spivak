@@ -200,9 +200,13 @@ bool Database::updateLastScan()
 
 bool Database::clearDatabase()
 {
-    return execute( "DROP TABLE songs")
-            && recreateSongTable()
-            && execute( "UPDATE settings SET lastupdated=0" );
+    if ( !execute( "DROP TABLE songs") )
+        return false;
+
+    recreateSongTable();
+    execute( "UPDATE settings SET lastupdated=0" );
+    getDatabaseCurrentState();
+    return true;
 }
 
 qint64 Database::lastDatabaseUpdate() const
