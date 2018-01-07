@@ -93,6 +93,7 @@ void ActionHandler_WebServer_Socket::readyRead()
 
         // Parse the headers, get all we need
         int content_length = 0;
+        bool requires_expect_100 = false;
 
         for ( int i = 1; i < header.size(); i++ )
         {
@@ -135,11 +136,7 @@ void ActionHandler_WebServer_Socket::readyRead()
             else if ( hdr.compare( "content-length", Qt::CaseInsensitive) == 0 )
                 content_length = value.toInt();
             else if ( hdr.compare( "expect", Qt::CaseInsensitive) == 0 && value.startsWith( "100") )
-            {
-                // Kick off cURL with its expect 100
-                sendError( 400 );
-                return;
-            }
+                requires_expect_100 = true;
             else if ( hdr.compare( "host", Qt::CaseInsensitive ) == 0 && !pSettings->httpForceUseHost.isEmpty() )
             {
                 // This is useful if player machine has open WiFi and is used as captive portal
@@ -158,6 +155,13 @@ void ActionHandler_WebServer_Socket::readyRead()
         }
 
         m_contentLength = content_length;
+
+        // Expect: 100 tells us that the data is not yet sent, and we need to tell the client to send it
+        if ( requires_expect_100 )
+        {
+            m_httpsock->write( "HTTP/1.1 100 Continue\r\n\r\n" );
+            return;
+        }
     }
 
     // If we have content-length, ensure we got all the content
