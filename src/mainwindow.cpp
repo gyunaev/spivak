@@ -182,10 +182,14 @@ MainWindow::MainWindow(QWidget *parent) :
         qDebug("crashing in 2 seconds");
         QTimer::singleShot( 2000, this, SLOT(generateCrash()) );
     }
+
+    setScreensaverSuppression( true );
 }
 
 MainWindow::~MainWindow()
 {
+    setScreensaverSuppression( false );
+
     if ( m_songScanner )
     {
         m_songScanner->stopScan();
@@ -393,6 +397,32 @@ void MainWindow::karaokeDatabaseAbortScan()
 bool MainWindow::karaokeDatabaseIsScanning() const
 {
     return m_songScanner != 0;
+}
+
+void MainWindow::setScreensaverSuppression(bool supress)
+{
+#if defined (Q_OS_LINUX)
+    // On Linux we use the xdg-screensaver tool
+    QStringList args;
+
+    if ( supress )
+        args << "suspend";
+    else
+        args << "resume";
+
+    args << QString::number( winId() );
+
+    int ret = QProcess::execute( "xdg-screensaver", args );
+
+    if ( ret == -1 )
+        Logger::error( "xdg-screensaver tool is not installed, screensaver won't be disabled");
+
+#elif defined (Q_OS_WIN)
+    if ( supress )
+        SetThreadExecutionState( ES_DISPLAY_REQUIRED | ES_SYSTEM_REQUIRED );
+    else
+        SetThreadExecutionState( ES_CONTINUOUS );
+#endif
 }
 
 void MainWindow::scanCollectionStarted()

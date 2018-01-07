@@ -75,6 +75,9 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
         void    karaokeDatabaseAbortScan();
         bool    karaokeDatabaseIsScanning() const;
 
+        // Whether to deactivate or reactivate screensever supression
+        void    setScreensaverSuppression ( bool supress );
+
     private slots:
         // Scan collection slots from Eventor
         void    scanCollectionStarted();
