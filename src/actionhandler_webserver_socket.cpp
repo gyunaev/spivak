@@ -458,7 +458,6 @@ bool ActionHandler_WebServer_Socket::login(QJsonDocument &document)
     QNetworkCookie cookie;
     cookie.setName( "token" );
     cookie.setValue( m_loggedName.toUtf8().toBase64() );
-    cookie.setExpirationDate( QDateTime::currentDateTimeUtc().addDays( 1 ) );
     cookie.setPath( "/" );
 
     sendData( QJsonDocument( out ).toJson(), "application/json", "Set-Cookie: " + cookie.toRawForm() + "\r\n" );
