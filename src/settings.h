@@ -21,6 +21,7 @@
 
 #include <QFont>
 #include <QColor>
+#include <QJsonValue>
 
 class Settings
 {
@@ -104,11 +105,18 @@ class Settings
 
     public:
         // Load and save settings
-        void            load();
-        void            save();
+        bool            load();
+        bool            save();
+
+        QJsonObject     toJson();
+        void            fromJson( const QJsonObject& data );
 
     private:
+        QJsonValue      fromStringList( const QStringList& list );
+        QStringList     toStringList( const QJsonValue& value, const QString& defaultval = "" );
+
         QString         m_appDataPath;
+        QString         m_settingsFile;
 
         // If the song path replacement is set (songPathReplacementFrom is not empty), this would replace '^from' to '^to'
         QString         songPathReplacementFrom;

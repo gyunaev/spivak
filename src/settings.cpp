@@ -20,7 +20,9 @@
 #include <QString>
 #include <QStringList>
 #include <QFileInfo>
-#include <QSettings>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QSaveFile>
 #include <QStandardPaths>
 
 #include "util.h"
@@ -33,6 +35,7 @@ Settings * pSettings;
 Settings::Settings()
 {
     m_appDataPath = QStandardPaths::writableLocation( QStandardPaths::AppDataLocation );
+    m_settingsFile = QStandardPaths::writableLocation( QStandardPaths::AppDataLocation ) + QDir::separator() + "config.json";
 
     if ( m_appDataPath.isEmpty() )
         m_appDataPath = ".";
@@ -72,117 +75,185 @@ QString Settings::replacePath(const QString &origpath)
     return songPathReplacementTo + origpath.mid( ( songPathReplacementFrom.length() ) );
 }
 
-void Settings::load()
+bool Settings::load()
 {
-    QSettings settings;
+    // Load the settings file
+    QFile file(m_settingsFile);
 
-    playerBackgroundType = (BackgroundType) settings.value( "player/BackgroundType", (int)BACKGROUND_TYPE_IMAGE ).toInt();
-    playerBackgroundObjects = settings.value( "player/BackgroundObjects", QStringList() << ":/background" ).toStringList();
-    playerBackgroundTransitionDelay = settings.value( "player/BackgroundTransitionDelay", 30 ).toInt();
-    playerRenderFPS = settings.value( "player/RenderFPS", 25 ).toInt();
-    playerBackgroundColor = QColor( settings.value( "player/BackgroundColor", "black" ).toString() );
-    playerLyricsFont = QFont( settings.value( "player/LyricsFont", "arial" ).toString() );
-    playerLyricsTextBeforeColor = QColor( settings.value( "player/LyricsTextBeforeColor", "blue" ).toString() );
-    playerLyricsTextAfterColor = QColor( settings.value( "player/LyricsTextAfterColor", "red" ).toString() );
-    playerLyricsTextSpotColor = QColor( settings.value( "player/LyricsTextSpotColor", "yellow" ).toString() );
-    playerCDGbackgroundTransparent = settings.value( "player/CDGbackgroundTransparent", false ).toBool();
-    playerMusicLyricDelay = settings.value( "player/MusicLyricDelay", 0 ).toInt();
-    playerIgnoreBackgroundFromFormats = settings.value( "player/IgnoreBackgroundFromFormats", false ).toBool();
-    playerLyricsFontFitLines = settings.value( "player/LyricsFontFitLines", 4 ).toInt();
-    playerLyricsFontMaxSize = settings.value( "player/LyricsFontMaximumSize", 512 ).toInt();
-    playerVolumeStep = settings.value( "player/VolumeStep", 10 ).toInt();
-    playerUseBuiltinMidiSynth = settings.value( "player/UseBuiltinMidiSynth", true ).toBool();
-    playerLyricBackgroundTintPercentage = settings.value( "player/LyricsTextBackgroundTintPercentage", 75 ).toInt();
+    if ( file.open(QIODevice::ReadOnly ) )
+    {
+        QByteArray data = file.readAll();
 
-    queueAddNewSingersNext = settings.value( "queue/AddNewSingersNext", false ).toBool();
-    queueSaveOnExit = settings.value( "queue/SaveOnExit", false ).toBool();
+        if ( !data.isEmpty() )
+        {
+            QJsonDocument document = QJsonDocument::fromJson(data);
 
-    songPathReplacementFrom = settings.value( "database/PathReplacementPrefixFrom", "" ).toString();
-    songPathReplacementTo = settings.value( "database/PathReplacementPrefixTo", "" ).toString();
+            if ( document.isObject() )
+            {
+                // Parse the settings from JSON
+                fromJson( document.object() );
+                return true;
+            }
+        }
+    }
 
-    lircDevicePath = settings.value( "lirc/DevicePath", "" ).toString();
-    lircMappingFile = settings.value( "lirc/MappingFile", "" ).toString();
-    lircEnabled = settings.value( "lirc/Enable", false ).toBool();
-
-    // http
-    httpEnabled = settings.value( "http/Enabled", false ).toBool();
-    httpListenPort = settings.value( "http/ListeningPort", 8000 ).toInt();
-    httpDocumentRoot = settings.value( "http/DocumentRoot", "" ).toString();
-    httpEnableAddQueue = settings.value( "http/EnableAddQueue", false ).toBool();
-    httpAccessCode = settings.value( "http/SecureAccessCode", "" ).toString();
-    httpForceUseHost = settings.value( "http/ForceUseHostname", "" ).toString();
-
-    startInFullscreen = settings.value( "mainmenu/StartInFullscreen", false ).toBool();
-    firstTimeWizardShown = settings.value( "mainmenu/FirstTimeWizardShown", false ).toBool();
-
-    cacheDir = settings.value( "player/cacheDir", QStandardPaths::writableLocation( QStandardPaths::CacheLocation ) ).toString();
-
-    // Notification
-    notificationTopColor = QColor( settings.value( "notification/TopColor", "white" ).toString() );
-    notificationCenterColor = QColor( settings.value( "notification/CenterColor", "white" ).toString() );
-
-    // Music collection
-    musicCollections = settings.value( "musicCollection/Paths", QStringList() ).toStringList();
-    musicCollectionSortedOrder = settings.value( "musicCollection/SortedOrder", true ).toBool();
-    musicCollectionCrossfadeTime = settings.value( "musicCollection/CrossfadeTime", 5 ).toInt();
+    // Use default settings
+    fromJson( QJsonObject() );
+    return false;
 }
 
-void Settings::save()
+bool Settings::save()
 {
-    QSettings settings;
+    // QSaveFile is an I/O device for writing text and binary files, without
+    // losing existing data if the writing operation fails.
+    QSaveFile file(m_settingsFile);
 
-    settings.setValue( "player/BackgroundType", playerBackgroundType );
-    settings.setValue( "player/BackgroundObjects", playerBackgroundObjects );
-    settings.setValue( "player/BackgroundTransitionDelay", playerBackgroundTransitionDelay );
-    settings.setValue( "player/RenderFPS", playerRenderFPS );
+    if ( !file.open(QIODevice::WriteOnly | QIODevice::Truncate) )
+        return false;
 
-    settings.setValue( "player/BackgroundColor", playerBackgroundColor.name() );
-    settings.setValue( "player/LyricsFont", playerLyricsFont.family() );
-    settings.setValue( "player/LyricsTextBeforeColor", playerLyricsTextBeforeColor.name() );
-    settings.setValue( "player/LyricsTextAfterColor", playerLyricsTextAfterColor.name() );
-    settings.setValue( "player/LyricsTextSpotColor", playerLyricsTextSpotColor.name() );
-    settings.setValue( "player/LyricsTextBackgroundTintPercentage", playerLyricBackgroundTintPercentage );
-    settings.setValue( "player/LyricsFontMaximumSize", playerLyricsFontMaxSize );
-    settings.setValue( "player/LyricsFontFitLines", playerLyricsFontFitLines );
+    QJsonDocument document( toJson() );
 
-    settings.setValue( "player/CDGbackgroundTransparent", playerCDGbackgroundTransparent );
-    settings.setValue( "player/IgnoreBackgroundFromFormats", playerIgnoreBackgroundFromFormats );
-    settings.setValue( "player/MusicLyricDelay", playerMusicLyricDelay );
-    settings.setValue( "player/VolumeStep", playerVolumeStep );
-    settings.setValue( "player/UseBuiltinMidiSynth", playerUseBuiltinMidiSynth );
+    // QSaveFile will remember the write error happen, so no need to check
+    file.write( document.toJson() );
+    file.commit();
+    return true;
+}
 
-    settings.setValue( "queue/AddNewSingersNext", queueAddNewSingersNext );
-    settings.setValue( "queue/SaveOnExit", queueSaveOnExit );
+QJsonObject Settings::toJson()
+{
+    QJsonObject out;
 
-    settings.setValue( "database/PathReplacementPrefixFrom", songPathReplacementFrom );
-    settings.setValue( "database/PathReplacementPrefixTo", songPathReplacementTo );
+    out[ "player/BackgroundType" ] = (int) playerBackgroundType;
+    out[ "player/BackgroundObjects" ] = fromStringList( playerBackgroundObjects );
+    out[ "player/BackgroundTransitionDelay" ] = (int) playerBackgroundTransitionDelay;
+    out[ "player/RenderFPS" ] = playerRenderFPS;
+
+    out[ "player/BackgroundColor" ] = playerBackgroundColor.name();
+    out[ "player/LyricsFont"] = playerLyricsFont.family();
+    out[ "player/LyricsTextBeforeColor"] = playerLyricsTextBeforeColor.name();
+    out[ "player/LyricsTextAfterColor"] = playerLyricsTextAfterColor.name();
+    out[ "player/LyricsTextSpotColor"] = playerLyricsTextSpotColor.name();
+    out[ "player/LyricsTextBackgroundTintPercentage"] = playerLyricBackgroundTintPercentage;
+    out[ "player/LyricsFontMaximumSize"] = playerLyricsFontMaxSize;
+    out[ "player/LyricsFontFitLines"] = playerLyricsFontFitLines;
+
+    out[ "player/CDGbackgroundTransparent"] = playerCDGbackgroundTransparent;
+    out[ "player/IgnoreBackgroundFromFormats"] = playerIgnoreBackgroundFromFormats;
+    out[ "player/MusicLyricDelay"] = playerMusicLyricDelay;
+    out[ "player/VolumeStep"] = playerVolumeStep;
+    out[ "player/UseBuiltinMidiSynth"] = playerUseBuiltinMidiSynth;
+
+    out[ "queue/AddNewSingersNext"] = queueAddNewSingersNext;
+    out[ "queue/SaveOnExit"] = queueSaveOnExit;
+
+    out[ "database/PathReplacementPrefixFrom"] = songPathReplacementFrom;
+    out[ "database/PathReplacementPrefixTo"] = songPathReplacementTo;
 
     // LIRC
-    settings.setValue( "lirc/Enable", lircEnabled );
-    settings.setValue( "lirc/DevicePath", lircDevicePath );
-    settings.setValue( "lirc/MappingFile", lircMappingFile );
+    out[ "lirc/Enable"] = lircEnabled;
+    out[ "lirc/DevicePath"] = lircDevicePath;
+    out[ "lirc/MappingFile"] = lircMappingFile;
 
     // http
-    settings.setValue( "http/Enabled", httpEnabled );
-    settings.setValue( "http/ListeningPort", httpListenPort );
-    settings.setValue( "http/DocumentRoot", httpDocumentRoot );
-    settings.setValue( "http/EnableAddQueue", httpEnableAddQueue );
-    settings.setValue( "http/SecureAccessCode", httpAccessCode );
-    settings.setValue( "http/ForceUseHostname", httpForceUseHost );
+    out[ "http/Enabled"] = httpEnabled;
+    out[ "http/ListeningPort"] = (int) httpListenPort;
+    out[ "http/EnableAddQueue"] = httpEnableAddQueue;
+
+    // Those are only set if not empty
+    if ( !httpAccessCode.isEmpty() )
+        out[ "http/SecureAccessCode"] = httpAccessCode;
+
+    if ( !httpDocumentRoot.isEmpty() )
+        out[ "http/DocumentRoot"] = httpDocumentRoot;
+
+    out[ "http/ForceUseHostname"] = httpForceUseHost;
 
     // Music collection
-    settings.setValue( "musicCollection/Paths", musicCollections );
-    settings.setValue( "musicCollection/SortedOrder", musicCollectionSortedOrder );
-    settings.setValue( "musicCollection/CrossfadeTime", musicCollectionCrossfadeTime );
+    out[ "musicCollection/Paths"] = fromStringList( musicCollections );
+    out[ "musicCollection/SortedOrder"] = musicCollectionSortedOrder;
+    out[ "musicCollection/CrossfadeTime"] = musicCollectionCrossfadeTime;
 
-    settings.setValue( "mainmenu/StartInFullscreen", startInFullscreen );
-    settings.setValue( "mainmenu/FirstTimeWizardShown", firstTimeWizardShown );
+    out[ "mainmenu/StartInFullscreen"] = startInFullscreen;
+    out[ "mainmenu/FirstTimeWizardShown"] = firstTimeWizardShown;
 
     // Notification
-    settings.setValue( "notification/TopColor", notificationTopColor.name() );
-    settings.setValue( "notification/CenterColor", notificationCenterColor.name() );
+    out[ "notification/TopColor"] = notificationTopColor.name();
+    out[ "notification/CenterColor"] = notificationCenterColor.name();
 
     // Store the cache dir only if the location is changed (i.e. not standard)
     if ( QStandardPaths::writableLocation( QStandardPaths::CacheLocation ) != cacheDir )
-        settings.setValue( "player/cacheDir", cacheDir );
+        out[ "player/cacheDir"] = cacheDir;
+
+    return out;
+}
+
+void Settings::fromJson(const QJsonObject &data)
+{
+    playerBackgroundType = (BackgroundType) data.value( "player/BackgroundType" ).toInt( (int)BACKGROUND_TYPE_IMAGE );
+    playerBackgroundObjects = toStringList( data.value( "player/BackgroundObjects" ), ":/background" );
+    playerBackgroundTransitionDelay = data.value( "player/BackgroundTransitionDelay" ).toInt( 30 );
+    playerRenderFPS = data.value( "player/RenderFPS" ).toInt( 25 );
+    playerBackgroundColor = QColor( data.value( "player/BackgroundColor" ).toString( "black" ) );
+    playerLyricsFont = QFont( data.value( "player/LyricsFont" ).toString( "arial" ) );
+    playerLyricsTextBeforeColor = QColor( data.value( "player/LyricsTextBeforeColor" ).toString( "blue" ) );
+    playerLyricsTextAfterColor = QColor( data.value( "player/LyricsTextAfterColor" ).toString("red") );
+    playerLyricsTextSpotColor = QColor( data.value( "player/LyricsTextSpotColor" ).toString("yellow") );
+    playerCDGbackgroundTransparent = data.value( "player/CDGbackgroundTransparent" ).toBool(false);
+    playerMusicLyricDelay = data.value( "player/MusicLyricDelay" ).toInt( 0 );
+    playerIgnoreBackgroundFromFormats = data.value( "player/IgnoreBackgroundFromFormats" ).toBool(false);
+    playerLyricsFontFitLines = data.value( "player/LyricsFontFitLines").toInt( 4 );
+    playerLyricsFontMaxSize = data.value( "player/LyricsFontMaximumSize" ).toInt( 512);
+    playerVolumeStep = data.value( "player/VolumeStep").toInt(10);
+    playerUseBuiltinMidiSynth = data.value( "player/UseBuiltinMidiSynth" ).toBool( true );
+    playerLyricBackgroundTintPercentage = data.value( "player/LyricsTextBackgroundTintPercentage" ).toInt( 75 );
+
+    queueAddNewSingersNext = data.value( "queue/AddNewSingersNext" ).toBool(false);
+    queueSaveOnExit = data.value( "queue/SaveOnExit" ).toBool(false);
+
+    songPathReplacementFrom = data.value( "database/PathReplacementPrefixFrom" ).toString();
+    songPathReplacementTo = data.value( "database/PathReplacementPrefixTo" ).toString();
+
+    lircDevicePath = data.value( "lirc/DevicePath" ).toString();
+    lircMappingFile = data.value( "lirc/MappingFile" ).toString();
+    lircEnabled = data.value( "lirc/Enable" ).toBool( false );
+
+    // http
+    httpEnabled = data.value( "http/Enabled" ).toBool( false );
+    httpListenPort = data.value( "http/ListeningPort" ).toInt( 8000 );
+    httpDocumentRoot = data.value( "http/DocumentRoot" ).toString();
+    httpEnableAddQueue = data.value( "http/EnableAddQueue" ).toBool( false );
+    httpAccessCode = data.value( "http/SecureAccessCode" ).toString();
+    httpForceUseHost = data.value( "http/ForceUseHostname" ).toString();
+
+    startInFullscreen = data.value( "mainmenu/StartInFullscreen" ).toBool( false );
+    firstTimeWizardShown = data.value( "mainmenu/FirstTimeWizardShown" ).toBool( false );
+
+    cacheDir = data.value( "player/cacheDir" ).toString( QStandardPaths::writableLocation( QStandardPaths::CacheLocation ) );
+
+    // Notification
+    notificationTopColor = QColor( data.value( "notification/TopColor" ).toString( "white" ) );
+    notificationCenterColor = QColor( data.value( "notification/CenterColor" ).toString( "white" ) );
+
+    // Music collection
+    musicCollections = toStringList( data.value( "musicCollection/Paths" ) );
+    musicCollectionSortedOrder = data.value( "musicCollection/SortedOrder" ).toBool( true );
+    musicCollectionCrossfadeTime = data.value( "musicCollection/CrossfadeTime" ).toInt( 5 );
+}
+
+QJsonValue Settings::fromStringList(const QStringList &list)
+{
+    if ( list.isEmpty() )
+        return QString();
+
+    return list.join( "|" );
+}
+
+QStringList Settings::toStringList( const QJsonValue& value, const QString& defaultval )
+{
+    QString listvalue = value.toString( defaultval );
+
+    if ( listvalue.isEmpty() )
+        return QStringList();
+
+    return listvalue.split( "|" );
 }
