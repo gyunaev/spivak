@@ -229,14 +229,23 @@ void ActionHandler_WebServer_Socket::readyRead()
             res = controlAction( document );
         else if ( m_url == "/api/collection/info" )
             res = collectionInfo( document );
-        else if ( m_url == "/api/collection/action" )
-            res = collectionControl( document );
         else if ( m_url == "/api/auth/status" )
             res = authinfo( document );
         else if ( m_url == "/api/auth/login" )
             res = login( document );
         else if ( m_url == "/api/auth/logout" )
             res = logout( document );
+
+        // Those are administrator only functions
+        if ( isAdministrator() )
+        {
+            if ( m_url == "/api/collection/action" )
+                res = collectionControl( document );
+            else if ( m_url == "/api/settings/get" )
+                res = settingsGet( document );
+            else if ( m_url == "/api/settings/set" )
+                res = settingsSet( document );
+        }
 
         if ( !res )
         {
@@ -768,6 +777,27 @@ bool ActionHandler_WebServer_Socket::collectionControl(QJsonDocument &document)
     return false;
 }
 
+bool ActionHandler_WebServer_Socket::settingsGet(QJsonDocument &)
+{
+    QJsonObject out;
+    out["settings"] = pSettings->toJson();
+
+    sendData( QJsonDocument( out ).toJson() );
+    return true;
+}
+
+bool ActionHandler_WebServer_Socket::settingsSet(QJsonDocument &document)
+{
+    QJsonObject obj = document.object();
+
+    if ( !obj.contains( "settings" ) || !obj["settings"].isObject() )
+        return false;
+
+    pSettings->fromJson( obj["settings"].toObject() );
+    sendData( "{ \"success\" : true }" );
+    return true;
+}
+
 // We do not take the reference since we modify the string
 QString ActionHandler_WebServer_Socket::escapeHTML( QString orig )
 {
@@ -777,6 +807,12 @@ QString ActionHandler_WebServer_Socket::escapeHTML( QString orig )
             .replace( '>', "&gt;" )
             .replace( '"', "&quot;" )
             .replace( '\'', "&#039;" );
+}
+
+bool ActionHandler_WebServer_Socket::isAdministrator()
+{
+    // FIXME
+    return true;
 }
 
 QString ActionHandler_WebServer_Socket::generateChallenge()

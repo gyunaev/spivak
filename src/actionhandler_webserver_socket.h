@@ -62,7 +62,13 @@ class ActionHandler_WebServer_Socket : public QObject
         bool    controlAction( QJsonDocument& document );
         bool    collectionInfo( QJsonDocument& document );
         bool    collectionControl( QJsonDocument& document );
+        bool    settingsGet( QJsonDocument& document );
+        bool    settingsSet( QJsonDocument& document );
+
         QString escapeHTML( QString orig );
+
+        // True if the currently logged user is a Karaoke admin
+        bool    isAdministrator();
 
         // Generates or verifies challenge string based on IP address
         QString generateChallenge();
