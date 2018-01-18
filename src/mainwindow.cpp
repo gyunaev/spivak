@@ -241,10 +241,24 @@ void MainWindow::menuAbout()
     ui_about.setupUi( &dlg );
 
     ui_about.labelAbout->setText( tr("<b>Spivak Karaoke Player version %1.%2</b><br><br>"
-            "Copyright (C) George Yunaev 2015-2017, <a href=\"mailto:support@ulduzsoft.com\">support@ulduzsoft.com</a><br><br>"
+            "Copyright (C) George Yunaev 2015-2018, <a href=\"mailto:support@ulduzsoft.com\">support@ulduzsoft.com</a><br><br>"
             "Web site: <a href=\"http://www.ulduzsoft.com\">www.ulduzsoft.com/karplayer</a><br><br>"
             "This program is licensed under terms of GNU General Public License "
             "version 3; see LICENSE file for details.") .arg(APP_VERSION_MAJOR) .arg(APP_VERSION_MINOR) );
+
+    ui_about.textThirdParty->setHtml( tr(
+        "<qt>"
+        "<h3>Qt toolkit library</h3>"
+        "<p>Spivak uses a portable GUI/core library available from "
+        "<a href=\"http://qt.nokia.com\">http://qt.nokia.com</a>. This toolkit library is "
+        "available and used under LGPL license.</p>"
+        "<h3>Icons</h3>"
+        "<p>Spivak uses icons developed by DryIcons, "
+        "<a href=\"http://www.dryicons.com\">http://www.dryicons.com</a>"
+        "<h3>GStreamer</h3>"
+        "<p>Spivak uses GStreamer library from <a href=\"http://gstreamer.org\">"
+        "gstreamer.org</a> for playing music and video files</p>"
+        "</qt>" ) );
 
     dlg.exec();
 }
