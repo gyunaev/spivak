@@ -18,6 +18,7 @@
 
 #include <QDir>
 #include <QMap>
+#include <QBuffer>
 #include <QFileInfo>
 #include <QThread>
 #include <QDateTime>
@@ -28,6 +29,7 @@
 #include "database.h"
 #include "playerlyricstext.h"
 #include "pluginmanager.h"
+#include "collectionprovider.h"
 #include "eventor.h"
 #include "util.h"
 
@@ -195,6 +197,34 @@ void SongDatabaseScanner::scanCollectionsThread()
         if ( m_finishScanning != 0 )
             break;
 
+        // Find the collection provider for this type
+        CollectionProvider * provider = CollectionProvider::createProvider( m_collection[i].type );
+
+        if ( !provider )
+            continue;
+
+        QByteArray indexdata;
+        QBuffer buf( &indexdata );
+
+        // If for this collection we already have the index file, just use it
+        if ( provider->retrieveFile( m_collection[i].rootPath + "index.dat", &buf ).isEmpty() )
+        {
+            // Parse the index file and send it directly into submission thread
+            parseCollectionIndex( m_collection[i].id, indexdata );
+            delete provider;
+            continue;
+        }
+
+        // Not so much luck, now we need to proceed with file system enumeration
+        // and this only makes sense with local collection
+        if ( !provider->isLocalProvider() )
+        {
+            delete provider;
+            Logger::error( "Skipped collection %s: provider is not local and no index found",
+                           qPrintable( m_collection[i].name) );
+            continue;
+        }
+
         // We do not use recursion, and use the queue-like list instead
         QStringList paths;
         paths << m_collection[i].rootPath;
@@ -228,6 +258,7 @@ void SongDatabaseScanner::scanCollectionsThread()
 
                 // If we're here this means the directory also has files. Those we will only check for if the parent directory
                 // has been modified after the last update
+                //FIXME! thisdoesn't seem right
                 if ( !modtime_checked )
                 {
                     if ( lastupdate > 0 && QFileInfo( current ).lastModified().toMSecsSinceEpoch() < lastupdate )
@@ -513,6 +544,41 @@ void SongDatabaseScanner::submittingThread()
         Logger::debug( "SongDatabaseScanner: submitter thread finished, scan aborted" );
 }
 
+void SongDatabaseScanner::parseCollectionIndex(int collid, const QByteArray &indexdata)
+{
+    // Index file is a simple vertical dash-separated text file in UTF8, containing per each line:
+    // <artist> <title> <filepathfromroot> <musicpathifneeded> <type> [language]
+    // filepathfromroot must contain path of lyrics (for music+lyric file)
+    // or the complete file (if video or zip). In former case musicpathifneeded
+    // should contain the music file, otherwise it should be empty.
+    QStringList entries = QString::fromUtf8( indexdata ).split( "\n" );
+
+    Q_FOREACH( const QString& entry, entries )
+    {
+        QStringList values = entry.split( '|' );
+
+        if ( values.size() < 5 )
+        {
+            Logger::error( "SongDatabaseScanner: Invalid line in the collection index: %s",
+                           qPrintable( entry) );
+            continue;
+        }
+
+        SongDatabaseEntry dbe;
+        dbe.colidx = collid;
+        dbe.artist = values[0];
+        dbe.title = values[1];
+        dbe.filePath = values[2];
+        dbe.musicPath = values[3];
+        dbe.type = values[4];
+
+        if ( values.size() > 5 )
+            dbe.language = values[5];
+
+        addSubmitting( dbe );
+    }
+}
+
 void SongDatabaseScanner::addProcessing(const SongDatabaseScanner::SongDatabaseEntry &entry)
 {
     m_stat_karaokeFilesFound++;
@@ -579,3 +645,4 @@ bool SongDatabaseScanner::guessArtistandTitle( const QString& filePath, const QS
 
     return true;
 }
+

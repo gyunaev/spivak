@@ -62,7 +62,10 @@ SOURCES += main.cpp\
     pluginmanager.cpp \
     notification.cpp \
     messageboxautoclose.cpp \
-    collectionentry.cpp
+    collectionentry.cpp \
+    collectionprovider.cpp \
+    collectionproviderfs.cpp \
+    collectionproviderhttp.cpp
 
 HEADERS  += mainwindow.h \
     settings.h \
@@ -119,7 +122,10 @@ HEADERS  += mainwindow.h \
     interface_mediaplayer.h \
     notification.h \
     messageboxautoclose.h \
-    collectionentry.h
+    collectionentry.h \
+    collectionprovider.h \
+    collectionproviderfs.h \
+    collectionproviderhttp.h
 
 FORMS    += mainwindow.ui \
     playerwidget.ui \

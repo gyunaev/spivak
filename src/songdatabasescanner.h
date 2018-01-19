@@ -82,6 +82,9 @@ class SongDatabaseScanner : public QObject
         // This thread submits the new entries into the database.
         void    submittingThread();
 
+        // Parses the collection index file to skip enumerator and processor
+        void    parseCollectionIndex( int colid, const QByteArray& indexdata );
+
         // Producer-consumer implementation of processing queue
         QMutex                      m_processingQueueMutex;
         QWaitCondition              m_processingQueueCond;
