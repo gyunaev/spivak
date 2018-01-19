@@ -16,7 +16,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  **************************************************************************/
 
-#include <QMessageBox>
 #include <QPainter>
 #include <QThread>
 #include <QTimer>
@@ -31,7 +30,7 @@
 #include "playerrenderer.h"
 #include "notification.h"
 #include "musiccollectionmanager.h"
-
+#include "messageboxautoclose.h"
 
 KaraokeWidget::KaraokeWidget(QWidget *parent )
     : QWidget(parent)
@@ -136,9 +135,10 @@ void KaraokeWidget::playCurrent()
         m_background->pause( false );
         Logger::error("KaraokeWidget::playCurrent %s: exception %s", qPrintable( current.file), qPrintable(ex) );
 
-        QMessageBox::critical( 0,
-                               "Cannot play file",
-                               tr("Cannot play file %1:\n%2") .arg( current.file ) .arg( ex ) );
+        MessageBoxAutoClose::critical(
+                    "Cannot play file",
+                    tr("Cannot play file %1:\n%2") .arg( current.file ) .arg( ex ) );
+
         delete karfile;
 
         // Kick the current song out of queue
@@ -239,8 +239,12 @@ void KaraokeWidget::karaokeSongError( QString errormsg )
 {
     Logger::debug( "KaraokeWidget: song failed to load, or aborted: %s", qPrintable(errormsg) );
 
+    MessageBoxAutoClose::critical(
+                "Cannot play file",
+                tr("Cannot play music:\n%1") .arg( errormsg ) );
+
     // Resume our background if we do not have custom background (we paused it before in playCurrent() )
-    if ( !m_karaoke->hasCustomBackground() )
+    if ( m_karaoke && !m_karaoke->hasCustomBackground() )
         m_background->pause( false );
 
     karaokeSongFinished();

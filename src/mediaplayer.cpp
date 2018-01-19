@@ -497,9 +497,14 @@ void MediaPlayer::reportError(const QString &text)
 {
     Logger::error( "GstMediaPlayer: Reported error: %s", qPrintable(text));
 
-    m_errorsDetected = true;
     m_errorMsg = text;
-    QMetaObject::invokeMethod( this, "error", Qt::QueuedConnection, Q_ARG( QString, m_errorMsg ) );
+
+    // Avoid sending multiple error messages; one is enough
+    if ( !m_errorsDetected )
+    {
+        m_errorsDetected = true;
+        QMetaObject::invokeMethod( this, "error", Qt::QueuedConnection, Q_ARG( QString, m_errorMsg ) );
+    }
 }
 
 GstElement *MediaPlayer::createElement(const char *type, const char *name, bool mandatory)

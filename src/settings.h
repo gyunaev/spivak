@@ -56,6 +56,7 @@ class Settings
         int         playerMusicLyricDelay;      // delay in milliseconds between lyrics and music for this hardware
         int         playerVolumeStep;           // how much change the volume when +/- is pressed
 
+        int         dialogAutoCloseTimer;
 
         // Queue parameters
         bool        queueAddNewSingersNext; // if true, new singers are added right after the current singer; otherwise at the end.
@@ -86,7 +87,7 @@ class Settings
         QString         lircDevicePath;
         QString         lircMappingFile;
 
-        // HTTP port
+        // HTTP server
         bool            httpEnabled;
         bool            httpEnableAddQueue;
         unsigned int    httpListenPort;

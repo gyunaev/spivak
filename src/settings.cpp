@@ -168,6 +168,8 @@ QJsonObject Settings::toJson()
 
     out[ "http/ForceUseHostname"] = httpForceUseHost;
 
+    out[ "misc/DialogAutoCloseTimer" ] = dialogAutoCloseTimer;
+
     // Music collection
     out[ "musicCollection/Paths"] = fromStringList( musicCollections );
     out[ "musicCollection/SortedOrder"] = musicCollectionSortedOrder;
@@ -227,6 +229,8 @@ void Settings::fromJson(const QJsonObject &data)
 
     startInFullscreen = data.value( "mainmenu/StartInFullscreen" ).toBool( false );
     firstTimeWizardShown = data.value( "mainmenu/FirstTimeWizardShown" ).toBool( false );
+
+    dialogAutoCloseTimer = data.value( "misc/DialogAutoCloseTimer" ).toInt( 10 );
 
     cacheDir = data.value( "player/cacheDir" ).toString( QStandardPaths::writableLocation( QStandardPaths::CacheLocation ) );
 

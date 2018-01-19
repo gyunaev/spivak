@@ -61,7 +61,8 @@ SOURCES += main.cpp\
     midisyntheser.cpp \
     midistripper.cpp \
     pluginmanager.cpp \
-    notification.cpp
+    notification.cpp \
+    messageboxautoclose.cpp
 
 HEADERS  += mainwindow.h \
     settings.h \
@@ -117,7 +118,8 @@ HEADERS  += mainwindow.h \
     pluginmanager.h \
     interface_languagedetector.h \
     interface_mediaplayer.h \
-    notification.h
+    notification.h \
+    messageboxautoclose.h
 
 FORMS    += mainwindow.ui \
     playerwidget.ui \
