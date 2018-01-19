@@ -32,7 +32,6 @@ void MessageBoxAutoClose::critical(const QString &title, const QString &message)
 
     // Show the dialog and wait until it returns
     m->exec();
-    Logger::debug( "dialog closed");
 }
 
 void MessageBoxAutoClose::updatetime()
