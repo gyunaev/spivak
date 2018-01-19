@@ -19,6 +19,7 @@
 #ifndef SONGDATABASESCANNER_H
 #define SONGDATABASESCANNER_H
 
+#include <QMap>
 #include <QQueue>
 #include <QTimer>
 #include <QObject>
@@ -27,7 +28,7 @@
 #include <QMutex>
 #include <QDateTime>
 
-#include "database_collectioninfo.h"
+#include "collectionentry.h"
 
 class SongDatabaseScannerWorkerThread;
 class Interface_LanguageDetector;
@@ -110,7 +111,7 @@ class SongDatabaseScanner : public QObject
         QAtomicInt                  m_abortScanning;
 
         // Copy of collection for scanning
-        QList<Database_CollectionInfo> m_collection;
+        QMap<int,CollectionEntry>   m_collection;
 
         // An optional plugin (auto-loaded) to detect the lyric language
         Interface_LanguageDetector    *       m_langDetector;

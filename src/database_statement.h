@@ -23,7 +23,6 @@
 #include <QByteArray>
 
 #include "database_songinfo.h"
-#include "database_collectioninfo.h"
 
 struct sqlite3;
 struct sqlite3_stmt;

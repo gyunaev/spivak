@@ -40,9 +40,10 @@ public:
         void    backgroundChanged(int idx);
         void    collectionLanguageCheckboxChanged();
         void    collectionSeparatorChanged();
+        void    collectionTypeChanged();
 
         void    browseCollection();
-        void    browseCollectionTestFileName();
+        void    collectionTestArtistTitle( QString );
         void    browseBackgroundImages();
         void    browseBackgroundVideos();
         void    browseLIRCmapping();

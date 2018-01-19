@@ -52,7 +52,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     connect( ui->boxCollectionSeparator, SIGNAL(activated(int)), this, SLOT(collectionSeparatorChanged()) );
 
     connect( ui->btnBrowseCollection, SIGNAL(clicked()), this, SLOT(browseCollection()) );
-    connect( ui->btnTestArtistTitle, SIGNAL(clicked()), this, SLOT(browseCollectionTestFileName()) );
+    connect( ui->leArtistTitleTest, SIGNAL(textChanged(QString)), this, SLOT(collectionTestArtistTitle( QString )) );
     connect( ui->btnBrowseImages, SIGNAL(clicked()), this, SLOT(browseBackgroundImages()) );
     connect( ui->btnBrowseVideos, SIGNAL(clicked()), this, SLOT(browseBackgroundVideos()) );
     connect( ui->btnBrowseLIRCmapping, SIGNAL(clicked()), this, SLOT(browseLIRCmapping()) );
@@ -61,6 +61,9 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 
     connect( ui->btnUpdateCollection, &QPushButton::clicked, this, &SettingsDialog::startUpdateDatabase );
     connect( ui->btnEraseCollection, &QPushButton::clicked, this, &SettingsDialog::eraseDatabase );
+
+    connect( ui->boxCollectionTypeFS, &QRadioButton::clicked, this, &SettingsDialog::collectionTypeChanged );
+    connect( ui->boxCollectionTypeHTTP, &QRadioButton::clicked, this, &SettingsDialog::collectionTypeChanged );
 
     // Prepare the languages if the interface is available
     m_langdetector = pPluginManager->loadLanguageDetector();
@@ -85,7 +88,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 
     //
     // Collection tab
-    QList<Database_CollectionInfo> cols = pDatabase->getCollections();
+    //
 
     // Common separator values are hardcoded
     for ( int i = 0; coltemplatelist[i]; i++ )
@@ -93,16 +96,25 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 
     ui->boxCollectionSeparator->addItem( tr("Add a new separator..." ) );
 
-    // Collections tab is hidden where multiple collections are defined - edited via Collection Editor
-    if ( cols.size() > 1 )
-        ui->tabCollections->hide();
-    else if ( cols.size() == 1 )
+    if ( !pSettings->collections.isEmpty() )
     {
-        const Database_CollectionInfo& col = cols.first();
+        const CollectionEntry& col = pSettings->collections.first();
 
+        if ( col.type == CollectionEntry::TYPE_FILESYSTEM )
+        {
+            ui->boxCollectionTypeFS->setChecked( true );
+            ui->boxCollectionDetectLang->setChecked( col.detectLanguage );
+        }
+        else
+        {
+            ui->boxCollectionTypeHTTP->setChecked( true );
+            ui->leHTTPuser->setText( col.authuser );
+            ui->leHTTPpass->setText( col.authpass );
+        }
+
+        ui->leCollectionName->setText( col.name );
         ui->leCollectionPath->setText( col.rootPath );
         ui->boxColelctionZIP->setChecked( col.scanZips );
-        ui->boxCollectionDetectLang->setChecked( col.detectLanguage );
 
         if ( !col.defaultLanguage.isEmpty() && m_langdetector )
             ui->boxCollectionLanguage->setCurrentText( col.defaultLanguage );
@@ -114,6 +126,9 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
         // And show it as current
         ui->boxCollectionSeparator->setCurrentIndex( ui->boxCollectionSeparator->findData( col.artistTitleSeparator  ) );
     }
+
+    // Modify the text strings
+    collectionTypeChanged();
 
     // Show the database information
     refreshDatabaseInformation();
@@ -307,6 +322,12 @@ void SettingsDialog::browseCollection()
     ui->leCollectionPath->setText( e );
 }
 
+void SettingsDialog::collectionTestArtistTitle(QString test)
+{
+    m_testFileName = test;
+    updateCollectionTestOutput();
+}
+
 void SettingsDialog::browseBackgroundImages()
 {
     QString e = QFileDialog::getExistingDirectory( 0, "Choose the background image root path" );
@@ -483,30 +504,55 @@ void SettingsDialog::updateLyricsPreview()
 
 bool SettingsDialog::validateAndStoreCollection()
 {
-    QList<Database_CollectionInfo> collections;
-
     if ( ui->leCollectionPath->text().isEmpty() )
     {
-        pDatabase->setCollections( collections );
+        // Collection removed
+        //TODO: erase songs
+        if ( !pSettings->collections.isEmpty() )
+            pSettings->collections.remove( pSettings->collections.first().id );
+
         return true;    // valid but empty
     }
 
-    // Path must be valid
-    Database_CollectionInfo col;
-    col.rootPath = ui->leCollectionPath->text();
-
-    if ( !QFileInfo(col.rootPath).exists() )
+    // If the collection list is empty, add the first one
+    if ( pSettings->collections.isEmpty() )
     {
-        QMessageBox::critical( 0, "The collection path does not exist", "Cannot use this collection - the path does not exist" );
+        // Use ID 1
+        CollectionEntry col;
+        col.id = 1;
+        pSettings->collections[ col.id ] = col;
+    }
 
-        // Switch to our tab and focus on value
-        ui->tabWidget->setCurrentIndex( 0 );
-        ui->leCollectionPath->setFocus();
-        return false;
+    // Modify the first collection
+    CollectionEntry& col = pSettings->collections.first();
+
+    col.name = ui->leCollectionName->text();
+    col.rootPath = ui->leCollectionPath->text();
+    col.type = ui->boxCollectionTypeFS->isChecked()
+            ? CollectionEntry::TYPE_FILESYSTEM : CollectionEntry::TYPE_HTTP;
+
+    if ( col.type == CollectionEntry::TYPE_FILESYSTEM )
+    {
+        if ( !QFileInfo(col.rootPath).exists() )
+        {
+            QMessageBox::critical( 0, "The collection path does not exist", "Cannot use this collection - the path does not exist" );
+
+            // Switch to our tab and focus on value
+            ui->tabWidget->setCurrentIndex( 0 );
+            ui->leCollectionPath->setFocus();
+            return false;
+        }
+
+        col.detectLanguage = m_langdetector && ui->boxCollectionDetectLang->isChecked();
+    }
+    else
+    {
+        col.detectLanguage = false;
+        col.authuser = ui->leHTTPuser->text();
+        col.authpass = ui->leHTTPpass->text();
     }
 
     col.scanZips = ui->boxColelctionZIP->isChecked();
-    col.detectLanguage = m_langdetector && ui->boxCollectionDetectLang->isChecked();
 
     if ( ui->boxCollectionLanguage->currentIndex() > 0 && m_langdetector )
         col.defaultLanguage = ui->boxCollectionLanguage->currentText();
@@ -514,23 +560,7 @@ bool SettingsDialog::validateAndStoreCollection()
         col.defaultLanguage.clear();
 
     col.artistTitleSeparator = ui->boxCollectionSeparator->currentData().toString();
-
-    collections.append( col );
-    pDatabase->setCollections( collections );
-
     return true;
-}
-
-
-void SettingsDialog::browseCollectionTestFileName()
-{
-    QString e = QFileDialog::getOpenFileName( 0, "Choose the file from your collection" );
-
-    if ( e.isEmpty() )
-        return;
-
-    m_testFileName = e;
-    updateCollectionTestOutput();
 }
 
 QString SettingsDialog::collectionSeparatorString(const QString &value)
@@ -564,19 +594,50 @@ void SettingsDialog::collectionSeparatorChanged()
     updateCollectionTestOutput();
 }
 
+void SettingsDialog::collectionTypeChanged()
+{
+    if ( ui->boxCollectionTypeFS->isChecked() )
+    {
+        // Hide the authentication
+        ui->lblHTTPauth->hide();
+        ui->leHTTPuser->hide();
+        ui->leHTTPpass->hide();
+
+        // Show the language detection
+        ui->boxCollectionDetectLang->show();
+        ui->lblFSdetectLang->show();
+        ui->lblRootDir->setText( tr("Root directory of the local &Karaoke collection:"));
+    }
+    else
+    {
+        // Show the authentication
+        ui->lblHTTPauth->show();
+        ui->leHTTPuser->show();
+        ui->leHTTPpass->show();
+
+        // Hide the language detection
+        ui->boxCollectionDetectLang->hide();
+        ui->lblFSdetectLang->hide();
+        ui->lblRootDir->setText( tr("Full URL of the &Karaoke collection:"));
+
+    }
+}
+
 void SettingsDialog::updateCollectionTestOutput()
 {
     if ( m_testFileName.isEmpty() )
+    {
+        ui->lblTestArtistTitle->setText( "Nothing entered" );
         return;
+    }
 
     QString artist, title;
 
-    if ( !SongDatabaseScanner::guessArtistandTitle( m_testFileName, ui->boxCollectionSeparator->currentData().toString(), artist, title ) )
-        ui->lblTestArtistTitle->setText( tr("File <i>%1</i>\nCannot detect artist/title in this file using the separator above")
-                                         .arg(m_testFileName.toHtmlEscaped()) );
+    if ( !SongDatabaseScanner::guessArtistandTitle( m_testFileName, ui->boxCollectionSeparator->currentData().toString(), artist, title ) || title.isEmpty() )
+        ui->lblTestArtistTitle->setText( tr("Cannot detect artist/title in this file using the separator above") );
     else
-        ui->lblTestArtistTitle->setText( tr("File <i>%1</i><br>Detected artist: <b>%2</b>, title: <b>%3</b>")
-                                         .arg(m_testFileName.toHtmlEscaped()) .arg(artist.toHtmlEscaped()) .arg(title.toHtmlEscaped()) );
+        ui->lblTestArtistTitle->setText( tr("Artist: <b>%1</b>, Title: <b>%2</b>")
+                                         .arg(artist.toHtmlEscaped()) .arg(title.toHtmlEscaped()) );
 }
 
 

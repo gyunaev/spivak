@@ -22,6 +22,7 @@
 #include <QFileInfo>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonArray>
 #include <QSaveFile>
 #include <QStandardPaths>
 
@@ -186,6 +187,16 @@ QJsonObject Settings::toJson()
     if ( QStandardPaths::writableLocation( QStandardPaths::CacheLocation ) != cacheDir )
         out[ "player/cacheDir"] = cacheDir;
 
+    // Collections
+    QJsonArray colarray;
+
+    Q_FOREACH( const CollectionEntry& e, collections )
+    {
+        colarray.push_back( e.toJson() );
+    }
+
+    out[ "collection" ] = colarray;
+
     return out;
 }
 
@@ -242,6 +253,17 @@ void Settings::fromJson(const QJsonObject &data)
     musicCollections = toStringList( data.value( "musicCollection/Paths" ) );
     musicCollectionSortedOrder = data.value( "musicCollection/SortedOrder" ).toBool( true );
     musicCollectionCrossfadeTime = data.value( "musicCollection/CrossfadeTime" ).toInt( 5 );
+
+    // Collections
+    collections.clear();
+    QJsonArray colarray = data.value("collection").toArray();
+
+    Q_FOREACH( const QJsonValue& v, colarray )
+    {
+        CollectionEntry entry;
+        entry.fromJson( v.toObject() );
+        collections[ entry.id ] = entry;
+    }
 }
 
 QJsonValue Settings::fromStringList(const QStringList &list)

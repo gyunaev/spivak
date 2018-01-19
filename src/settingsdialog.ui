@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>768</width>
-    <height>504</height>
+    <width>1167</width>
+    <height>730</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tabCollections">
       <attribute name="title">
@@ -25,20 +25,86 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QGroupBox" name="groupBox_6">
+        <widget class="QGroupBox" name="groupBox">
          <property name="title">
-          <string>Song collection</string>
+          <string>Collection information</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_2">
           <item row="0" column="0" colspan="3">
-           <widget class="QLabel" name="label_18">
+           <layout class="QHBoxLayout" name="horizontalLayout_13">
+            <item>
+             <widget class="QLabel" name="label_7">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>This is a</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="boxCollectionTypeFS">
+              <property name="text">
+               <string>filesystem collection (including mapped dri&amp;ves)</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="boxCollectionTypeHTTP">
+              <property name="text">
+               <string>Web collection</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_12">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="lblRootDir_2">
             <property name="text">
-             <string>Use this entry if you want to use Karaoke collection feature, such as song searching</string>
+             <string>Collection name:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="buddy">
+             <cstring>leCollectionPath</cstring>
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_12">
+          <item row="1" column="1" rowspan="2" colspan="2">
+           <widget class="QLineEdit" name="leCollectionName">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A name for your collection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" rowspan="2">
+           <widget class="QLabel" name="lblRootDir">
             <property name="text">
              <string>Root directory of the local &amp;Karaoke collection:</string>
             </property>
@@ -50,7 +116,7 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="1" colspan="2">
+          <item row="3" column="1" colspan="2">
            <widget class="QLineEdit" name="leCollectionPath">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -59,11 +125,11 @@
              </sizepolicy>
             </property>
             <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Karaoke songs are typically stored on disk in a specific folder. This folder may contain one or more Karaoke songs, as well as other subfolders containing Karaoke songs. This folder would be your collection root path, and should be specified here.&lt;/p&gt;&lt;p&gt;For example, if you have the following folder structure:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;C:\Users\Me\Documents\Karaoke\&lt;br/&gt;C:\Users\Me\Documents\Karaoke\Beatles\Yesterday.kar&lt;br/&gt;C:\Users\Me\Documents\Karaoke\Bee Gees\How deep is your love.zip&lt;/span&gt;&lt;/p&gt;&lt;p&gt;your collection root path would be &lt;span style=&quot; font-weight:600;&quot;&gt;C:\Users\Me\Documents\Karaoke\&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Karaoke songs are typically stored on disk in a specific folder. This folder may contain one or more Karaoke songs, as well as other subfolders containing Karaoke songs. This folder would be your collection root path, and should be specified here.&lt;/p&gt;&lt;p&gt;For example, if you have the following folder structure:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;C:\Users\Me\Documents\Karaoke\&lt;br/&gt;C:\Users\Me\Documents\Karaoke\Beatles\Yesterday.kar&lt;br/&gt;C:\Users\Me\Documents\Karaoke\Bee Gees\How deep is your love.zip&lt;/span&gt;&lt;/p&gt;&lt;p&gt;your collection root path would be &lt;span style=&quot; font-weight:600;&quot;&gt;C:\Users\Me\Documents\Karaoke\&lt;/span&gt;&lt;/p&gt;&lt;p&gt;You can also store your collection on an HTTP server which serves the similar data structure. Please read the documentation how to do this.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="3">
+          <item row="3" column="3">
            <widget class="QPushButton" name="btnBrowseCollection">
             <property name="text">
              <string/>
@@ -74,7 +140,7 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="4">
+          <item row="3" column="4">
            <widget class="LabelShowHelp" name="label_25">
             <property name="text">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;background&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Help&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -84,7 +150,37 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0" colspan="3">
+          <item row="4" column="0">
+           <widget class="QLabel" name="lblHTTPauth">
+            <property name="text">
+             <string>Authentication infor&amp;mation if needed:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="buddy">
+             <cstring>leCollectionPath</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="leHTTPuser">
+            <property name="placeholderText">
+             <string>login</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="2">
+           <widget class="QLineEdit" name="leHTTPpass">
+            <property name="echoMode">
+             <enum>QLineEdit::Password</enum>
+            </property>
+            <property name="placeholderText">
+             <string>password</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0" colspan="3">
            <widget class="QCheckBox" name="boxColelctionZIP">
             <property name="whatsThis">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If you have Karaoke songs which are stored in ZIP archives (typical example would be MP3+G, where an MP3 and associated CD+G file with the same file name are stored in a single ZIP archive), please check this checkbox. This will ensure ZIP files are analyzed during the database scan, and those songs would be available during the search.&lt;/p&gt;&lt;p&gt;However if you do not have any ZIP archives containing Karaoke songs, you can uncheck this box and all ZIP archives would be ignored.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -94,40 +190,20 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="4">
-           <widget class="LabelShowHelp" name="label_26">
-            <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;background&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Help&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="buddy">
-             <cstring>boxColelctionZIP</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0" colspan="3">
+          <item row="6" column="0" colspan="3">
            <widget class="QCheckBox" name="boxCollectionDetectLang">
             <property name="whatsThis">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The scanner is able to detect the language the Karaoke &lt;span style=&quot; font-weight:600;&quot;&gt;text&lt;/span&gt; lyrics are written into, and store it in the database during the scan. This information will be available during search and browsing, and allows users to look directly for songs in a specific language, for example Chinese, Russian or Italian. This will slow down the scan roughly by 10%.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;This option only works with text lyrics&lt;/span&gt;, and does not work with non-text Karaoke files such as video or CD+G (and the language scanner is not invoked on them). Currenly supported text lyrics formats are KAR, Karafun, LRC and UltraStar.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Please note this option controls language detection, and not lyrics encoding detection, which is detected separately and automatically.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
-             <string>Automatically detect and remember the karaoke song language for text lyrics (seen in browse/search)</string>
+             <string>Detect the karaoke song language for text lyrics (seen in browse/search)</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="4">
-           <widget class="LabelShowHelp" name="label_27">
-            <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;background&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Help&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="buddy">
-             <cstring>boxCollectionDetectLang</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
+          <item row="7" column="0">
            <widget class="QLabel" name="lblCollectionLanguage">
             <property name="text">
-             <string>&amp;Language the song :</string>
+             <string>Default &amp;language for undetected songs:</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -137,70 +213,7 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="1" colspan="3">
-           <widget class="QComboBox" name="boxCollectionLanguage">
-            <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the language for either all the songs (if detection is disabled), or only for the songs which language is not detected. If you know your collection only contains the songs in certain language, you can set this option and disable the language detection to speed up the scan.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="4">
-           <widget class="LabelShowHelp" name="label_28">
-            <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;background&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Help&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="buddy">
-             <cstring>boxCollectionLanguage</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="4">
-           <widget class="LabelShowHelp" name="label_32">
-            <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;background&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Help&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="buddy">
-             <cstring>boxCollectionSeparator</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="0" colspan="5">
-           <widget class="QGroupBox" name="groupBox_5">
-            <property name="title">
-             <string>Test the artist-title detection with a file</string>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_16">
-             <item>
-              <widget class="QLabel" name="lblTestArtistTitle">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>1</horstretch>
-                 <verstretch>1</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>Choose a file from your collection using the browse button to see how the artist and title are detected in the file from your collection</string>
-               </property>
-               <property name="wordWrap">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="btnTestArtistTitle">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/images/icon_open_file.png</normaloff>:/images/icon_open_file.png</iconset>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="5" column="0">
+          <item row="8" column="0">
            <widget class="QLabel" name="label_14">
             <property name="text">
              <string>Artist and title are separated by:</string>
@@ -210,12 +223,105 @@
             </property>
            </widget>
           </item>
-          <item row="5" column="1" colspan="3">
+          <item row="7" column="1" colspan="2">
+           <widget class="QComboBox" name="boxCollectionLanguage">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the language for either all the songs (if detection is disabled), or only for the songs which language is not detected. If you know your collection only contains the songs in certain language, you can set this option and disable the language detection to speed up the scan.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="1" colspan="2">
            <widget class="QComboBox" name="boxCollectionSeparator">
             <property name="whatsThis">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This option is used for detecting the &lt;span style=&quot; font-weight:600;&quot;&gt;Artist &lt;/span&gt;(Singer, Performer) and &lt;span style=&quot; font-weight:600;&quot;&gt;Title &lt;/span&gt;(Song name) of a Karaoke song. While this information could be sometime obtained from the Karaoke song itself, this information may be not reliable, and is often not available at all (for example for CD+G files). Therefore the only reliable way is to use the file and folder names.&lt;/p&gt;&lt;p&gt;The &amp;quot;A-HA/Take on me&amp;quot; option means the Artist is the folder name. In this case the scanner assumes this folder only contains the songs for this particular artist. The file name of each song in this case is a song title.&lt;/p&gt;&lt;p&gt;The &amp;quot;A-HA - Take on me&amp;quot; option means the information about the Artist and Title is stored in the file name itself. In this case the scanner separates them by a combination of space-dash-space and assumes the left part is artist, and the right part is title. Using a space-dash-space instead of just a dash is important, as using only a dash in the case above would result in the artist name &amp;quot;A&amp;quot; and song title &amp;quot;HA - Take on me&amp;quot;, which would be incorrect.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
            </widget>
+          </item>
+          <item row="5" column="3" colspan="2">
+           <widget class="LabelShowHelp" name="label_26">
+            <property name="text">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;background&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Help&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="buddy">
+             <cstring>boxColelctionZIP</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="3" colspan="2">
+           <widget class="LabelShowHelp" name="lblFSdetectLang">
+            <property name="text">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;background&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Help&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="buddy">
+             <cstring>boxCollectionDetectLang</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="3" colspan="2">
+           <widget class="LabelShowHelp" name="label_28">
+            <property name="text">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;background&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Help&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="buddy">
+             <cstring>boxCollectionLanguage</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="3" colspan="2">
+           <widget class="LabelShowHelp" name="label_32">
+            <property name="text">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;background&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Help&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="buddy">
+             <cstring>boxCollectionSeparator</cstring>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_5">
+         <property name="title">
+          <string>Paste a path or URL from your collection to see how the artist and title are detected:</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_11">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_16">
+            <item>
+             <widget class="QLabel" name="label_12">
+              <property name="text">
+               <string>Path/URL:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="leArtistTitleTest">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>1</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lblTestArtistTitle">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                <horstretch>2</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Not detected artist or title</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>
@@ -258,19 +364,6 @@
           </item>
          </layout>
         </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_5">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>

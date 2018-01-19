@@ -53,7 +53,6 @@ SOURCES += main.cpp\
     welcome_wizard.cpp \
     database.cpp \
     database_songinfo.cpp \
-    database_collectioninfo.cpp \
     database_statement.cpp \
     actionhandler_webserver_socket.cpp \
     feedbackdialog.cpp \
@@ -62,7 +61,8 @@ SOURCES += main.cpp\
     midistripper.cpp \
     pluginmanager.cpp \
     notification.cpp \
-    messageboxautoclose.cpp
+    messageboxautoclose.cpp \
+    collectionentry.cpp
 
 HEADERS  += mainwindow.h \
     settings.h \
@@ -107,7 +107,6 @@ HEADERS  += mainwindow.h \
     welcome_wizard.h \
     database.h \
     database_songinfo.h \
-    database_collectioninfo.h \
     database_statement.h \
     actionhandler_webserver_socket.h \
     feedbackdialog.h \
@@ -119,7 +118,8 @@ HEADERS  += mainwindow.h \
     interface_languagedetector.h \
     interface_mediaplayer.h \
     notification.h \
-    messageboxautoclose.h
+    messageboxautoclose.h \
+    collectionentry.h
 
 FORMS    += mainwindow.ui \
     playerwidget.ui \

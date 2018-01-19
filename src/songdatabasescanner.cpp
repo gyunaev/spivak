@@ -104,7 +104,7 @@ SongDatabaseScanner::~SongDatabaseScanner()
 bool SongDatabaseScanner::startScan()
 {
     // Make a copy in case the settings change during scanning
-    m_collection = pDatabase->getCollections();
+    m_collection = pSettings->collections;
 
     // Do we need the language detector?
     bool need_lang_detector = false;

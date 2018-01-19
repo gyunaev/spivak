@@ -19,9 +19,12 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+#include <QMap>
 #include <QFont>
 #include <QColor>
 #include <QJsonValue>
+
+#include "collectionentry.h"
 
 class Settings
 {
@@ -67,6 +70,8 @@ class Settings
         QColor      notificationTopColor;
         QColor      notificationCenterColor;
 
+        // Collection list mapped by collection ID
+        QMap<int,CollectionEntry>  collections;
 
         // Player background
         BackgroundType  playerBackgroundType;

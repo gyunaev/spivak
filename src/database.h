@@ -27,7 +27,6 @@
 
 #include "songdatabasescanner.h"
 #include "database_songinfo.h"
-#include "database_collectioninfo.h"
 
 
 struct sqlite3;
@@ -72,10 +71,6 @@ class Database : public QObject
 
         // Reset the last update timestamp
         void    resetLastDatabaseUpdate();
-
-        // For collections
-        QList<Database_CollectionInfo>  getCollections();
-        bool    setCollections( QList<Database_CollectionInfo>& collections );
 
         // Goes through all collections and removes the songs which are missing from disk. Takes a while, run in a separate thread!
         bool    cleanupCollections();

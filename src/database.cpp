@@ -64,9 +64,8 @@ bool Database::init()
     if ( !recreateSongTable() )
         return false;
 
-    // Collection and setting tables
-    if ( !execute( "CREATE TABLE IF NOT EXISTS settings( version INTEGER, identifier TEXT, lastupdated INT)" )
-    || !execute( "CREATE TABLE IF NOT EXISTS collections( root TEXT, parameters TEXT, lastscan INT )" ) )
+    // Setting table
+    if ( !execute( "CREATE TABLE IF NOT EXISTS settings( version INTEGER, identifier TEXT, lastupdated INT)" ) )
         return false;
 
     // Verify/update version
@@ -242,85 +241,6 @@ qint64 Database::getArtistCount() const
         return songstmt.columnInt64( 0 );
 
     return 0;
-}
-
-QList<Database_CollectionInfo> Database::getCollections()
-{
-    Database_Statement stmt;
-    QList<Database_CollectionInfo> cols;
-
-    // root TEXT, parameters TEXT, lastscan INT
-    if ( !stmt.prepare( m_sqlitedb, "SELECT rowid, root, parameters, lastscan FROM collections") )
-        return cols;
-
-    while ( stmt.step() == SQLITE_ROW )
-    {
-        Database_CollectionInfo cinfo;
-
-        cinfo.id = stmt.columnInt64( 0 );
-        cinfo.rootPath = stmt.columnText( 1 );
-        cinfo.lastScanned = stmt.columnInt64( 3 );
-
-        // Parse song parameters
-        QJsonDocument doc = QJsonDocument::fromJson( stmt.columnText(2).toUtf8() );
-
-        if ( !doc.isEmpty() )
-        {
-            QJsonObject obj = doc.object();
-
-            if ( obj.contains( "detectLang" ) )
-                cinfo.detectLanguage = obj["detectLang"].toBool();
-
-            if ( obj.contains( "scanZips" ) )
-                cinfo.scanZips = obj["scanZips"].toBool();
-
-            if ( obj.contains( "defaultLang" ) )
-                cinfo.defaultLanguage = obj["defaultLang"].toString();
-
-            if ( obj.contains( "separator" ) )
-                cinfo.artistTitleSeparator = obj["separator"].toString();
-        }
-
-        cols.append( cinfo );
-    }
-
-    return cols;
-}
-
-bool Database::setCollections(QList<Database_CollectionInfo> &collections)
-{
-    Database_Statement stmt;
-
-    if ( !execute( "BEGIN TRANSACTION" ) )
-        return false;
-
-    if ( !execute( "DELETE FROM collections" ) )
-    {
-        execute( "ROLLBACK TRANSACTION" );
-        return false;
-    }
-
-    for ( int i = 0; i < collections.size(); i++ )
-    {
-        const Database_CollectionInfo& e = collections[i];
-
-        // Encode parameters
-        QJsonObject obj;
-
-        obj["detectLang"] = e.detectLanguage;
-        obj["scanZips"] = e.scanZips;
-        obj["defaultLang"] = e.defaultLanguage;
-        obj["separator"] = e.artistTitleSeparator;
-
-        // root TEXT, parameters TEXT, lastscan INT
-        if ( !execute( QString("INSERT INTO collections VALUES( ?, ?, %1 )").arg( e.lastScanned ), QStringList()  << e.rootPath << QJsonDocument( obj ).toJson() ) )
-        {
-            execute( "ROLLBACK TRANSACTION" );
-            return false;
-        }
-    }
-
-    return execute( "COMMIT TRANSACTION" );
 }
 
 bool Database::cleanupCollections()
