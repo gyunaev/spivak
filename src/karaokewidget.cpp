@@ -140,6 +140,9 @@ void KaraokeWidget::playCurrent()
                                "Cannot play file",
                                tr("Cannot play file %1:\n%2") .arg( current.file ) .arg( ex ) );
         delete karfile;
+
+        // Kick the current song out of queue
+        pActionHandler->dequeueSong( current.id );
         return;
     }
 

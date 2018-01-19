@@ -206,7 +206,11 @@ bool KaraokeSong::open()
             m_lyrics = new PlayerLyricsText( info.artist, info.title );
 
         if ( !m_lyrics->load( lyricDevice.data(), lyricFile ) )
+        {
+            delete m_lyrics;
+            m_lyrics = 0;
             throw( QObject::tr("Can't load lyrics file %1: %2") .arg( lyricFile ) .arg( m_lyrics->errorMsg() ) );
+        }
 
         // Destroy the object right away
         lyricDevice.reset( 0 );
@@ -468,6 +472,11 @@ void KaraokeSong::toggleVoiceRemoval()
 
 void KaraokeSong::songLoaded()
 {
+    // We might end up in a situation where the music is loaded, but the lyrics aren't.
+    // In this case we'll get this signal but m_lyrics is NULL.
+    if ( m_lyrics == 0 )
+        return;
+
     pCurrentState->playerPitch = 50;
     pCurrentState->playerTempo = 50;
     pCurrentState->playerVoiceRemovalEnabled = false;
