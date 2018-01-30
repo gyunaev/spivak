@@ -80,7 +80,7 @@ class QueueMusicWidget : public QWidget
         void    musicTagsChanged( QString artist, QString title );
 
         // Notification slots (so we can turn off the player when song is started, and then turn it back)
-        void    karaokeStarted( SongQueue::Song song );
+        void    karaokeStarted( SongQueueItem song );
         void    karaokeStopped();
 
         // To handle window closure

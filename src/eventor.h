@@ -51,7 +51,7 @@ class Eventor : public QObject
         //
 
         // A Karaoke song started playing
-        void    karaokeStarted( SongQueue::Song song );
+        void    karaokeStarted( SongQueueItem song );
 
         // Karaoke song paused or resumed
         void    karaokePausedResumed( bool pause );
@@ -69,7 +69,7 @@ class Eventor : public QObject
         void    karaokeParametersChanged();
 
         // Karaoke song failed to start
-        //void    karaokeStarted( SongQueue::Song song );
+        //void    karaokeStarted( SongQueueItem song );
 
         //
         // Background events

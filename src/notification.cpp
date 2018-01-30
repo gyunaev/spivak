@@ -188,7 +188,7 @@ qint64 Notifications::drawRegular(KaraokePainter &p)
 void Notifications::queueUpdated()
 {
     // Get the song list and currently scheduled song
-    QList<SongQueue::Song> queue = pSongQueue->exportQueue();
+    QList<SongQueueItem> queue = pSongQueue->exportQueue();
     int current = pSongQueue->currentItem();
 
     m_notificationLine.clear();
@@ -203,7 +203,7 @@ void Notifications::queueUpdated()
         for ( int i = current; i < queue.size(); i++ )
         {
             // Do not show the song if it is being played
-            if ( queue[i].state == SongQueue::Song::STATE_PLAYING )
+            if ( queue[i].state == SongQueueItem::STATE_PLAYING )
                 continue;
 
             QString itemname = queue[i].title;

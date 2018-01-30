@@ -58,7 +58,7 @@ QueueKaraokeWidget_AddEditDialog::~QueueKaraokeWidget_AddEditDialog()
     delete ui;
 }
 
-void QueueKaraokeWidget_AddEditDialog::setCurrentParams(const SongQueue::Song &song)
+void QueueKaraokeWidget_AddEditDialog::setCurrentParams(const SongQueueItem &song)
 {
     m_params = song;
 
@@ -68,7 +68,7 @@ void QueueKaraokeWidget_AddEditDialog::setCurrentParams(const SongQueue::Song &s
     setWindowTitle( "Edit a singer and/or song");
 }
 
-SongQueue::Song QueueKaraokeWidget_AddEditDialog::params() const
+SongQueueItem QueueKaraokeWidget_AddEditDialog::params() const
 {
     return m_params;
 }

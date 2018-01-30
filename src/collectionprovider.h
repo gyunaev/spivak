@@ -1,9 +1,9 @@
 #ifndef COLLECTIONPROVIDER_H
 #define COLLECTIONPROVIDER_H
 
+#include <QThread>
 #include <QObject>
 #include <QIODevice>
-#include "collectionentry.h"
 
 // The role of the provider class is to provide the data files for the player.
 // Player can only play files which are stored locally, but some collections
@@ -12,39 +12,51 @@
 class CollectionProvider : public QObject
 {
     Q_OBJECT
+
     public:
+        enum Type
+        {
+            TYPE_FILESYSTEM,
+            TYPE_HTTP,
+        };
+
+        CollectionProvider( QObject * parent = 0 );
         virtual ~CollectionProvider();
 
         // Creates a provider to perform actions for specific collection type
-        static CollectionProvider * createProvider( CollectionEntry::Type type );
+        static CollectionProvider * createProvider( Type type, QObject * parent = 0 );
 
         // Returns true if this provider is based on file system, and the file operations
         // are supported directly.
         virtual bool    isLocalProvider() const = 0;
 
-        // Synchronously retrieve the content of a specific file in the provider context.
-        // This function may take significant time (i.e. HTTP download) and should thus
-        // only be called in a separate thread.
-        // It returns an empty string if the file read successfully, otherwise error message.
-        virtual QString retrieveFile( const QString& filename, QIODevice * storage ) = 0;
+        // Returns the provider type
+        virtual Type type() const = 0;
 
         // Makes the file available locally (for example by downloading it)
         // and stores it in the provided QIODevice.
         // Emits the finished() signal once completed or if error happens.
         // While the file is being retrieved, periodically emits progress signal.
         // Function is executed asynchronously.
-        void    startRetrieveOne( int id, const QString& url, QIODevice * local );
+        void    download( int id, const QString& url, QIODevice * local );
 
         // Same as above but for multiple files - finished() is only emitted when
         // all files are downloaded.
-        void    startRetrieveAll( int id, const QList<QUrl>& urls, QList<QIODevice *> locals );
+        void    downloadAll( int id, const QList<QString>& urls, QList<QIODevice *> locals );
 
     signals:
         void    finished( int id, QString errormsg );
         void    progress( int id, int percentage );
 
     protected:
-        CollectionProvider();
+        // Makes the files available locally (for example by downloading it) from
+        // those URLs, and store them in the provided QIODevices.
+        // Emits the finished() signal once completed or if error happens.
+        // While the file is being retrieved, periodically emits progress signal.
+        // Function is executed asynchronously.
+        virtual void retrieveMultiple( int id, const QList<QString>& urls, QList<QIODevice *> files ) = 0;
+
+        QThread workerThread;
 };
 
 #endif // COLLECTIONPROVIDER_H

@@ -282,7 +282,7 @@ void QueueKaraokeWidget::timerUpdatePlayer()
     }
 }
 
-void QueueKaraokeWidget::karaokeStarted(SongQueue::Song song)
+void QueueKaraokeWidget::karaokeStarted(SongQueueItem song)
 {
     // Remember the text and params
     m_playText = tr("\"%1\" by %2") .arg(song.title) .arg(song.artist);

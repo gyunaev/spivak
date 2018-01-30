@@ -50,10 +50,10 @@ class TableModelQueue : public QAbstractTableModel
         QStringList singers();
 
         // Gets a copy of an item
-        const SongQueue::Song& itemAt( const QModelIndex & index );
+        const SongQueueItem& itemAt( const QModelIndex & index );
 
     private:
-        QList<SongQueue::Song>  m_queue;
+        QList<SongQueueItem>    m_queue;
         unsigned int            m_currentItem;
 };
 

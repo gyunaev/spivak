@@ -36,7 +36,7 @@
 #include "mainwindow.h"
 #include "actionhandler_webserver_socket.h"
 
-ActionHandler_WebServer_Socket::ActionHandler_WebServer_Socket(QTcpSocket *httpsock, const SongQueue::Song& currentSong)
+ActionHandler_WebServer_Socket::ActionHandler_WebServer_Socket(QTcpSocket *httpsock, const SongQueueItem& currentSong)
     : QObject()
 {
     m_httpsock = httpsock;
@@ -495,7 +495,7 @@ bool ActionHandler_WebServer_Socket::logout(QJsonDocument &)
 bool ActionHandler_WebServer_Socket::queueList(QJsonDocument &)
 {
     // Get the song list and currently scheduled song
-    QList<SongQueue::Song> queue = pSongQueue->exportQueue();
+    QList<SongQueueItem> queue = pSongQueue->exportQueue();
     unsigned int current = pSongQueue->currentItem();
 
     QJsonArray out;

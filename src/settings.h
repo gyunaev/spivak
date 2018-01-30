@@ -59,11 +59,17 @@ class Settings
         int         playerMusicLyricDelay;      // delay in milliseconds between lyrics and music for this hardware
         int         playerVolumeStep;           // how much change the volume when +/- is pressed
 
-        int         dialogAutoCloseTimer;
+        int         dialogAutoCloseTimer;       // How fast the dialog will automatically close
 
+        //
         // Queue parameters
-        bool        queueAddNewSingersNext; // if true, new singers are added right after the current singer; otherwise at the end.
-        QString     queueFilename;  // if defined, we save queue into file
+        //
+
+        // if true, new singers are added right after the current singer; otherwise at the end.
+        bool        queueAddNewSingersNext;
+
+        // if defined, we save queue into file
+        QString     queueFilename;
         bool        queueSaveOnExit;
 
         // Notification
@@ -72,6 +78,10 @@ class Settings
 
         // Collection list mapped by collection ID
         QMap<int,CollectionEntry>  collections;
+
+        // Maximum number of songs which could be simultaneously
+        // got ready (i.e. downloaded or converted)
+        int         queueMaxConcurrentPrepare;
 
         // Player background
         BackgroundType  playerBackgroundType;

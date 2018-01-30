@@ -38,8 +38,8 @@ class QueueKaraokeWidget_AddEditDialog : public QDialog
         explicit QueueKaraokeWidget_AddEditDialog( const QStringList& singers, QWidget *parent = 0 );
         ~QueueKaraokeWidget_AddEditDialog();
 
-        void    setCurrentParams( const SongQueue::Song& song );
-        SongQueue::Song params() const;
+        void    setCurrentParams( const SongQueueItem& song );
+        SongQueueItem params() const;
 
 
     private slots:
@@ -52,7 +52,7 @@ class QueueKaraokeWidget_AddEditDialog : public QDialog
     private:
         Ui::QueueKaraokeWidget_AddEditDialog * ui;
 
-        SongQueue::Song m_params;
+        SongQueueItem m_params;
 
         TableModelSearch *  m_modelSearch;
 };

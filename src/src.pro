@@ -65,7 +65,9 @@ SOURCES += main.cpp\
     collectionentry.cpp \
     collectionprovider.cpp \
     collectionproviderfs.cpp \
-    collectionproviderhttp.cpp
+    collectionproviderhttp.cpp \
+    songqueueitem.cpp \
+    songqueueitemretriever.cpp
 
 HEADERS  += mainwindow.h \
     settings.h \
@@ -125,7 +127,9 @@ HEADERS  += mainwindow.h \
     collectionentry.h \
     collectionprovider.h \
     collectionproviderfs.h \
-    collectionproviderhttp.h
+    collectionproviderhttp.h \
+    songqueueitem.h \
+    songqueueitemretriever.h
 
 FORMS    += mainwindow.ui \
     playerwidget.ui \

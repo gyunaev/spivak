@@ -6,7 +6,7 @@ CollectionEntry::CollectionEntry()
 {
     id = 0;
     priority = 0;
-    type = TYPE_FILESYSTEM;
+    type = CollectionProvider::TYPE_FILESYSTEM;
     detectLanguage = false;
     scanZips = false;
     lastScanned = -1;
@@ -18,7 +18,7 @@ QJsonObject CollectionEntry::toJson() const
 
     out[ "id" ] = id;
     out[ "priority" ] = priority;
-    out[ "type" ] = type == TYPE_FILESYSTEM ? "fs" : "http";
+    out[ "type" ] = type == CollectionProvider::TYPE_FILESYSTEM ? "fs" : "http";
     out[ "root" ] = rootPath;
     out[ "name" ] = name;
 
@@ -46,7 +46,7 @@ void CollectionEntry::fromJson(const QJsonObject &data)
     id = data.value( "id" ).toInt( 0 );
     name = data.value( "name" ).toString();
     priority = data.value( "priority" ).toInt( 0 );
-    type  = data.value( "type" ).toString( "fs" ) == "fs" ? TYPE_FILESYSTEM : TYPE_HTTP;
+    type  = data.value( "type" ).toString( "fs" ) == "fs" ? CollectionProvider::TYPE_FILESYSTEM : CollectionProvider::TYPE_HTTP;
     rootPath = data.value( "root" ).toString();
     authuser = data.value( "authuser" ).toString();
     authpass = data.value( "authpass" ).toString();

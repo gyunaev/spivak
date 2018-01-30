@@ -64,7 +64,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_settings = 0;
     m_welcomeWizard = 0;
 
-    qRegisterMetaType<SongQueue::Song>();
+    qRegisterMetaType<SongQueueItem>();
 
     // We don't use any crypto
     qsrand( (unsigned int) (long) pMainWindow * (unsigned int) QDateTime::currentMSecsSinceEpoch() );

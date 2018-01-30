@@ -207,7 +207,7 @@ QStringList TableModelQueue::singers()
     return out;
 }
 
-const SongQueue::Song &TableModelQueue::itemAt(const QModelIndex &index)
+const SongQueueItem &TableModelQueue::itemAt(const QModelIndex &index)
 {
     return m_queue[ index.row() ];
 }

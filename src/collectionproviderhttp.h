@@ -1,23 +1,57 @@
 #ifndef COLLECTIONPROVIDERHTTP_H
 #define COLLECTIONPROVIDERHTTP_H
 
+#include <QMap>
+#include <QThread>
+#include <QIODevice>
+#include <QAtomicInt>
+#include <QNetworkReply>
+#include <QNetworkAccessManager>
+
 #include "collectionprovider.h"
 
 class CollectionProviderHTTP : public CollectionProvider
 {
+    //Q_OBJECT
+
     public:
-        CollectionProviderHTTP();
+        CollectionProviderHTTP(QObject * parent);
 
         // Returns true if this provider is based on file system, and the file operations
         // are supported directly.
         virtual bool    isLocalProvider() const;
 
-        // Synchronously retrieve the content of a specific file in the provider context.
-        // This function may take significant time (i.e. HTTP download) and should thus
-        // only be called in a separate thread.
-        // It returns an empty string if the file read successfully, otherwise error message.
-        virtual QString retrieveFile( const QString& filename, QIODevice * storage );
+        // Returns the provider type
+        virtual Type type() const;
 
+    protected:
+        // Implemented in subclasses. Should download one or more files syncrhonously,
+        // and return when everything is downloaded. With non-zero ID should also
+        // call progress and finished callbacks (no callbacks with zero ID)
+        virtual void retrieveMultiple( int id, const QList<QString>& urls, QList<QIODevice *> files );
+
+    private slots:
+        void    httpFinished();
+        void    httpReadyRead();
+        void    httpProgress( qint64 bytesReceived, qint64 bytesTotal );
+
+    private:
+        void    cleanup();
+
+        class RequestData
+        {
+            public:
+                QNetworkReply * reply;
+                QIODevice * file;
+                QString     url;
+                qint64      bytesReceived;
+                qint64      bytesTotal;
+                bool        finished;
+        };
+
+        int m_id;
+        QNetworkAccessManager m_qnam;
+        QMap< QNetworkReply *, RequestData >  m_state;
 };
 
 #endif // COLLECTIONPROVIDERHTTP_H

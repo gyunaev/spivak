@@ -302,7 +302,7 @@ void QueueMusicWidget::musicTagsChanged(QString artist, QString title)
         m_player->setText( m_playText );
 }
 
-void QueueMusicWidget::karaokeStarted(SongQueue::Song )
+void QueueMusicWidget::karaokeStarted(SongQueueItem )
 {
     m_karaokePlaying = true;
 

@@ -31,7 +31,7 @@ class ActionHandler_WebServer_Socket : public QObject
     Q_OBJECT
 
     public:
-        ActionHandler_WebServer_Socket( QTcpSocket * httpsock, const SongQueue::Song& m_currentSong );
+        ActionHandler_WebServer_Socket( QTcpSocket * httpsock, const SongQueueItem& m_currentSong );
         ~ActionHandler_WebServer_Socket();
 
     signals:

@@ -144,7 +144,7 @@ void ActionHandler_WebServer::sessionOpened()
     }
 }
 
-void ActionHandler_WebServer::karaokeStarted(SongQueue::Song song)
+void ActionHandler_WebServer::karaokeStarted(SongQueueItem song)
 {
     m_currentSong = song;
 }

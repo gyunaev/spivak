@@ -100,7 +100,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     {
         const CollectionEntry& col = pSettings->collections.first();
 
-        if ( col.type == CollectionEntry::TYPE_FILESYSTEM )
+        if ( col.type == CollectionProvider::TYPE_FILESYSTEM )
         {
             ui->boxCollectionTypeFS->setChecked( true );
             ui->boxCollectionDetectLang->setChecked( col.detectLanguage );
@@ -529,9 +529,9 @@ bool SettingsDialog::validateAndStoreCollection()
     col.name = ui->leCollectionName->text();
     col.rootPath = ui->leCollectionPath->text();
     col.type = ui->boxCollectionTypeFS->isChecked()
-            ? CollectionEntry::TYPE_FILESYSTEM : CollectionEntry::TYPE_HTTP;
+            ? CollectionProvider::TYPE_FILESYSTEM : CollectionProvider::TYPE_HTTP;
 
-    if ( col.type == CollectionEntry::TYPE_FILESYSTEM )
+    if ( col.type == CollectionProvider::TYPE_FILESYSTEM )
     {
         if ( !QFileInfo(col.rootPath).exists() )
         {

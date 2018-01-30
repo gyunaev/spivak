@@ -91,7 +91,7 @@ class QueueKaraokeWidget : public QWidget
         void    timerUpdatePlayer();
 
         // Events from eventor
-        void    karaokeStarted( SongQueue::Song song );
+        void    karaokeStarted( SongQueueItem song );
         void    karaokePausedResumed( bool pause );
         void    karaokeVolumeChanged( int newvalue );
         void    karaokeStopped();

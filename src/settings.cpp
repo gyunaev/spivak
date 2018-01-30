@@ -146,6 +146,7 @@ QJsonObject Settings::toJson()
 
     out[ "queue/AddNewSingersNext"] = queueAddNewSingersNext;
     out[ "queue/SaveOnExit"] = queueSaveOnExit;
+    out[ "queue/MaxConcurrentPrepare"] = queueMaxConcurrentPrepare;
 
     out[ "database/PathReplacementPrefixFrom"] = songPathReplacementFrom;
     out[ "database/PathReplacementPrefixTo"] = songPathReplacementTo;
@@ -222,6 +223,7 @@ void Settings::fromJson(const QJsonObject &data)
 
     queueAddNewSingersNext = data.value( "queue/AddNewSingersNext" ).toBool(false);
     queueSaveOnExit = data.value( "queue/SaveOnExit" ).toBool(false);
+    queueMaxConcurrentPrepare = data.value( "queue/MaxConcurrentPrepare" ).toInt( 3 );
 
     songPathReplacementFrom = data.value( "database/PathReplacementPrefixFrom" ).toString();
     songPathReplacementTo = data.value( "database/PathReplacementPrefixTo" ).toString();

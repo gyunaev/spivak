@@ -41,7 +41,7 @@
 #include "libkaraokelyrics/lyricsloader.h"
 
 
-KaraokeSong::KaraokeSong( KaraokeWidget *w, const SongQueue::Song &song )
+KaraokeSong::KaraokeSong( KaraokeWidget *w, const SongQueueItem &song )
 {
     m_widget = w;
     m_song = song;
@@ -90,12 +90,6 @@ KaraokeSong::~KaraokeSong()
     delete m_lyrics;
     delete m_background;
     delete m_tempMusicFile;
-}
-
-bool KaraokeSong::needsProcessing(const QString &filename)
-{
-    Q_UNUSED(filename);
-    return false;
 }
 
 bool KaraokeSong::open()

@@ -64,6 +64,9 @@ class SongDatabaseScanner : public QObject
     private slots:
         void    updateScanProgress();
 
+        // This slot is used when implementing the
+        void    providerFinished( int id, QString errmsg );
+
     private:
         friend class SongDatabaseScannerWorkerThread;
 
@@ -83,7 +86,7 @@ class SongDatabaseScanner : public QObject
         void    submittingThread();
 
         // Parses the collection index file to skip enumerator and processor
-        void    parseCollectionIndex( int colid, const QByteArray& indexdata );
+        void    parseCollectionIndex(const CollectionEntry &col, const QByteArray& indexdata );
 
         // Producer-consumer implementation of processing queue
         QMutex                      m_processingQueueMutex;
@@ -127,6 +130,9 @@ class SongDatabaseScanner : public QObject
 
         // Scan information update timer
         QTimer                      m_updateTimer;
+
+        // Used in tracking the collection provider; 0 means done/succeed, 1 done/error
+        int                         m_providerStatus;
 };
 
 #endif // SONGDATABASESCANNER_H

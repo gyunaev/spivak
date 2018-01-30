@@ -2,17 +2,12 @@
 #define COLLECTIONENTRY_H
 
 #include <QJsonObject>
+#include "collectionprovider.h"
 
 class CollectionEntry
 {
     public:
         CollectionEntry();
-
-        enum Type
-        {
-            TYPE_FILESYSTEM,
-            TYPE_HTTP,
-        };
 
         // Collection ID. Fixed. Data in sqlite (songs.collectionid value)
         int         id;
@@ -21,7 +16,7 @@ class CollectionEntry
         int         priority;
 
         // Collection type
-        Type        type;
+        CollectionProvider::Type type;
 
         // Collection human-readable name
         QString     name;

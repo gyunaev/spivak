@@ -270,7 +270,7 @@ void MusicCollectionManager::volumeSet(int percentage)
     setVolume( percentage );
 }
 
-void MusicCollectionManager::karaokeStarted(SongQueue::Song )
+void MusicCollectionManager::karaokeStarted(SongQueueItem )
 {
     if ( !m_player )
         return;

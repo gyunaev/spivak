@@ -44,11 +44,8 @@ class KaraokeSong : public QObject
     Q_OBJECT
 
     public:
-        KaraokeSong( KaraokeWidget * w, const SongQueue::Song& song );
+        KaraokeSong( KaraokeWidget * w, const SongQueueItem& song );
         ~KaraokeSong();
-
-        // Checks if the file queued needs processing (i.e. MIDI conversion)
-        static bool needsProcessing( const QString& filename );
 
         // open a file
         bool    open();
@@ -113,7 +110,7 @@ class KaraokeSong : public QObject
         qint64              m_nextRedrawTime;
 
         // Song info
-        SongQueue::Song     m_song;
+        SongQueueItem       m_song;
 
         // Song rating
         int                 m_rating;

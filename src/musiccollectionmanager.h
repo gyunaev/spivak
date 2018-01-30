@@ -64,7 +64,7 @@ class MusicCollectionManager : public QObject
         void    volumeSet( int percentage );
 
         // Notification slots (so we can turn off the player when song is started, and then turn it back)
-        void    karaokeStarted( SongQueue::Song song );
+        void    karaokeStarted(SongQueueItem song );
         void    karaokeStopped();
         void    playerCurrentSongFinished();
 

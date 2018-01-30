@@ -87,10 +87,14 @@ void KaraokeWidget::playCurrent()
         return;
     }
 
-    SongQueue::Song current = pSongQueue->current();
+    SongQueueItem current = pSongQueue->current();
+
+    // This shouldn't happen
+    if ( current.state == SongQueueItem::STATE_NOT_READY )
+        abort();
 
     // If current song is not ready yet, show the notification and wait until it is
-    if ( current.state == SongQueue::Song::STATE_PREPARING )
+    if ( current.state == SongQueueItem::STATE_GETTING_READY )
     {
         Logger::debug("KaraokeWidget::playCurrent want %s play but it is not ready yet", qPrintable( current.file) );
 
