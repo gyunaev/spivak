@@ -219,7 +219,7 @@ void SongDatabaseScanner::scanCollectionsThread()
         Logger::debug( "SongDatabaseScanner: scanning collection %s", qPrintable( it->name ) );
 
         // Find the collection provider for this type
-        CollectionProvider * provider = CollectionProvider::createProvider( it->type );
+        CollectionProvider * provider = CollectionProvider::createProviderForID( it->id );
 
         if ( !provider )
             continue;

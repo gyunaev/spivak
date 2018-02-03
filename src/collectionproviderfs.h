@@ -7,7 +7,7 @@
 class CollectionProviderFS : public CollectionProvider
 {
     public:
-        CollectionProviderFS( QObject * parent );
+        CollectionProviderFS( int id, QObject * parent );
 
         // Returns true if this provider is based on file system, and the file operations
         // are supported directly.

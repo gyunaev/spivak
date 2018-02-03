@@ -22,13 +22,13 @@
 #include <QStandardPaths>
 
 #include "songqueueitem.h"
+#include "songqueueitemretriever.h"
 #include "util.h"
 
 SongQueueItem::SongQueueItem()
 {
     id = 0;
     songid = 0;
-    percentage = 0;
 }
 
 SongQueueItem::~SongQueueItem()
@@ -43,7 +43,10 @@ QString SongQueueItem::stateText() const
             return QObject::tr("waiting to be downloaded");
 
         case STATE_GETTING_READY:
-            return QObject::tr("downloading %1%%").arg( percentage );
+            if ( retriever )
+                return QObject::tr("downloading %1%%").arg( retriever->percentage );
+            else
+                abort();
 
         case STATE_READY:
             return QObject::tr("ready");
@@ -55,7 +58,7 @@ QString SongQueueItem::stateText() const
             return "unknown";
     }
 }
-
+/*
 QString SongQueueItem::cachedFileName(const QString &source) const
 {
     // We use the first source base name for the cache
@@ -68,3 +71,4 @@ QString SongQueueItem::cachedFileName(const QString &source) const
         + QDir::separator()
         + basename + "." + ext;
 }
+*/

@@ -55,13 +55,13 @@ void SongQueue::init()
 
 void SongQueue::addSong( SongQueueItem song )
 {
-    // First verify the sanity
+/*    // First verify the sanity
     if ( song.file.isEmpty() && song.sources.isEmpty() )
     {
         Logger::error( "Attempting to add a non-local song with empty source or provider" );
         return;
     }
-
+*/
     // Add the singer into the queue if he's not there, and find the current singer (who's singing the current song)
     int singeridx = addSinger( song.singer );
 
@@ -70,7 +70,7 @@ void SongQueue::addSong( SongQueueItem song )
 
     // Assume it to be ready
     song.state = SongQueueItem::STATE_READY;
-
+/*
     // Find out if it a local song or requires retrieval through provider
     if ( !song.sources.isEmpty() )
     {
@@ -92,7 +92,7 @@ void SongQueue::addSong( SongQueueItem song )
             }
         }
     }
-
+*/
     // Add to queue
     m_queue.append( song );
 
@@ -351,7 +351,7 @@ void SongQueue::clear()
 
 void SongQueue::providerFinished(int id, const QString &error)
 {
-    // Non-empty error means we failed
+/*    // Non-empty error means we failed
     Logger::debug( "SongQueue: Queue id %d finished downloading: %s",
                    id, error.isEmpty() ? "success" : qPrintable( error ) );
 
@@ -393,12 +393,12 @@ void SongQueue::providerFinished(int id, const QString &error)
         }
     }
 
-    queueUpdated();
+    queueUpdated();*/
 }
 
 void SongQueue::providerProgress(int id, int progress)
 {
-    Logger::debug( "SongQueue: Progress received for queue id %d: %d%%", id, progress );
+    /*Logger::debug( "SongQueue: Progress received for queue id %d: %d%%", id, progress );
 
     for ( int i = 0; i < m_queue.size(); i++ )
     {
@@ -407,7 +407,7 @@ void SongQueue::providerProgress(int id, int progress)
             m_queue[i].percentage = progress;
             break;
         }
-    }
+    }*/
 }
 
 void SongQueue::statusChanged(int id, bool playstarted)
@@ -430,7 +430,7 @@ void SongQueue::queueUpdated()
     // Save the queue if needed
     if ( !pSettings->queueFilename.isEmpty() )
         save();
-
+/*
     // Check if there are any songs which need to be retrieved
     if ( m_retrievers.size() < pSettings->queueMaxConcurrentPrepare )
     {
@@ -448,7 +448,7 @@ void SongQueue::queueUpdated()
     }
     else
         Logger::debug( "SongQueue: song needs to be retrieved but max retrievers is reached, ignoring" );
-
+*/
     emit pEventor->queueChanged();
 }
 
@@ -472,10 +472,10 @@ void SongQueue::save()
 
     foreach ( const SongQueueItem& s, m_queue )
     {
-        // Ignore the non-local songs
+/*        // Ignore the non-local songs
         if ( !s.sources.isEmpty() )
             continue;
-
+*/
         dts << s.id;
         dts << s.songid;
         dts << s.file;
@@ -533,7 +533,7 @@ void SongQueue::load()
 
 bool SongQueue::startRetrieve(SongQueueItem &song)
 {
-    Logger::debug( "SongQueue: start retrieving song id %d from %s", song.id, qPrintable(song.sources.join(", ")) );
+/*    Logger::debug( "SongQueue: start retrieving song id %d from %s", song.id, qPrintable(song.sources.join(", ")) );
 
     // Create the retriever
     SongQueueItemRetriever * ret = new SongQueueItemRetriever();
@@ -580,6 +580,6 @@ bool SongQueue::startRetrieve(SongQueueItem &song)
     ret->provider->downloadAll( song.id, urls, ret->outputs );
 
     // And store it in the map
-    m_retrievers[ song.id ] = ret;
+    m_retrievers[ song.id ] = ret;*/
     return true;
 }

@@ -15,7 +15,7 @@ class CollectionProviderHTTP : public CollectionProvider
     //Q_OBJECT
 
     public:
-        CollectionProviderHTTP(QObject * parent);
+        CollectionProviderHTTP(int id, QObject * parent);
 
         // Returns true if this provider is based on file system, and the file operations
         // are supported directly.

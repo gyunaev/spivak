@@ -20,11 +20,12 @@ class CollectionProvider : public QObject
             TYPE_HTTP,
         };
 
-        CollectionProvider( QObject * parent = 0 );
+        CollectionProvider(int id, QObject * parent = 0 );
         virtual ~CollectionProvider();
 
         // Creates a provider to perform actions for specific collection type
-        static CollectionProvider * createProvider( Type type, QObject * parent = 0 );
+        static CollectionProvider * createProviderForType( Type type, QObject * parent = 0 );
+        static CollectionProvider * createProviderForID( int id, QObject * parent = 0 );
 
         // Returns true if this provider is based on file system, and the file operations
         // are supported directly.
@@ -56,7 +57,11 @@ class CollectionProvider : public QObject
         // Function is executed asynchronously.
         virtual void retrieveMultiple( int id, const QList<QString>& urls, QList<QIODevice *> files ) = 0;
 
+        // This thread is used to convert async calls to sync calls for retrieval
         QThread workerThread;
+
+        // Collection ID which the collection was created with. -1 if it was created without ID.
+        int     collectionID;
 };
 
 #endif // COLLECTIONPROVIDER_H

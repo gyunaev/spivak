@@ -2,8 +2,8 @@
 
 #include "collectionproviderfs.h"
 
-CollectionProviderFS::CollectionProviderFS(QObject *parent)
-    : CollectionProvider(parent)
+CollectionProviderFS::CollectionProviderFS(int id, QObject *parent)
+    : CollectionProvider(id, parent)
 {
 }
 

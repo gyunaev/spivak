@@ -24,6 +24,8 @@
 
 #include "collectionprovider.h"
 
+class SongQueueItemRetriever;
+
 //
 // Represents a single song in the song queue
 // This class must be copyable, as used everywhere through player
@@ -56,13 +58,8 @@ class SongQueueItem
         QString     singer;     // Can be empty
         State       state;      // see above
 
-        // If the song is added using a non-local collection, the file is empty,
-        // and the source and provider type are set. Otherwise they are not set.
-        QStringList                 sources;
-        CollectionProvider::Type    providertype;
-
-        // Percentage the file is downloaded
-        int         percentage;
+        // If the song needs to be retrieved, this field is set. Otherwise null.
+        SongQueueItemRetriever * retriever;
 };
 
 

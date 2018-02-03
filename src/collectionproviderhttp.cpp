@@ -2,8 +2,8 @@
 #include "logger.h"
 
 
-CollectionProviderHTTP::CollectionProviderHTTP(QObject *parent)
-    : CollectionProvider(parent), m_qnam(parent)
+CollectionProviderHTTP::CollectionProviderHTTP(int id, QObject *parent)
+    : CollectionProvider(id, parent), m_qnam(parent)
 {
 
 }
@@ -45,7 +45,7 @@ void CollectionProviderHTTP::retrieveMultiple(int id, const QList<QString> &urls
         connect( reqdata.reply, &QIODevice::readyRead, this, &CollectionProviderHTTP::httpReadyRead);
         connect( reqdata.reply, &QNetworkReply::downloadProgress, this, &CollectionProviderHTTP::httpProgress );
 
-        Logger::debug( "Initiating donwload for %s into %p (nr %p)", qPrintable( reqdata.url), reqdata.file, reqdata.reply);
+        Logger::debug( "Initiating download for %s into %p (nr %p)", qPrintable( reqdata.url), reqdata.file, reqdata.reply);
     }
 }
 

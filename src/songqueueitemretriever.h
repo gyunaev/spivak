@@ -41,7 +41,15 @@ class SongQueueItemRetriever : public QObject
         CollectionProvider  *   provider;
 
         // File where we write the output object
-        QList<QIODevice*> outputs;
+        QList<QIODevice*>       outputs;
+
+        // Song sources which are to be retrieved,
+        // and file names into which are they to be saved
+        QStringList             sources;
+        QStringList             outfiles;
+
+        // During retrieve this keeps the current percentage (total)
+        int                     percentage;
 
     private:
         Q_DISABLE_COPY(SongQueueItemRetriever)

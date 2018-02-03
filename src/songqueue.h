@@ -25,8 +25,6 @@
 
 #include "songqueueitem.h"
 
-class SongQueueItemRetriever;
-
 // Represents the enqueued songs, maintains people's position
 // and ensures honest rotation
 class SongQueue : public QObject
@@ -116,9 +114,6 @@ class SongQueue : public QObject
 
         // keeps track of all singers by name
         QList<QString>      m_singers;
-
-        // Active song retrievers mapped by id
-        QMap< int, SongQueueItemRetriever * > m_retrievers;
 
         // Queue identifier increment
         unsigned int        m_nextQueueId;
