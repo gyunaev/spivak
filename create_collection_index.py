@@ -16,7 +16,7 @@ def createIndex( src ):
     #artisttitlepattern = ( ".*\/(.*) - (.*)\.(\w+)", ".*\/(.*)-(.*)\.(\w+)" )
     
     # dir-separated
-    artisttitlepattern = ( ".*\/(.*)\/(.*)\.(\w+)", )
+    artisttitlepattern = ( ".*\/(.*)\/(.*)\.(.+)$", )
 
     # File extensions containing Karaoke media in a single file (i.e. mp4, kfn or zip)
     karaoke_ext_standalone = ("mp4", "mkv", "avi", "kfn", "zip", "mid" )
