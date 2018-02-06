@@ -84,6 +84,7 @@ void KaraokeWidget::playCurrent()
     if ( pSongQueue->isEmpty() )
     {
         Logger::debug("KaraokeWidget::playCurrent nothing to play");
+        pNotification->clearOnScreenMessage();
         return;
     }
 

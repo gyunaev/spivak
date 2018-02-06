@@ -468,7 +468,8 @@ void KaraokeSong::songLoaded()
 {
     // We might end up in a situation where the music is loaded, but the lyrics aren't.
     // In this case we'll get this signal but m_lyrics is NULL.
-    if ( m_lyrics == 0 )
+    // But m_lyrics is also NULL when we're playing a video file so check for this too.
+    if ( m_lyrics == 0 && !KaraokePlayable::isVideoFile( m_song.file ) )
         return;
 
     pCurrentState->playerPitch = 50;
