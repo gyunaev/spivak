@@ -444,14 +444,9 @@ void MainWindow::scanCollectionStarted()
     statusbar->showMessage( "Collection scan started", 1000 );
 }
 
-void MainWindow::scanCollectionProgress(unsigned long directoriesScanned, unsigned long karaokeFilesFound, unsigned long filesProcessed, unsigned long filesSubmitted)
+void MainWindow::scanCollectionProgress( QString progressinfo )
 {
-    statusbar->showMessage( tr("Collection scan: %1 directories scanned, %2 karaoke files found, %3 processed, %4 submitted")
-                            .arg( directoriesScanned )
-                            .arg( karaokeFilesFound )
-                            .arg( filesProcessed)
-                            .arg( filesSubmitted),
-                            1000 );
+    statusbar->showMessage( progressinfo, 1000 );
 }
 
 void MainWindow::scanCollectionFinished()

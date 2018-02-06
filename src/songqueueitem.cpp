@@ -16,19 +16,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  **************************************************************************/
 
-#include <QDir>
-#include <QFile>
-#include <QCryptographicHash>
-#include <QStandardPaths>
-
 #include "songqueueitem.h"
-#include "songqueueitemretriever.h"
-#include "util.h"
 
 SongQueueItem::SongQueueItem()
 {
     id = 0;
     songid = 0;
+    readiness = 0;
 }
 
 SongQueueItem::~SongQueueItem()
@@ -43,10 +37,7 @@ QString SongQueueItem::stateText() const
             return QObject::tr("waiting to be downloaded");
 
         case STATE_GETTING_READY:
-            if ( retriever )
-                return QObject::tr("downloading %1%%").arg( retriever->percentage );
-            else
-                abort();
+            return QObject::tr("downloading %1%").arg( readiness );
 
         case STATE_READY:
             return QObject::tr("ready");
@@ -58,17 +49,3 @@ QString SongQueueItem::stateText() const
             return "unknown";
     }
 }
-/*
-QString SongQueueItem::cachedFileName(const QString &source) const
-{
-    // We use the first source base name for the cache
-    QString basename = QCryptographicHash::hash( sources.front().toUtf8(), QCryptographicHash::Md5 ).toHex();
-
-    // Get the file extension
-    QString ext = Util::fileExtension( source );
-
-    return QStandardPaths::writableLocation( QStandardPaths::CacheLocation )
-        + QDir::separator()
-        + basename + "." + ext;
-}
-*/

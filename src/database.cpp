@@ -177,9 +177,14 @@ bool Database::updateDatabase(const QList<SongDatabaseScanner::SongDatabaseEntry
     {
         // We use a separate search field since sqlite is not necessary built with full Unicode support (nor we want it to be)
         QString search = e.artist.toUpper() + " " + e.title.toUpper();
+        QString path = e.filePath;
+
+        // For non-local collections append the music to file path if we have it
+        if ( pSettings->collections[e.colidx].type != CollectionProvider::TYPE_FILESYSTEM && !e.musicPath.isEmpty() )
+            path += "|" + e.musicPath;
 
         QStringList params;
-        params << e.filePath << e.artist << e.title << e.type << search << e.language;
+        params << path << e.artist << e.title << e.type << search << e.language;
 
         // "path TEXT PRIMARY KEY, artist TEXT, title TEXT, type TEXT, search TEXT, played INT, lastplayed INT, added INT, rating INT, language INT, flags INT, collectionid INT, parameters TEXT"
         if ( !execute( QString("INSERT OR REPLACE INTO songs VALUES( ?, ?, ?, ?, ?, 0, 0, DATETIME(), 0, ?, %1, %2, '' )") .arg( e.flags) .arg(e.colidx), params ) )

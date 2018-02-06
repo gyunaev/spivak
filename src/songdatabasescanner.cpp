@@ -186,7 +186,14 @@ void SongDatabaseScanner::updateScanProgress()
     if ( m_finishScanning )
         m_updateTimer.stop();
 
-    emit pEventor->scanCollectionProgress( m_stat_directoriesScanned, m_stat_karaokeFilesFound, m_stat_karaokeFilesProcessed, m_stat_karaokeFilesSubmitted );
+    QString progress = tr("Collection scan: %1 directories scanned, %2 karaoke files found, %3 processed, %4 submitted")
+                                .arg( m_stat_directoriesScanned )
+                                .arg( m_stat_karaokeFilesFound )
+                                .arg( m_stat_karaokeFilesProcessed )
+                                .arg( m_stat_karaokeFilesSubmitted );
+
+    // If m_stringProgress is non-empty it overrides the progress
+    emit pEventor->scanCollectionProgress( m_stringProgress.isEmpty() ? progress : m_stringProgress );
 }
 
 void SongDatabaseScanner::providerFinished(int, QString errmsg)
@@ -195,9 +202,18 @@ void SongDatabaseScanner::providerFinished(int, QString errmsg)
     {
         Logger::debug( "SongDatabaseScanner: couldn't retrieve the index file: %s", qPrintable( errmsg ) );
         m_providerStatus = 1;
+        m_stringProgress = errmsg;
     }
     else
+    {
         m_providerStatus = 0;
+        m_stringProgress.clear();
+    }
+}
+
+void SongDatabaseScanner::providerProgress(int id, int percentage)
+{
+    m_stringProgress = tr("Downloading index... %1%" ).arg( percentage );
 }
 
 void SongDatabaseScanner::scanCollectionsThread()
@@ -216,6 +232,7 @@ void SongDatabaseScanner::scanCollectionsThread()
         if ( m_finishScanning != 0 )
             break;
 
+        m_stringProgress.clear();
         Logger::debug( "SongDatabaseScanner: scanning collection %s", qPrintable( it->name ) );
 
         // Find the collection provider for this type
@@ -225,8 +242,11 @@ void SongDatabaseScanner::scanCollectionsThread()
             continue;
 
         connect( provider, SIGNAL(finished(int,QString)), this, SLOT(providerFinished(int,QString)) );
+        connect( provider, SIGNAL(progress(int,int)), this, SLOT(providerProgress(int,int)) );
 
         m_providerStatus = -1;
+
+        // Download the index file into this array
         QByteArray indexdata;
         QBuffer buf( &indexdata );
         buf.open( QIODevice::WriteOnly );

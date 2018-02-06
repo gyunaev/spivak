@@ -28,6 +28,9 @@ class CollectionEntry
         QString     authuser;
         QString     authpass;
 
+        // For HTTP collection, whether to ignore SSL errors
+        bool        ignoreSSLerrors;
+
         // Detect lyrics language (if false, language is not detected)
         bool        detectLanguage;
 

@@ -10,6 +10,7 @@ CollectionEntry::CollectionEntry()
     detectLanguage = false;
     scanZips = false;
     lastScanned = -1;
+    ignoreSSLerrors = false;
 }
 
 QJsonObject CollectionEntry::toJson() const
@@ -28,6 +29,8 @@ QJsonObject CollectionEntry::toJson() const
         out[ "authpass" ] = authpass;
     }
 
+
+    out[ "ignoreSSLerrors" ] = ignoreSSLerrors;
     out[ "detectLanguage" ] = detectLanguage;
     out[ "scanZips" ] = scanZips;
     out[ "artistTitleSeparator" ] = artistTitleSeparator;
@@ -55,4 +58,5 @@ void CollectionEntry::fromJson(const QJsonObject &data)
     artistTitleSeparator = data.value( "artistTitleSeparator" ).toString();
     defaultLanguage = data.value( "defaultLanguage" ).toString();
     lastScanned = data.value( "lastScanned" ).toString("-1").toLongLong();
+    ignoreSSLerrors = data.value( "ignoreSSLerrors" ).toBool( false );
 }

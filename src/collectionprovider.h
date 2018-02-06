@@ -16,7 +16,8 @@ class CollectionProvider : public QObject
     public:
         enum Type
         {
-            TYPE_FILESYSTEM,
+            TYPE_INVALID,
+            TYPE_FILESYSTEM = 1,
             TYPE_HTTP,
         };
 

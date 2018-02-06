@@ -110,6 +110,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
             ui->boxCollectionTypeHTTP->setChecked( true );
             ui->leHTTPuser->setText( col.authuser );
             ui->leHTTPpass->setText( col.authpass );
+            ui->boxIgnoreSSLerrors->setChecked( col.ignoreSSLerrors );
         }
 
         ui->leCollectionName->setText( col.name );
@@ -406,13 +407,9 @@ void SettingsDialog::eraseDatabase()
     refreshDatabaseInformation();
 }
 
-void SettingsDialog::scanCollectionProgress(unsigned long directoriesScanned, unsigned long karaokeFilesFound, unsigned long filesProcessed, unsigned long filesSubmitted)
+void SettingsDialog::scanCollectionProgress( QString progress )
 {
-    ui->lblCollectionInfo->setText( tr("Scan progress: %1 directories scanned, %2 karaoke files found, %3 processed, %4 submitted")
-                                                                .arg( directoriesScanned )
-                                                                .arg( karaokeFilesFound )
-                                                                .arg( filesProcessed)
-                                                                .arg( filesSubmitted) );
+    ui->lblCollectionInfo->setText( progress );
 }
 
 void SettingsDialog::refreshDatabaseInformation()
@@ -550,6 +547,7 @@ bool SettingsDialog::validateAndStoreCollection()
         col.detectLanguage = false;
         col.authuser = ui->leHTTPuser->text();
         col.authpass = ui->leHTTPpass->text();
+        col.ignoreSSLerrors = ui->boxIgnoreSSLerrors->isChecked();
     }
 
     col.scanZips = ui->boxColelctionZIP->isChecked();
@@ -602,6 +600,7 @@ void SettingsDialog::collectionTypeChanged()
         ui->lblHTTPauth->hide();
         ui->leHTTPuser->hide();
         ui->leHTTPpass->hide();
+        ui->boxIgnoreSSLerrors->hide();
 
         // Show the language detection
         ui->boxCollectionDetectLang->show();
@@ -614,6 +613,7 @@ void SettingsDialog::collectionTypeChanged()
         ui->lblHTTPauth->show();
         ui->leHTTPuser->show();
         ui->leHTTPpass->show();
+        ui->boxIgnoreSSLerrors->show();
 
         // Hide the language detection
         ui->boxCollectionDetectLang->hide();

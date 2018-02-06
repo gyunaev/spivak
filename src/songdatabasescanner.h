@@ -64,8 +64,9 @@ class SongDatabaseScanner : public QObject
     private slots:
         void    updateScanProgress();
 
-        // This slot is used when implementing the
+        // Those slots is used when downloading index using the provider
         void    providerFinished( int id, QString errmsg );
+        void    providerProgress( int id, int percentage );
 
     private:
         friend class SongDatabaseScannerWorkerThread;
@@ -133,6 +134,9 @@ class SongDatabaseScanner : public QObject
 
         // Used in tracking the collection provider; 0 means done/succeed, 1 done/error
         int                         m_providerStatus;
+
+        // If non-empty contains the progress (from a provider)
+        QString                     m_stringProgress;
 };
 
 #endif // SONGDATABASESCANNER_H

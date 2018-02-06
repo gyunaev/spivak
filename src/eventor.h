@@ -138,7 +138,7 @@ class Eventor : public QObject
         void    scanCollectionStarted();
 
         // Scan in progress, details update
-        void    scanCollectionProgress( unsigned long directoriesScanned, unsigned long karaokeFilesFound, unsigned long filesProcessed, unsigned long filesSubmitted );
+        void    scanCollectionProgress( QString progressinfo );
 
         // Scan finished (either completed or aborted)
         void    scanCollectionFinished();

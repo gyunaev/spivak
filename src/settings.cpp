@@ -146,7 +146,7 @@ QJsonObject Settings::toJson()
 
     out[ "queue/AddNewSingersNext"] = queueAddNewSingersNext;
     out[ "queue/SaveOnExit"] = queueSaveOnExit;
-    out[ "queue/MaxConcurrentPrepare"] = queueMaxConcurrentPrepare;
+    out[ "queue/MaxConcurrentPrepare"] = (int) queueMaxConcurrentPrepare;
 
     out[ "database/PathReplacementPrefixFrom"] = songPathReplacementFrom;
     out[ "database/PathReplacementPrefixTo"] = songPathReplacementTo;

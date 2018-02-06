@@ -47,9 +47,6 @@ class SongQueueItem
         // Returns a text representation of state
         QString     stateText() const;
 
-        // Returns a list of QFiles with the cached representation of all song files
-        QString     cachedFileName(const QString &source) const;
-
         int         id;         // unique queue id as order can change anytime so index cannot be used as ID
         int         songid;     // nonzero if the song is in the database, so its status could be updated
         QString     file;       // may be original or cached. If empty when added, the song is to be retrieved
@@ -57,9 +54,7 @@ class SongQueueItem
         QString     artist;     // Song artist
         QString     singer;     // Can be empty
         State       state;      // see above
-
-        // If the song needs to be retrieved, this field is set. Otherwise null.
-        SongQueueItemRetriever * retriever;
+        int         readiness;  // If not yet ready, the percentage of how much of the item is converted/downloaded/unpacked (0-100)
 };
 
 

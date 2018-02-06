@@ -37,7 +37,15 @@ class SongQueueItemRetriever : public QObject
         SongQueueItemRetriever();
         ~SongQueueItemRetriever();
 
-        // Collection provider instance
+        // Returns a list of QFiles with the cached representation of all song files
+        QString     cachedFileName(const QString &source) const;
+
+        // Collection index (index could be -1 meaning generic collection).
+        // In this case collectiontype should be set, which is otherwise ignored.
+        int                     collectionindex;
+        CollectionProvider::Type    collectiontype;
+
+        // Collection provider instance (only created during the actual retrieval)
         CollectionProvider  *   provider;
 
         // File where we write the output object
@@ -47,9 +55,6 @@ class SongQueueItemRetriever : public QObject
         // and file names into which are they to be saved
         QStringList             sources;
         QStringList             outfiles;
-
-        // During retrieve this keeps the current percentage (total)
-        int                     percentage;
 
     private:
         Q_DISABLE_COPY(SongQueueItemRetriever)

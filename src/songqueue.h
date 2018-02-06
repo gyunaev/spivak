@@ -25,6 +25,10 @@
 
 #include "songqueueitem.h"
 
+// Internal queued song storage element
+class SongQueueEntry;
+
+
 // Represents the enqueued songs, maintains people's position
 // and ensures honest rotation
 class SongQueue : public QObject
@@ -73,6 +77,9 @@ class SongQueue : public QObject
         // Adds a song into queue, the struct should be filled up already
         void    addSong( SongQueueItem song );
 
+        // Add a song with possible retriever
+        void    addSong( SongQueueItem song , SongQueueItemRetriever *retriever );
+
         // Inserts a song into queue at specific position, without rearranging
         void    insertSong( unsigned int position, const QString& singer, int songid );
 
@@ -96,7 +103,7 @@ class SongQueue : public QObject
         void    queueUpdated();
         void    save();
         void    load();
-        bool    startRetrieve( SongQueueItem& song );
+        bool    startRetrieve( int idx );
 
         // Queue of songs. Works as following:
         //
@@ -107,16 +114,19 @@ class SongQueue : public QObject
         //   then next singer, and so on (if there is song in the list, there is singer in m_singers)
         // - The current item is swapped with the singer (i.e. list is rearranged)
         // - List may go back into previous entries, then it is not rearranged. m_lastArranged controls this
-        QList<SongQueueItem> m_queue;
+        QList<SongQueueEntry *>     m_queue;
 
         // The current song being played; if == m_queue.size(), nothing is played. Index in m_queue
-        unsigned int        m_currentSong;
+        unsigned int                m_currentSong;
 
         // keeps track of all singers by name
-        QList<QString>      m_singers;
+        QList<QString>              m_singers;
 
         // Queue identifier increment
-        unsigned int        m_nextQueueId;
+        unsigned int                m_nextQueueId;
+
+        // Number of songs currently being retrieved concurrently
+        unsigned int                m_beingRetrieved;
 };
 
 extern SongQueue * pSongQueue;

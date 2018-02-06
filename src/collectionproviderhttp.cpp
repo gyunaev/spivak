@@ -1,11 +1,14 @@
+#include <QAuthenticator>
+
 #include "collectionproviderhttp.h"
+#include "settings.h"
 #include "logger.h"
 
 
 CollectionProviderHTTP::CollectionProviderHTTP(int id, QObject *parent)
     : CollectionProvider(id, parent), m_qnam(parent)
 {
-
+    m_credentialsSent = false;
 }
 
 bool CollectionProviderHTTP::isLocalProvider() const
@@ -44,6 +47,8 @@ void CollectionProviderHTTP::retrieveMultiple(int id, const QList<QString> &urls
         connect( reqdata.reply, &QNetworkReply::finished, this, &CollectionProviderHTTP::httpFinished);
         connect( reqdata.reply, &QIODevice::readyRead, this, &CollectionProviderHTTP::httpReadyRead);
         connect( reqdata.reply, &QNetworkReply::downloadProgress, this, &CollectionProviderHTTP::httpProgress );
+        connect( &m_qnam, &QNetworkAccessManager::authenticationRequired, this, &CollectionProviderHTTP::httpAuthenticationRequired );
+        connect( &m_qnam, &QNetworkAccessManager::sslErrors, this, &CollectionProviderHTTP::httpsslErrors );
 
         Logger::debug( "Initiating download for %s into %p (nr %p)", qPrintable( reqdata.url), reqdata.file, reqdata.reply);
     }
@@ -146,4 +151,39 @@ void CollectionProviderHTTP::httpProgress(qint64 bytesReceived, qint64 bytesTota
     // If we're here everything is right, so calculate the percentage
     Logger::debug( "Calculated download average %d", allreceived * 100 / alltotal );
     emit progress( m_id, allreceived * 100 / alltotal );
+}
+
+void CollectionProviderHTTP::httpAuthenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator)
+{
+    if ( collectionID >= 0 && !m_credentialsSent )
+    {
+        authenticator->setUser( pSettings->collections[collectionID].authuser );
+        authenticator->setPassword( pSettings->collections[collectionID].authpass );
+        m_credentialsSent = true;
+    }
+}
+
+void CollectionProviderHTTP::httpsslErrors(QNetworkReply *reply, const QList<QSslError> &errors)
+{
+    // Only go through this if the ignore checkbox is set
+    if ( m_id < 0 || !pSettings->collections[collectionID].ignoreSSLerrors )
+        return;
+
+    Q_FOREACH ( const QSslError& err, errors )
+    {
+        switch ( err.error() )
+        {
+            case QSslError::SelfSignedCertificate:
+            case QSslError::SelfSignedCertificateInChain:
+            case QSslError::HostNameMismatch:
+                break;
+
+            // For all other errors we return so ignore isn't caller
+            default:
+                qDebug("not ignoring %d", err.error() );
+                return;
+        }
+    }
+
+    reply->ignoreSslErrors();
 }

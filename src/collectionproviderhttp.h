@@ -34,6 +34,8 @@ class CollectionProviderHTTP : public CollectionProvider
         void    httpFinished();
         void    httpReadyRead();
         void    httpProgress( qint64 bytesReceived, qint64 bytesTotal );
+        void    httpAuthenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator);
+        void    httpsslErrors(QNetworkReply *reply, const QList<QSslError> &errors);
 
     private:
         void    cleanup();
@@ -52,6 +54,7 @@ class CollectionProviderHTTP : public CollectionProvider
         int m_id;
         QNetworkAccessManager m_qnam;
         QMap< QNetworkReply *, RequestData >  m_state;
+        bool    m_credentialsSent;
 };
 
 #endif // COLLECTIONPROVIDERHTTP_H

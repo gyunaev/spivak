@@ -81,7 +81,7 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
     private slots:
         // Scan collection slots from Eventor
         void    scanCollectionStarted();
-        void    scanCollectionProgress( unsigned long directoriesScanned, unsigned long karaokeFilesFound, unsigned long filesProcessed, unsigned long filesSubmitted );
+        void    scanCollectionProgress(QString progressinfo);
         void    scanCollectionFinished();
 
         // Crash generator to test symbol submitter

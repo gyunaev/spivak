@@ -81,7 +81,7 @@ class Settings
 
         // Maximum number of songs which could be simultaneously
         // got ready (i.e. downloaded or converted)
-        int         queueMaxConcurrentPrepare;
+        unsigned int    queueMaxConcurrentPrepare;
 
         // Player background
         BackgroundType  playerBackgroundType;

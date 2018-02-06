@@ -53,7 +53,7 @@ public:
         void    eraseDatabase();
 
         // Scan collection slots from Eventor
-        void    scanCollectionProgress( unsigned long directoriesScanned, unsigned long karaokeFilesFound, unsigned long filesProcessed, unsigned long filesSubmitted );
+        void    scanCollectionProgress(QString progress);
         void    refreshDatabaseInformation();
 
         void    lircChanged();

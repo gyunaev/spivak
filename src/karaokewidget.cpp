@@ -110,7 +110,7 @@ void KaraokeWidget::playCurrent()
 
         m_karaokeMutex.unlock();
 
-        pNotification->setOnScreenMessage( tr("Conversion in progress") );
+        pNotification->setOnScreenMessage( current.stateText() );
         QTimer::singleShot( 500, this, SLOT( playCurrent() ) );
         return;
     }

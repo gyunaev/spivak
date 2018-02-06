@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1167</width>
-    <height>730</height>
+    <width>900</width>
+    <height>582</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -61,7 +61,7 @@
             <item>
              <widget class="QRadioButton" name="boxCollectionTypeHTTP">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="text">
                <string>Web collection</string>
@@ -96,20 +96,7 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="1" rowspan="2" colspan="2">
-           <widget class="QLineEdit" name="leCollectionName">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-              <horstretch>1</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A name for your collection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0" rowspan="2">
+          <item row="2" column="0">
            <widget class="QLabel" name="lblRootDir">
             <property name="text">
              <string>Root directory of the local &amp;Karaoke collection:</string>
@@ -122,7 +109,7 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="1" colspan="2">
+          <item row="2" column="1" colspan="4">
            <widget class="QLineEdit" name="leCollectionPath">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -135,7 +122,7 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="3">
+          <item row="2" column="5">
            <widget class="QPushButton" name="btnBrowseCollection">
             <property name="text">
              <string/>
@@ -146,7 +133,7 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="4">
+          <item row="2" column="6">
            <widget class="LabelShowHelp" name="label_25">
             <property name="text">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;background&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Help&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -156,7 +143,7 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
+          <item row="3" column="0">
            <widget class="QLabel" name="lblHTTPauth">
             <property name="text">
              <string>Authentication infor&amp;mation if needed:</string>
@@ -169,14 +156,14 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
+          <item row="3" column="1">
            <widget class="QLineEdit" name="leHTTPuser">
             <property name="placeholderText">
              <string>login</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="2">
+          <item row="3" column="2" colspan="2">
            <widget class="QLineEdit" name="leHTTPpass">
             <property name="echoMode">
              <enum>QLineEdit::Password</enum>
@@ -186,27 +173,27 @@
             </property>
            </widget>
           </item>
-          <item row="5" column="0" colspan="3">
-           <widget class="QCheckBox" name="boxColelctionZIP">
-            <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If you have Karaoke songs which are stored in ZIP archives (typical example would be MP3+G, where an MP3 and associated CD+G file with the same file name are stored in a single ZIP archive), please check this checkbox. This will ensure ZIP files are analyzed during the database scan, and those songs would be available during the search.&lt;/p&gt;&lt;p&gt;However if you do not have any ZIP archives containing Karaoke songs, you can uncheck this box and all ZIP archives would be ignored.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
+          <item row="4" column="6">
+           <widget class="LabelShowHelp" name="label_26">
             <property name="text">
-             <string>Consider all ZIP archives as possibly containing karaoke songs and analyze them</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;background&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Help&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="buddy">
+             <cstring>boxColelctionZIP</cstring>
             </property>
            </widget>
           </item>
-          <item row="6" column="0" colspan="3">
-           <widget class="QCheckBox" name="boxCollectionDetectLang">
-            <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The scanner is able to detect the language the Karaoke &lt;span style=&quot; font-weight:600;&quot;&gt;text&lt;/span&gt; lyrics are written into, and store it in the database during the scan. This information will be available during search and browsing, and allows users to look directly for songs in a specific language, for example Chinese, Russian or Italian. This will slow down the scan roughly by 10%.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;This option only works with text lyrics&lt;/span&gt;, and does not work with non-text Karaoke files such as video or CD+G (and the language scanner is not invoked on them). Currenly supported text lyrics formats are KAR, Karafun, LRC and UltraStar.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Please note this option controls language detection, and not lyrics encoding detection, which is detected separately and automatically.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
+          <item row="5" column="6">
+           <widget class="LabelShowHelp" name="lblFSdetectLang">
             <property name="text">
-             <string>Detect the karaoke song language for text lyrics (seen in browse/search)</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;background&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Help&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="buddy">
+             <cstring>boxCollectionDetectLang</cstring>
             </property>
            </widget>
           </item>
-          <item row="7" column="0">
+          <item row="6" column="0">
            <widget class="QLabel" name="lblCollectionLanguage">
             <property name="text">
              <string>Default &amp;language for undetected songs:</string>
@@ -219,51 +206,7 @@
             </property>
            </widget>
           </item>
-          <item row="8" column="0">
-           <widget class="QLabel" name="label_14">
-            <property name="text">
-             <string>Artist and title are separated by:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="1" colspan="2">
-           <widget class="QComboBox" name="boxCollectionLanguage">
-            <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the language for either all the songs (if detection is disabled), or only for the songs which language is not detected. If you know your collection only contains the songs in certain language, you can set this option and disable the language detection to speed up the scan.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="1" colspan="2">
-           <widget class="QComboBox" name="boxCollectionSeparator">
-            <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This option is used for detecting the &lt;span style=&quot; font-weight:600;&quot;&gt;Artist &lt;/span&gt;(Singer, Performer) and &lt;span style=&quot; font-weight:600;&quot;&gt;Title &lt;/span&gt;(Song name) of a Karaoke song. While this information could be sometime obtained from the Karaoke song itself, this information may be not reliable, and is often not available at all (for example for CD+G files). Therefore the only reliable way is to use the file and folder names.&lt;/p&gt;&lt;p&gt;The &amp;quot;A-HA/Take on me&amp;quot; option means the Artist is the folder name. In this case the scanner assumes this folder only contains the songs for this particular artist. The file name of each song in this case is a song title.&lt;/p&gt;&lt;p&gt;The &amp;quot;A-HA - Take on me&amp;quot; option means the information about the Artist and Title is stored in the file name itself. In this case the scanner separates them by a combination of space-dash-space and assumes the left part is artist, and the right part is title. Using a space-dash-space instead of just a dash is important, as using only a dash in the case above would result in the artist name &amp;quot;A&amp;quot; and song title &amp;quot;HA - Take on me&amp;quot;, which would be incorrect.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="3" colspan="2">
-           <widget class="LabelShowHelp" name="label_26">
-            <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;background&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Help&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="buddy">
-             <cstring>boxColelctionZIP</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="3" colspan="2">
-           <widget class="LabelShowHelp" name="lblFSdetectLang">
-            <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;background&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Help&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="buddy">
-             <cstring>boxCollectionDetectLang</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="3" colspan="2">
+          <item row="6" column="6">
            <widget class="LabelShowHelp" name="label_28">
             <property name="text">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;background&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Help&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -273,13 +216,90 @@
             </property>
            </widget>
           </item>
-          <item row="8" column="3" colspan="2">
+          <item row="7" column="0">
+           <widget class="QLabel" name="label_14">
+            <property name="text">
+             <string>Artist and title are separated by:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="6">
            <widget class="LabelShowHelp" name="label_32">
             <property name="text">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;background&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;Help&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="buddy">
              <cstring>boxCollectionSeparator</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1" colspan="5">
+           <widget class="QComboBox" name="boxCollectionLanguage">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the language for either all the songs (if detection is disabled), or only for the songs which language is not detected. If you know your collection only contains the songs in certain language, you can set this option and disable the language detection to speed up the scan.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="1" colspan="5">
+           <widget class="QComboBox" name="boxCollectionSeparator">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This option is used for detecting the &lt;span style=&quot; font-weight:600;&quot;&gt;Artist &lt;/span&gt;(Singer, Performer) and &lt;span style=&quot; font-weight:600;&quot;&gt;Title &lt;/span&gt;(Song name) of a Karaoke song. While this information could be sometime obtained from the Karaoke song itself, this information may be not reliable, and is often not available at all (for example for CD+G files). Therefore the only reliable way is to use the file and folder names.&lt;/p&gt;&lt;p&gt;The &amp;quot;A-HA/Take on me&amp;quot; option means the Artist is the folder name. In this case the scanner assumes this folder only contains the songs for this particular artist. The file name of each song in this case is a song title.&lt;/p&gt;&lt;p&gt;The &amp;quot;A-HA - Take on me&amp;quot; option means the information about the Artist and Title is stored in the file name itself. In this case the scanner separates them by a combination of space-dash-space and assumes the left part is artist, and the right part is title. Using a space-dash-space instead of just a dash is important, as using only a dash in the case above would result in the artist name &amp;quot;A&amp;quot; and song title &amp;quot;HA - Take on me&amp;quot;, which would be incorrect.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0" colspan="4">
+           <widget class="QCheckBox" name="boxCollectionDetectLang">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The scanner is able to detect the language the Karaoke &lt;span style=&quot; font-weight:600;&quot;&gt;text&lt;/span&gt; lyrics are written into, and store it in the database during the scan. This information will be available during search and browsing, and allows users to look directly for songs in a specific language, for example Chinese, Russian or Italian. This will slow down the scan roughly by 10%.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;This option only works with text lyrics&lt;/span&gt;, and does not work with non-text Karaoke files such as video or CD+G (and the language scanner is not invoked on them). Currenly supported text lyrics formats are KAR, Karafun, LRC and UltraStar.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Please note this option controls language detection, and not lyrics encoding detection, which is detected separately and automatically.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>Detect the karaoke song language for text lyrics (seen in browse/search)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="4" colspan="2">
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>195</width>
+              <height>29</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="1" column="1" colspan="3">
+           <widget class="QLineEdit" name="leCollectionName">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A name for your collection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" colspan="5">
+           <widget class="QCheckBox" name="boxColelctionZIP">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If you have Karaoke songs which are stored in ZIP archives (typical example would be MP3+G, where an MP3 and associated CD+G file with the same file name are stored in a single ZIP archive), please check this checkbox. This will ensure ZIP files are analyzed during the database scan, and those songs would be available during the search.&lt;/p&gt;&lt;p&gt;However if you do not have any ZIP archives containing Karaoke songs, you can uncheck this box and all ZIP archives would be ignored.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>Consider all ZIP archives as possibly containing karaoke songs and analyze them</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="4" colspan="2">
+           <widget class="QCheckBox" name="boxIgnoreSSLerrors">
+            <property name="text">
+             <string>Ignore SSL certificate errors</string>
             </property>
            </widget>
           </item>

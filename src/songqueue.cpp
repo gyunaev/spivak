@@ -31,14 +31,36 @@
 #include "actionhandler.h"
 #include "database.h"
 #include "songqueueitemretriever.h"
+#include "collectionprovider.h"
 
 SongQueue * pSongQueue;
+
+class SongQueueEntry
+{
+    public:
+        SongQueueItem   item;
+
+        // If the song needs to be retrieved, this field is non-null. Otherwise null.
+        SongQueueItemRetriever * retriever;
+
+        SongQueueEntry( const SongQueueItem& i ) : item(i)
+        {
+            retriever = 0;
+        }
+
+        ~SongQueueEntry()
+        {
+            delete retriever;
+        }
+};
+
 
 SongQueue::SongQueue(QObject *parent)
     : QObject( parent )
 {
     m_currentSong = 0;
     m_nextQueueId = 1;
+    m_beingRetrieved = 0;
 }
 
 SongQueue::~SongQueue()
@@ -55,13 +77,18 @@ void SongQueue::init()
 
 void SongQueue::addSong( SongQueueItem song )
 {
-/*    // First verify the sanity
-    if ( song.file.isEmpty() && song.sources.isEmpty() )
+    addSong( song, 0 );
+}
+
+void SongQueue::addSong( SongQueueItem song, SongQueueItemRetriever * retriever )
+{
+    // First verify the sanity
+    if ( song.file.isEmpty() && !retriever )
     {
         Logger::error( "Attempting to add a non-local song with empty source or provider" );
         return;
     }
-*/
+
     // Add the singer into the queue if he's not there, and find the current singer (who's singing the current song)
     int singeridx = addSinger( song.singer );
 
@@ -70,14 +97,14 @@ void SongQueue::addSong( SongQueueItem song )
 
     // Assume it to be ready
     song.state = SongQueueItem::STATE_READY;
-/*
+
     // Find out if it a local song or requires retrieval through provider
-    if ( !song.sources.isEmpty() )
+    if ( retriever )
     {
         // See if all song files are present
-        Q_FOREACH( const QString& src, song.sources )
+        Q_FOREACH( const QString& src, retriever->sources )
         {
-            QString srcfile = song.cachedFileName( src );
+            QString srcfile = retriever->cachedFileName( src );
 
             if ( song.file.isEmpty() )
                 song.file = srcfile;
@@ -85,16 +112,24 @@ void SongQueue::addSong( SongQueueItem song )
             if ( !QFile::exists( srcfile ) )
             {
                 // File does not exist - so we need to retrieve it
-                Logger::debug( "SongQueue: song %d does not exist locally", song.id );
+                Logger::debug( "SongQueue: cached file %s for song %d does not exist locally", qPrintable(srcfile), song.id );
 
                 song.state = SongQueueItem::STATE_NOT_READY;
                 break;
             }
         }
     }
-*/
+
     // Add to queue
-    m_queue.append( song );
+    SongQueueEntry * entry = new SongQueueEntry( song );
+
+    // If the song status is ready, we do not need retriever anymore
+    if ( song.state == SongQueueItem::STATE_READY && retriever )
+        retriever->deleteLater();
+    else
+        entry->retriever = retriever;
+
+    m_queue.append( entry );
 
     // Now we have to rearrange the songs from current to the end according to the singer order
     singeridx++;
@@ -122,13 +157,13 @@ void SongQueue::addSong( SongQueueItem song )
             qDebug("%d: should be next singer %s", songidx, qPrintable( m_singers[singeridx] ));
 
             // Is the next song already sang by the next supposed singer?
-            if ( m_queue[songidx].singer != m_singers[singeridx] )
+            if ( m_queue[songidx]->item.singer != m_singers[singeridx] )
             {
                 // Find the next song with the next supposed singer
                 int i = songidx + 1;
 
                 for ( ; i < m_queue.size(); i++ )
-                    if ( m_queue[i].singer == m_singers[singeridx] )
+                    if ( m_queue[i]->item.singer == m_singers[singeridx] )
                         break;
 
                 // If there is a song with this singer, swap them and move to next song
@@ -176,6 +211,7 @@ void SongQueue::addSong( const QString &singer, int id )
         return;
 
     SongQueueItem song;
+    SongQueueItemRetriever * retriever = 0;
 
     song.artist = info.artist;
     song.file = info.filePath;
@@ -183,7 +219,22 @@ void SongQueue::addSong( const QString &singer, int id )
     song.singer = singer;
     song.title = info.title;
 
-    addSong( song );
+    // Check the collection type
+    if ( pSettings->collections.contains(info.collectionid) )
+    {
+        if ( pSettings->collections[info.collectionid].type != CollectionProvider::TYPE_FILESYSTEM )
+        {
+            // Create the provider
+            retriever = new SongQueueItemRetriever();
+            retriever->collectionindex = info.collectionid;
+            retriever->sources = info.filePath.split('|');
+
+            // Clear the file (so it is reinitialized to cached) and create the sources
+            song.file.clear();
+        }
+    }
+
+    addSong( song, retriever );
 }
 
 void SongQueue::addSong(const QString &singer, const QString &file)
@@ -214,7 +265,7 @@ void SongQueue::insertSong(unsigned int position, const QString &singer, int son
     song.title = info.title;
 
     // Song queue is exported from m_currentSong, so we need to adjust the items
-    m_queue.insert( position, song );
+    m_queue.insert( position, new SongQueueEntry( song ) );
 
     queueUpdated();
 }
@@ -226,32 +277,33 @@ void SongQueue::replaceSong(unsigned int position, int songid)
     if ( !pDatabase->songById( songid, info ) )
         return;
 
-    m_queue[ position ].artist = info.artist;
-    m_queue[ position ].title = info.title;
-    m_queue[ position ].file = info.filePath;
-    m_queue[ position ].songid = info.id;
+    m_queue[ position ]->item.artist = info.artist;
+    m_queue[ position ]->item.title = info.title;
+    m_queue[ position ]->item.file = info.filePath;
+    m_queue[ position ]->item.songid = info.id;
 
     queueUpdated();
 }
 
 void SongQueue::replaceSong(unsigned int position, const SongQueueItem &song)
 {
-    m_queue[ position ].artist = song.artist;
-    m_queue[ position ].title = song.title;
-    m_queue[ position ].file = song.file;
-    m_queue[ position ].songid = song.songid;
+    m_queue[ position ]->item.artist = song.artist;
+    m_queue[ position ]->item.title = song.title;
+    m_queue[ position ]->item.file = song.file;
+    m_queue[ position ]->item.songid = song.songid;
 
     // This might replace the singer, in which case we must add another singer
-    if ( m_queue[ position ].singer != song.singer )
+    if ( m_queue[ position ]->item.singer != song.singer )
         addSinger( song.singer );
 
-    m_queue[ position ].singer = song.singer;
+    m_queue[ position ]->item.singer = song.singer;
     queueUpdated();
 }
 
 void SongQueue::removeSong(unsigned int position)
 {
     // Song queue is exported from m_currentSong, so we need to adjust the items
+    delete m_queue[position];
     m_queue.removeAt( position );
 
     queueUpdated();
@@ -261,8 +313,9 @@ bool SongQueue::removeSongById(int id)
 {
     for ( int i = 0; i < m_queue.size(); i++ )
     {
-        if ( m_queue[i].id == id )
+        if ( m_queue[i]->item.id == id )
         {
+            delete m_queue[i];
             m_queue.removeAt( i );
             queueUpdated();
 
@@ -286,7 +339,7 @@ int SongQueue::addSinger(const QString &singer)
     int singeridx = 0;
 
     if ( !m_queue.isEmpty() && (int) m_currentSong < m_queue.size() )
-        singeridx = qMax( m_singers.indexOf( m_queue[m_currentSong].singer ), 0 );
+        singeridx = qMax( m_singers.indexOf( m_queue[m_currentSong]->item.singer ), 0 );
 
     if ( m_singers.indexOf( singer ) == -1 )
     {
@@ -301,7 +354,7 @@ int SongQueue::addSinger(const QString &singer)
 
 SongQueueItem SongQueue::current() const
 {
-    return m_queue[ m_currentSong ];
+    return m_queue[ m_currentSong ]->item;
 }
 
 bool SongQueue::prev()
@@ -327,7 +380,12 @@ bool SongQueue::next()
 
 QList<SongQueueItem> SongQueue::exportQueue() const
 {
-    return m_queue;
+    QList<SongQueueItem> output;
+
+    for ( int i = 0; i < m_queue.size(); i++ )
+        output.push_back( m_queue[i]->item );
+
+    return output;
 }
 
 unsigned int SongQueue::currentItem() const
@@ -349,75 +407,14 @@ void SongQueue::clear()
     queueUpdated();
 }
 
-void SongQueue::providerFinished(int id, const QString &error)
-{
-/*    // Non-empty error means we failed
-    Logger::debug( "SongQueue: Queue id %d finished downloading: %s",
-                   id, error.isEmpty() ? "success" : qPrintable( error ) );
-
-    // Find the provider
-    QMap< int, SongQueueItemRetriever * >::iterator it = m_retrievers.find( id );
-
-    if ( it != m_retrievers.end() )
-    {
-        // Remove the provider entry
-        m_retrievers.erase( it );
-
-        // And mark it for later deletion
-        (*it)->deleteLater();
-    }
-
-    // Find the file in queue
-    for ( int i = 0; i < m_queue.size(); i++ )
-    {
-        if ( m_queue[i].id == id )
-        {
-            if ( !error.isEmpty() )
-            {
-                // Remove all the cached files
-                Q_FOREACH( const QString& src, m_queue[id].sources )
-                {
-                    QString srcfile = m_queue[id].cachedFileName( src );
-                    QFile::remove( srcfile );
-                }
-
-                // Since it failed, we delete the entry from the queue
-                m_queue.removeAt( i );
-                break;
-            }
-            else
-            {
-                // We're ready to play
-                m_queue[i].state = SongQueueItem::STATE_READY;
-            }
-        }
-    }
-
-    queueUpdated();*/
-}
-
-void SongQueue::providerProgress(int id, int progress)
-{
-    /*Logger::debug( "SongQueue: Progress received for queue id %d: %d%%", id, progress );
-
-    for ( int i = 0; i < m_queue.size(); i++ )
-    {
-        if ( m_queue[i].id == id )
-        {
-            m_queue[i].percentage = progress;
-            break;
-        }
-    }*/
-}
-
 void SongQueue::statusChanged(int id, bool playstarted)
 {
     // Find the file in queue - we go through the entire loop in case a file is added more than once
     for ( int i = 0; i < m_queue.size(); i++ )
     {
-        if ( m_queue[i].id == id )
+        if ( m_queue[i]->item.id == id )
         {
-            m_queue[i].state = playstarted ? SongQueueItem::STATE_PLAYING : SongQueueItem::STATE_READY;
+            m_queue[i]->item.state = playstarted ? SongQueueItem::STATE_PLAYING : SongQueueItem::STATE_READY;
             break;
         }
     }
@@ -430,25 +427,26 @@ void SongQueue::queueUpdated()
     // Save the queue if needed
     if ( !pSettings->queueFilename.isEmpty() )
         save();
-/*
+
     // Check if there are any songs which need to be retrieved
-    if ( m_retrievers.size() < pSettings->queueMaxConcurrentPrepare )
+    if ( m_beingRetrieved < pSettings->queueMaxConcurrentPrepare )
     {
-        for ( int i = 0; i < m_queue.size(); i++ )
+        for ( int i = m_currentSong; i < m_queue.size(); i++ )
         {
-            if ( m_queue[i].state == SongQueueItem::STATE_NOT_READY )
+            if ( m_queue[i]->item.state == SongQueueItem::STATE_NOT_READY )
             {
                 // Maximum is not reached - start retrieving
-                startRetrieve( m_queue[i] );
+                startRetrieve( i );
 
-                if ( m_retrievers.size() >= pSettings->queueMaxConcurrentPrepare )
+                // If we are already at maximum, no more downloading
+                if ( m_beingRetrieved >= pSettings->queueMaxConcurrentPrepare )
                     break;
             }
         }
     }
     else
         Logger::debug( "SongQueue: song needs to be retrieved but max retrievers is reached, ignoring" );
-*/
+
     emit pEventor->queueChanged();
 }
 
@@ -470,18 +468,18 @@ void SongQueue::save()
     dts << m_singers;
     dts << m_queue.size();
 
-    foreach ( const SongQueueItem& s, m_queue )
+    for ( int i = 0; i < m_queue.size(); i++ )
     {
-/*        // Ignore the non-local songs
-        if ( !s.sources.isEmpty() )
+        // Ignore the non-local songs
+        if ( m_queue[i]->retriever )
             continue;
-*/
-        dts << s.id;
-        dts << s.songid;
-        dts << s.file;
-        dts << s.artist;
-        dts << s.title;
-        dts << s.singer;
+
+        dts << m_queue[i]->item.id;
+        dts << m_queue[i]->item.songid;
+        dts << m_queue[i]->item.file;
+        dts << m_queue[i]->item.artist;
+        dts << m_queue[i]->item.title;
+        dts << m_queue[i]->item.singer;
     }
 }
 
@@ -524,62 +522,125 @@ void SongQueue::load()
 
         s.state = SongQueueItem::STATE_READY;
 
-        m_queue.append( s );
+        m_queue.append( new SongQueueEntry( s ) );
     }
 
     if ( !m_queue.isEmpty() )
         emit pEventor->queueChanged();
 }
 
-bool SongQueue::startRetrieve(SongQueueItem &song)
+bool SongQueue::startRetrieve( int idx )
 {
-/*    Logger::debug( "SongQueue: start retrieving song id %d from %s", song.id, qPrintable(song.sources.join(", ")) );
+    SongQueueEntry * entry = m_queue[idx];
 
-    // Create the retriever
-    SongQueueItemRetriever * ret = new SongQueueItemRetriever();
-    ret->provider = CollectionProvider::createProvider( song.providertype );
+    Logger::debug( "SongQueue: start retrieving song id %d from %s", idx, qPrintable(entry->retriever->sources.join(", ")) );
 
-    if ( ret->provider == 0 )
+    // Create the provider
+    if ( entry->retriever->collectionindex >= 0 )
+        entry->retriever->provider = CollectionProvider::createProviderForID( entry->retriever->collectionindex );
+    else
+        entry->retriever->provider = CollectionProvider::createProviderForType( entry->retriever->collectiontype );
+
+    if ( entry->retriever->provider == 0 )
     {
-        Logger::error( "SongQueue: cannot start retrieving song id %d from %s: no provider", song.id, qPrintable(song.sources.join(", ")) );
-        removeSongById( song.id );
-        delete ret;
+        Logger::error( "SongQueue: cannot start retrieving song from %s: no provider", qPrintable( entry->retriever->sources.join(", ")) );
+        removeSong( idx );
         return false;
     }
 
+    // Connect the signals
+    connect( entry->retriever->provider, SIGNAL(finished(int,QString)), this, SLOT(providerFinished(int,QString)) );
+    connect( entry->retriever->provider, SIGNAL(progress(int,int)), this, SLOT(providerProgress(int,int)) );
+
     QStringList urls;
 
-    // Iterate through all sources and add downloaders
-    Q_FOREACH( const QString& src, song.sources )
+    // Add downloaders for missing sources
+    Q_FOREACH( QString src, entry->retriever->sources )
     {
-        QString srcfile = song.cachedFileName( src );
+        QString srcfile = entry->retriever->cachedFileName( src );
 
         if ( !QFile::exists( srcfile ) )
         {
             QFile * newfile = new QFile( srcfile );
 
-            ret->outputs.push_back( newfile );
+            entry->retriever->outputs.push_back( newfile );
+            entry->retriever->outfiles.push_back( srcfile );
 
             if ( !newfile->open( QIODevice::WriteOnly ) )
             {
-                Logger::error( "SongQueue: cannot start retrieving song id %d from %s: cannot write into cached file %s", song.id, qPrintable(song.sources.join(", ")), qPrintable( song.file ) );
-                removeSongById( song.id );
-                delete ret;
+                Logger::error( "SongQueue: cannot start retrieving from %s: cannot write into cached file %s", qPrintable( src ), qPrintable( srcfile ) );
+                removeSong( idx );
                 return false;
             }
 
-            urls.push_back( src );
+            Logger::debug( "SongQueue: setting up to retrieve %s into %s", qPrintable( src ), qPrintable( srcfile ) );
+
+            urls.push_back( src.replace("#", "%23") );
+        }
+        else
+            Logger::debug( "SongQueue: not retrieving %s as %s already present", qPrintable( src ), qPrintable( srcfile ) );
+    }
+
+    // Start the download
+    entry->retriever->provider->downloadAll( entry->item.id, urls, entry->retriever->outputs );
+
+    // And store it in the map
+    m_beingRetrieved++;
+
+    entry->item.state = SongQueueItem::STATE_GETTING_READY;
+    return true;
+}
+
+void SongQueue::providerFinished(int id, const QString &error)
+{
+    // Non-empty error means we failed
+    Logger::debug( "SongQueue: Queue id %d finished downloading: %s",
+                   id, error.isEmpty() ? "success" : qPrintable( error ) );
+
+    // Find the file in queue
+    for ( int i = 0; i < m_queue.size(); i++ )
+    {
+        if ( m_queue[i]->item.id == id )
+        {
+            if ( !error.isEmpty() )
+            {
+                // Downloaded with an error. Remove all the cached files
+                Q_FOREACH( const QString& src, m_queue[i]->retriever->outfiles )
+                {
+                    QFile::remove( src );
+                }
+
+                // Since it failed, we delete the entry from the queue
+                m_queue.removeAt( i );
+            }
+            else
+            {
+                // We do not need the retriever anymore
+                delete m_queue[i]->retriever;
+                m_queue[i]->retriever = 0;
+
+                // We're ready to play
+                m_queue[i]->item.state = SongQueueItem::STATE_READY;
+            }
+
+            break;
         }
     }
 
-    // Connect the signals
-    connect( ret->provider, SIGNAL(finished(int,QString)), this, SLOT(providerFinished(int,QString)) );
-    connect( ret->provider, SIGNAL(progress(int,int)), this, SLOT(providerProgress(int,int)) );
+    m_beingRetrieved--;
+    queueUpdated();
+}
 
-    // Start the download
-    ret->provider->downloadAll( song.id, urls, ret->outputs );
+void SongQueue::providerProgress(int id, int progress)
+{
+    Logger::debug( "SongQueue: Progress received for queue id %d: %d%%", id, progress );
 
-    // And store it in the map
-    m_retrievers[ song.id ] = ret;*/
-    return true;
+    for ( int i = 0; i < m_queue.size(); i++ )
+    {
+        if ( m_queue[i]->item.id == id )
+        {
+            m_queue[i]->item.readiness = progress;
+            break;
+        }
+    }
 }
