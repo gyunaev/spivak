@@ -8,7 +8,6 @@ Currently Spivak is just out of beta, and already has impressive set of features
 
 Spivak is licensed under GNU GPL version 3, and is written by George Yunaev.
 
-Version 1.1 has been released on Nov 23, 2017.
 
 ## Features
 
