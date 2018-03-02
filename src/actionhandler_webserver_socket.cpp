@@ -379,7 +379,7 @@ bool ActionHandler_WebServer_Socket::addsong( QJsonDocument& document )
 
         if ( !pDatabase->songById( id, info ) || singer.isEmpty() )
         {
-            Logger::debug("WebServer: failed to add song %d: %s", singer.isEmpty() ? "singer is empty" : "song not found" );
+            Logger::debug("WebServer: failed to add song %d: %s", id, singer.isEmpty() ? "singer is empty" : "song not found" );
 
             QJsonObject out;
             out["result"] = 0;
