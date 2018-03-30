@@ -211,7 +211,7 @@ void SongDatabaseScanner::providerFinished(int, QString errmsg)
     }
 }
 
-void SongDatabaseScanner::providerProgress(int id, int percentage)
+void SongDatabaseScanner::providerProgress(int , int percentage)
 {
     m_stringProgress = tr("Downloading index... %1%" ).arg( percentage );
 }
