@@ -255,14 +255,21 @@ bool Database::cleanupCollections()
     if ( !execute( "BEGIN TRANSACTION" ) )
         return false;
 
-    if ( !stmt.prepare( m_sqlitedb, "SELECT rowid,path FROM songs" ) )
+    if ( !stmt.prepare( m_sqlitedb, "SELECT rowid,path,collectionid FROM songs" ) )
         return false;
 
     while ( stmt.step() == SQLITE_ROW )
     {
+        int colid = stmt.columnInt( 2 );
+
+        // If collection exists but not a filesystem we skip the check
+        if ( pSettings->collections.contains( colid ) && pSettings->collections[ colid ].type != CollectionProvider::TYPE_FILESYSTEM )
+            continue;
+
         QString path = stmt.columnText( 1 );
 
-        if ( !QFile::exists( path ) )
+        // If file is removed, or the collection is removed, we remove the record
+        if ( !QFile::exists( path ) || !pSettings->collections.contains( colid ) )
         {
             Logger::debug( "Collection cleanup: removing non-existing song %s", qPrintable(path) );
 
@@ -285,7 +292,7 @@ void Database::getDatabaseCurrentState()
     qint64 updated = lastDatabaseUpdate();
 
     pCurrentState->m_databaseUpdatedDateTime = updated > 0 ?
-                QDateTime::fromMSecsSinceEpoch( updated ).toString( "yyyy-MM-dd hh:mm:ss")
+                QDateTime::fromMSecsSinceEpoch( updated * 1000 ).toString( "yyyy-MM-dd hh:mm:ss")
                   : tr("never");
 }
 

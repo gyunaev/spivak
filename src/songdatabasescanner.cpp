@@ -223,7 +223,8 @@ void SongDatabaseScanner::scanCollectionsThread()
     Logger::debug( "SongDatabaseScanner: scanCollectionsThread started" );
 
     if ( lastupdate > 0 )
-        Logger::debug( "SongDatabaseScanner: collection thread will ignore the timestamps earlier than %s", qPrintable( QDateTime::fromMSecsSinceEpoch( lastupdate ).toString( "yyyy-mm-dd hh:mm:ss") ) );
+        Logger::debug( "SongDatabaseScanner: collection thread will ignore the timestamps earlier than %s",
+                       qPrintable( QDateTime::fromMSecsSinceEpoch( lastupdate ).toString( "yyyy-mm-dd hh:mm:ss") ) );
 
     for ( QMap<int,CollectionEntry>::const_iterator it = m_collection.begin();
           it != m_collection.end();
