@@ -95,6 +95,22 @@ void MusicCollectionManager::initCollection()
     {
         delete m_player;
         m_player = 0;
+
+        // And disconnect the slots
+        disconnect( pActionHandler, &ActionHandler::actionPlayerVolumeDown, this, &MusicCollectionManager::volumeDown );
+        disconnect( pActionHandler, &ActionHandler::actionPlayerVolumeUp, this, &MusicCollectionManager::volumeUp );
+        disconnect( pActionHandler, &ActionHandler::actionPlayerVolumeSet, this, &MusicCollectionManager::volumeSet );
+        disconnect( pActionHandler, &ActionHandler::actionMusicPlayerPauseResume, this, &MusicCollectionManager::pause );
+        disconnect( pActionHandler, &ActionHandler::actionMusicPlayerStop, this, &MusicCollectionManager::stop );
+        disconnect( pActionHandler, &ActionHandler::actionMusicPlayerPlay, this, &MusicCollectionManager::start );
+
+        // Queue control (via actions)
+        disconnect( pActionHandler, &ActionHandler::actionMusicQueueNext, this, &MusicCollectionManager::nextMusic );
+        disconnect( pActionHandler, &ActionHandler::actionMusicQueuePrev, this, &MusicCollectionManager::prevMusic );
+
+        // Notifications
+        disconnect( pEventor, &Eventor::karaokeStarted, this, &MusicCollectionManager::karaokeStarted );
+        disconnect( pEventor, &Eventor::karaokeStopped, this, &MusicCollectionManager::karaokeStopped );
         return;
     }
 
@@ -147,6 +163,13 @@ void MusicCollectionManager::start()
     // This will autostart
     if ( m_player )
         return; // already playing
+
+    // Do not start if musicFile is empty
+    if ( m_musicFiles.isEmpty() )
+    {
+        Logger::debug( "Attempting to invoke music collection with empty collection" );
+        return;
+    }
 
     m_player = new MediaPlayer();
 
