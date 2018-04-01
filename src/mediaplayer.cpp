@@ -46,7 +46,7 @@ MediaPlayer::MediaPlayer()
     m_mediaIODevice = 0;
 
     m_duration = -1;
-    m_tempoRate = 1.0;
+    m_tempoRatePercent = 100;
     m_playState = StateReset;
     m_errorsDetected = false;
     m_pitchPlugin = 0;
@@ -98,8 +98,11 @@ void MediaPlayer::pause()
 
 void MediaPlayer::seekTo(qint64 pos)
 {
-    // Seek with m_tempoRate is also used to change the tempo (that's actually the only way in GStreamer)
-    GstEvent * seek_event = gst_event_new_seek( m_tempoRate,
+    // Calculate the new tempo rate as it is used to change the tempo (that's actually the only way in GStreamer)
+    //
+    double temporate = m_tempoRatePercent / 100.0;
+
+    GstEvent * seek_event = gst_event_new_seek( temporate,
                                                 GST_FORMAT_TIME,
                                                 (GstSeekFlags)(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE),
                                                 GST_SEEK_TYPE_SET,
@@ -143,7 +146,7 @@ qint64 MediaPlayer::duration()
         m_duration = dur / GST_MSECOND;
     }
 
-    return m_duration;
+    return (m_duration * 100) / m_tempoRatePercent;
 }
 
 MediaPlayer::State MediaPlayer::state() const
@@ -173,10 +176,19 @@ bool MediaPlayer::setCapabilityValue( MediaPlayer::Capability cap, int value)
         return adjustPitch( value );
 
     case MediaPlayer::CapChangeTempo:
-        // Let's spread it to 0.75 ... +1.25
-        m_tempoRate = (value / 200.0) + 0.75;
+
+        // The UI gives us tempo rate as percentage, from 0 to 100 with 50 being normal value.
+        // Thus we convert it into 75% - 125% range
+        m_tempoRatePercent = 75 + value / 2;
+        Logger::debug( "MediaPlayer: tempo change: UI %d -> player %d", value, m_tempoRatePercent );
         position();
         seekTo( m_lastKnownPosition );
+
+        // Because the total song duration now changed, we need to inform the widgets
+        QMetaObject::invokeMethod( this,
+                                   "durationChanged",
+                                   Qt::QueuedConnection );
+
         break;
 
     case MediaPlayer::CapVoiceRemoval:
@@ -478,7 +490,7 @@ void MediaPlayer::reset()
     m_lastVideoSample = 0;
     m_errorsDetected = false;
     m_mediaLoading = true;
-    m_tempoRate = 1.0;
+    m_tempoRatePercent = 100;
     m_pitchPlugin = 0;
 
     m_mediaArtist.clear();

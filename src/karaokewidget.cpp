@@ -224,6 +224,8 @@ void KaraokeWidget::stopEverything()
 
 void KaraokeWidget::karaokeSongFinished()
 {
+    Logger::debug( "karaokeSongFinished" );
+
     // A song ended naturally
     stop();
     emit pEventor->karaokeFinished();

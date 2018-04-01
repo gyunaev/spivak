@@ -192,8 +192,8 @@ class MediaPlayer : public QObject
         // Bus object
         GstBus   *  m_gst_bus;
 
-        // Current tempo rate
-        double      m_tempoRate;
+        // Current tempo percentage rate; default value is 100%, allowed range is 75-125
+        int         m_tempoRatePercent;
         qint64      m_lastKnownPosition;
 
         MediaPlayer::LoadOptions m_loadOptions;

@@ -362,6 +362,8 @@ void ActionHandler::keyEvent(QKeyEvent *event)
 
 void ActionHandler::nextQueueAction()
 {
+    Logger::debug("ActionHandler: nextQueueAction");
+
     // This triggets next current music or next Karaoke song. Note the STOPPED check - this is only for manual change,
     // and should not be used for automatic between-song change
     if ( pCurrentState->playerState == CurrentState::PLAYERSTATE_STOPPED && pMusicCollectionMgr->isPlaying() )
