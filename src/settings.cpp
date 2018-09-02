@@ -130,7 +130,7 @@ QJsonObject Settings::toJson()
     out[ "player/RenderFPS" ] = playerRenderFPS;
 
     out[ "player/BackgroundColor" ] = playerBackgroundColor.name();
-    out[ "player/LyricsFont"] = playerLyricsFont.family();
+    out[ "player/LyricsFontString"] = playerLyricsFont.toString();
     out[ "player/LyricsTextBeforeColor"] = playerLyricsTextBeforeColor.name();
     out[ "player/LyricsTextAfterColor"] = playerLyricsTextAfterColor.name();
     out[ "player/LyricsTextSpotColor"] = playerLyricsTextSpotColor.name();
@@ -208,7 +208,6 @@ void Settings::fromJson(const QJsonObject &data)
     playerBackgroundTransitionDelay = data.value( "player/BackgroundTransitionDelay" ).toInt( 30 );
     playerRenderFPS = data.value( "player/RenderFPS" ).toInt( 25 );
     playerBackgroundColor = QColor( data.value( "player/BackgroundColor" ).toString( "black" ) );
-    playerLyricsFont = QFont( data.value( "player/LyricsFont" ).toString( "arial" ) );
     playerLyricsTextBeforeColor = QColor( data.value( "player/LyricsTextBeforeColor" ).toString( "blue" ) );
     playerLyricsTextAfterColor = QColor( data.value( "player/LyricsTextAfterColor" ).toString("red") );
     playerLyricsTextSpotColor = QColor( data.value( "player/LyricsTextSpotColor" ).toString("yellow") );
@@ -255,6 +254,12 @@ void Settings::fromJson(const QJsonObject &data)
     musicCollections = toStringList( data.value( "musicCollection/Paths" ) );
     musicCollectionSortedOrder = data.value( "musicCollection/SortedOrder" ).toBool( true );
     musicCollectionCrossfadeTime = data.value( "musicCollection/CrossfadeTime" ).toInt( 5 );
+
+    // Special handling for the font which was stored as player/LyricsFont and now player/LyricsFontString
+    if ( data.contains( "player/LyricsFontString" ) )
+        playerLyricsFont.fromString( data.value( "player/LyricsFontString" ).toString() );
+    else
+        playerLyricsFont = QFont( data.value( "player/LyricsFont" ).toString( "arial" ) );
 
     // Collections
     collections.clear();

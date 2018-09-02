@@ -468,7 +468,7 @@ void SettingsDialog::updateLyricsPreview()
                 ui->lblTextRenderingExample->size().height(),
                 QBrush( tint ) );
 
-    QFont font = ui->fontPlayerLyrics->font();
+    QFont font = ui->fontPlayerLyrics->currentFont();
     font.setPointSize( p.tallestFontSize( font, img.height() ) );
     p.setFont( font );
 
@@ -714,7 +714,7 @@ void SettingsDialog::accept()
     pSettings->playerIgnoreBackgroundFromFormats = ui->rbBackgroundIgnoreCustom->isChecked();
 
     // Player tab
-    pSettings->playerLyricsFont = ui->fontPlayerLyrics->font();
+    pSettings->playerLyricsFont = ui->fontPlayerLyrics->currentFont();
     pSettings->playerLyricsFontFitLines = ui->spinMaxLyricFontLines->value();
     pSettings->playerLyricsTextAfterColor = ui->btnPlayerLyricsFuture->color();
     pSettings->playerLyricsTextBeforeColor = ui->btnPlayerLyricsPast->color();

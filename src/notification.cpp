@@ -253,6 +253,10 @@ void Notifications::songStopped()
 void Notifications::settingsChanged()
 {
     QMutexLocker m( &m_mutex );
+
+    // This forces changing the notification font
+    m_lastScreenHeight = 0;
+
     updateWelcomeMessage();
 }
 
