@@ -24,6 +24,10 @@
 #include <QTimer>
 #include <QDesktopWidget>
 
+#if defined (Q_OS_WIN)
+    #include <windows.h>
+#endif
+
 #include "settings.h"
 #include "mainwindow.h"
 #include "karaokewidget.h"
