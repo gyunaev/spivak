@@ -161,6 +161,9 @@ QJsonObject Settings::toJson()
     out[ "http/ListeningPort"] = (int) httpListenPort;
     out[ "http/EnableAddQueue"] = httpEnableAddQueue;
 
+    // Encoding
+    out[ "advanced/FallbackEncoding"] = fallbackEncoding;
+
     // Those are only set if not empty
     if ( !httpAccessCode.isEmpty() )
         out[ "http/SecureAccessCode"] = httpAccessCode;
@@ -238,6 +241,9 @@ void Settings::fromJson(const QJsonObject &data)
     httpEnableAddQueue = data.value( "http/EnableAddQueue" ).toBool( false );
     httpAccessCode = data.value( "http/SecureAccessCode" ).toString();
     httpForceUseHost = data.value( "http/ForceUseHostname" ).toString();
+
+    // Encoding
+    fallbackEncoding = data.value( "advanced/FallbackEncoding" ).toString( "UTF-8" );
 
     startInFullscreen = data.value( "mainmenu/StartInFullscreen" ).toBool( false );
     firstTimeWizardShown = data.value( "mainmenu/FirstTimeWizardShown" ).toBool( false );

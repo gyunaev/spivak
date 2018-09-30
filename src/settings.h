@@ -110,6 +110,9 @@ class Settings
         QString         httpAccessCode;
         QString         httpForceUseHost;
 
+        // Fallback encoding to use if automatic detection failed
+        QString         fallbackEncoding;
+
         // If true, we should start in a full screen mode (but this doesn't mean NOW is a fullscreen mode)
         bool            startInFullscreen;
 

@@ -39,7 +39,12 @@ class PlayerLyricsTextCallback : public LyricsLoaderCallback
         // This function must detect the used text codec for the data, and return it, or return 0 (we will fall back to UTF-8)
         virtual QTextCodec * detectTextCodec( const QByteArray& data )
         {
-            return Util::detectEncoding( data );
+            QTextCodec * enc = Util::detectEncoding( data );
+
+            if ( !enc )
+                enc = QTextCodec::codecForName( qPrintable( pSettings->fallbackEncoding ) );
+
+            return enc;
         }
 
         // This function is called when the lyric file is password-protected, the client must return the non-empty password
@@ -84,7 +89,7 @@ bool PlayerLyricsText::load(QIODevice * file, const QString& filename )
     if ( m_properties.contains( LyricsLoader::PROP_DETECTED_ENCODING ) )
         Logger::debug( "Autodetected lyrics text encoding: %s", qPrintable( m_properties[ LyricsLoader::PROP_DETECTED_ENCODING ] ) );
     else
-        Logger::debug( "Automatic lyrics text encoding detection failed; falling back to UTF-8" );
+        Logger::debug( "Automatic lyrics text encoding detection failed; falling back to %s", qPrintable( pSettings->fallbackEncoding ) );
 
     // Convert them into sentences, and find the longest lyrics line when rendered by a lyric font
     QFontMetrics fm( m_renderFont );

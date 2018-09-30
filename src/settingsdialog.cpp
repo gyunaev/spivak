@@ -38,6 +38,38 @@
 
 
 static const char * coltemplatelist[] = { "/", " - ", " = ", 0 };
+typedef struct
+{
+    const char * language;
+    const char * qtcodec;
+} TextEncodingEntry;
+
+static const TextEncodingEntry text_encoding_table [] =
+{
+    {   "Arabic",  "CP1256" },
+    {   "Baltic",  "CP1257"	},
+    {   "Central European", "CP1250"    },
+    {   "Chinese Simplified",   "GB18030"   },
+    {   "Chinese Simplified",   "GBK"       },
+    {   "Chinese Simplified",   "GB2313"    },
+    {   "Chinese Traditional",  "Big5"      },
+    {   "Chinese Traditional",  "Big5-HKSCS"  },
+    {   "Cyrillic", "CP1251"	},
+    {   "Greek", "CP1253"   },
+    {   "Hebrew",   "CP1255"    },
+    {   "Japanese", "Shift-JIS"	},
+    {   "Japanese", "eucJP"	},
+    {   "Japanese", "JIS7"  },
+    {   "Korean",   "eucKR" },
+    {   "Tamil",    "TSCII" },
+    {   "Thai", "TIS-620"	},
+    {   "Turkish",  "CP1254"   },
+    {   "Vietnamese",   "CP1258" },
+    {   "Unicode",  "UTF-8" },
+    {   "Unicode",  "UTF-16" },
+    {   "Western",  "CP1252"  },
+    { 0, 0 }
+};
 
 
 SettingsDialog::SettingsDialog(QWidget *parent) :
@@ -226,6 +258,15 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     // Web server
     ui->boxWebEnable->setChecked( pSettings->httpEnabled );
     ui->boxWebAllowAddSong->setChecked( pSettings->httpEnableAddQueue );
+
+    // Fill up encodings
+    for ( const TextEncodingEntry * e = text_encoding_table; e->language; e++ )
+    {
+        ui->boxFallbackEncoding->addItem( QString( "%1 (%2)") .arg( e->language ) .arg( e->qtcodec ), e->qtcodec );
+
+        if ( pSettings->fallbackEncoding == e->qtcodec )
+            ui->boxFallbackEncoding->setCurrentIndex( ui->boxFallbackEncoding->count() - 1 );
+    }
 
     // LIRC
 #ifdef Q_OS_WIN
@@ -742,6 +783,8 @@ void SettingsDialog::accept()
     pSettings->startInFullscreen = ui->boxForceFullScreen->isChecked();
 
     pSettings->playerUseBuiltinMidiSynth = ui->rbMidiBuiltin->isChecked();
+
+    pSettings->fallbackEncoding = ui->boxFallbackEncoding->currentData().toString();
 
     // Music
     QStringList origMusicPaths = pSettings->musicCollections;
