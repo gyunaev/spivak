@@ -18,7 +18,11 @@
 
 #include <QApplication>
 #include <QScopedPointer>
+#include <QCommandLineParser>
+#include <QRect>
+#include <QScreen>
 
+#include "actionhandler.h"
 #include "mainwindow.h"
 #include "logger.h"
 #include "crashhandler.h"
@@ -52,6 +56,57 @@ int main(int argc, char *argv[])
     QScopedPointer<MainWindow> p (new MainWindow());
     p.data()->show();
 
-    a.exec();
-    return 0;
+    QCommandLineParser parser;
+
+    const QCommandLineOption fullScreenOption(
+                QStringList() << "fs" << "fullScreen",
+                "Toggle full screen"
+                );
+
+    const QCommandLineOption fileNameOption(
+                QStringList() << "file" << "fileName",
+                "File name to play",
+                "File name to play"
+                );
+
+    const QCommandLineOption displayOption(
+                QStringList() << "d" << "displayNumber",
+                "Display number",
+                "Screen"
+                );
+
+    parser.addOption(fullScreenOption);
+    parser.addOption(fileNameOption);
+    parser.addOption(displayOption);
+    parser.process(a);
+
+    const int displayNumber = parser.value(displayOption).toInt();
+    if(displayNumber && displayNumber < a.screens().size()) {
+
+        const QRect resolution = a.screens()[displayNumber]
+                ->availableGeometry();
+
+        p.data()->move(
+                    resolution.x(),
+                    resolution.y()
+                    );
+    }
+
+    if(parser.isSet(fullScreenOption)) {
+        p.data()->toggleFullscreen();
+    }
+
+    const QString fileName = parser.value(fileNameOption);
+
+    if(!fileName.isEmpty()) {
+        p.data()->enqueueSong(fileName);
+        QObject::connect(
+                    pActionHandler,
+                    &ActionHandler::actionKaraokePlayerStop,
+                    qApp,
+                    &QApplication::quit
+                    );
+    }
+
+    return a.exec();
 }
