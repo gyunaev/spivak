@@ -174,11 +174,7 @@ MainWindow::MainWindow(QWidget *parent) :
     if ( !pSettings->firstTimeWizardShown )
         QTimer::singleShot( 100, this, &MainWindow::menuShowWelcomeWizard );
 
-    // Restore size if we're not fullscreen
-    if ( pSettings->startInFullscreen || hasCmdLineOption("-fs") )
-        toggleFullscreen();
-    else
-        resize( pCurrentState->windowSizeMain );
+    resize( pCurrentState->windowSizeMain );
 
     // Generate a crash if defined (to test crash handler)
     if ( hasCmdLineOption( "--crashplease") )
@@ -213,16 +209,27 @@ void MainWindow::settingsChanged()
 
 void MainWindow::menuOpenKaraoke()
 {
-    QString file = QFileDialog::getOpenFileName( 0, "Music file", "/home/tim/work/my/karaokeplayer/test/", "*.*");
+    const QString file = QFileDialog::getOpenFileName(
+                0,
+                "Music file",
+                "/home/tim/work/my/karaokeplayer/test/",
+                "*.*"
+                );
 
-    if ( file.isEmpty() )
+    enqueueSong(file);
+}
+
+void MainWindow::enqueueSong(const QString &fileName)
+{
+    if ( fileName.isEmpty() )
         return;
 
     if ( pCurrentState->playerState == CurrentState::PLAYERSTATE_STOPPED )
         pSongQueue->clear();
 
-    pActionHandler->enqueueSong( "", file );
+    pActionHandler->enqueueSong( "", fileName );
 }
+
 
 void MainWindow::menuSettings()
 {

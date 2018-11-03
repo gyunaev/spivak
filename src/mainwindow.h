@@ -41,6 +41,7 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
     public:
         explicit MainWindow(QWidget *parent = 0);
         ~MainWindow();
+        void enqueueSong(const QString &fileName);
 
     public slots:
         // Settings changed
