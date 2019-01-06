@@ -614,14 +614,17 @@ bool PlayerLyricsCDG::render(KaraokePainter &p, qint64 time)
 
             case CDG_INST_LOAD_COL_TBL_0_7:
                 cmdLoadColorTable( sc.data, 0 );
+                redraw_image = true;
                 break;
 
             case CDG_INST_LOAD_COL_TBL_8_15:
                 cmdLoadColorTable( sc.data, 8 );
+                redraw_image = true;
                 break;
 
             case CDG_INST_DEF_TRANSP_COL:
                 cmdTransparentColor( sc.data );
+                redraw_image = true;
                 break;
 
             case CDG_INST_TILE_BLOCK:
