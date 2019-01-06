@@ -153,7 +153,7 @@ void CollectionProviderHTTP::httpProgress(qint64 bytesReceived, qint64 bytesTota
     emit progress( m_id, allreceived * 100 / alltotal );
 }
 
-void CollectionProviderHTTP::httpAuthenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator)
+void CollectionProviderHTTP::httpAuthenticationRequired(QNetworkReply *, QAuthenticator *authenticator)
 {
     if ( collectionID >= 0 && !m_credentialsSent )
     {
