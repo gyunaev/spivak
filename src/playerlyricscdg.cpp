@@ -20,6 +20,7 @@
 #include <QImage>
 
 #include "settings.h"
+#include "logger.h"
 #include "playerlyricscdg.h"
 #include "karaokepainter.h"
 
@@ -157,6 +158,10 @@ void PlayerLyricsCDG::cmdMemoryPreset( const char * data )
     for ( unsigned int i = CDG_BORDER_WIDTH; i < CDG_FULL_WIDTH - CDG_BORDER_WIDTH; i++ )
         for ( unsigned int  j = CDG_BORDER_HEIGHT; j < CDG_FULL_HEIGHT - CDG_BORDER_HEIGHT; j++ )
             setPixel( i, j, m_bgColor );
+
+#if defined (DEBUG_CDG_PARSER)
+    Logger::debug( "CDG: CmdMemoryPreset set to %d", m_bgColor );
+#endif
 }
 
 void PlayerLyricsCDG::cmdBorderPreset( const char * data )
@@ -183,18 +188,28 @@ void PlayerLyricsCDG::cmdBorderPreset( const char * data )
         }
     }
 
-    //CLog::Log( LOGDEBUG, "CDG: border color set to %d", borderColor );
+#if defined (DEBUG_CDG_PARSER)
+    Logger::debug( "CDG: CmdBorderPreset set to %d", m_borderColor );
+#endif
 }
 
 void PlayerLyricsCDG::cmdTransparentColor( const char * data )
 {
     int index = data[0] & 0x0F;
     m_colorTable[index] = 0xFFFFFFFF;
+
+#if defined (DEBUG_CDG_PARSER)
+    Logger::debug( "CDG: TransparentColor index is %d", index );
+#endif
 }
 
 void PlayerLyricsCDG::cmdLoadColorTable( const char * data, int index )
 {
     CDG_LoadColorTable* table = (CDG_LoadColorTable*) data;
+
+#if defined (DEBUG_CDG_PARSER)
+    Logger::debug( "CDG: LoadColorTable at %d", index );
+#endif
 
     for ( int i = 0; i < 8; i++ )
     {
@@ -208,7 +223,9 @@ void PlayerLyricsCDG::cmdLoadColorTable( const char * data, int index )
 
         m_colorTable[index+i] = (red << 16) | (green << 8) | blue;
 
-        //CLog::Log( LOGDEBUG, "CDG: loadColors: color %d -> %02X %02X %02X (%08X)", index + i, red, green, blue, m_colorTable[index+i] );
+#if defined (DEBUG_CDG_PARSER)
+        Logger::debug( "    color index %d: color %08X", index + i, m_colorTable[index+i] );
+#endif
     }
 }
 
@@ -218,15 +235,13 @@ void PlayerLyricsCDG::cmdTileBlock( const char * data )
     unsigned int offset_y = (tile->row & 0x1F) * 12;
     unsigned int offset_x = (tile->column & 0x3F) * 6;
 
-    //CLog::Log( LOGERROR, "TileBlockXor: %d, %d", offset_x, offset_y );
+#if defined (DEBUG_CDG_PARSER)
+    Logger::debug( "CMD: TileBlock (%d, %d) -> (%d, %d)", (tile->column & 0x3F), (tile->row & 0x1F), offset_x, offset_y );
+#endif
 
-    if ( offset_x + 6 >= CDG_FULL_WIDTH || offset_y + 12 >= CDG_FULL_HEIGHT )
+    if ( offset_x + 6 > CDG_FULL_WIDTH || offset_y + 12 > CDG_FULL_HEIGHT )
         return;
 
-    // In the XOR variant, the color values are combined with the color values that are
-    // already onscreen using the XOR operator.  Since CD+G only allows a maximum of 16
-    // colors, we are XORing the pixel values (0-15) themselves, which correspond to
-    // indexes into a color lookup table.  We are not XORing the actual R,G,B values.
     quint8 color_0 = tile->color0 & 0x0F;
     quint8 color_1 = tile->color1 & 0x0F;
 
@@ -238,6 +253,14 @@ void PlayerLyricsCDG::cmdTileBlock( const char * data )
 
         for ( int j = 0; j < 6; j++ )
         {
+#if defined (DEBUG_CDG_PARSER)
+            Logger::debug( "    Set (%d, %d) to color index %d (%08X)",
+                           offset_x + j,
+                           offset_y + i,
+                           (bTemp & mask[j]) ? color_1 : color_0,
+                           (bTemp & mask[j]) ? m_colorTable[color_1] : m_colorTable[color_0] );
+#endif
+
             if ( bTemp & mask[j] )
                 setPixel( offset_x + j, offset_y + i, color_1 );
             else
@@ -252,9 +275,11 @@ void PlayerLyricsCDG::cmdTileBlockXor( const char * data )
     unsigned int offset_y = (tile->row & 0x1F) * 12;
     unsigned int offset_x = (tile->column & 0x3F) * 6;
 
-    //CLog::Log( LOGERROR, "TileBlockXor: %d, %d", offset_x, offset_y );
+#if defined (DEBUG_CDG_PARSER)
+    Logger::debug( "CMD: TileBlockXor (%d, %d) -> (%d, %d)", (tile->column & 0x3F), (tile->row & 0x1F), offset_x, offset_y );
+#endif
 
-    if ( offset_x + 6 >= CDG_FULL_WIDTH || offset_y + 12 >= CDG_FULL_HEIGHT )
+    if ( offset_x + 6 > CDG_FULL_WIDTH || offset_y + 12 > CDG_FULL_HEIGHT )
         return;
 
     // In the XOR variant, the color values are combined with the color values that are
@@ -274,11 +299,24 @@ void PlayerLyricsCDG::cmdTileBlockXor( const char * data )
         {
             // Find the original color index
             quint8 origindex = getPixel( offset_x + j, offset_y + i );
+            quint8 newindex;
 
             if ( bTemp & mask[j] )  //pixel xored with color1
-                setPixel( offset_x + j, offset_y + i, origindex ^ color_1 );
+                newindex = origindex ^ color_1;
             else
-                setPixel( offset_x + j, offset_y + i, origindex ^ color_0 );
+                newindex = origindex ^ color_0;
+
+            setPixel( offset_x + j, offset_y + i, newindex  );
+
+#if defined (DEBUG_CDG_PARSER)
+            Logger::debug( "    Change (%d, %d) from color index %d (%08X) to color index %d (%08X)",
+                           offset_x + j,
+                           offset_y + i,
+                           origindex,
+                           m_colorTable[origindex],
+                           newindex,
+                           m_colorTable[newindex] );
+#endif
         }
     }
 }
