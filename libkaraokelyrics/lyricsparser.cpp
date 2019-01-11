@@ -34,6 +34,10 @@ QByteArray LyricsParser::load(QIODevice *file)
 {
     QByteArray datalyrics = file->readAll();
 
+    // Strip the bytemark if any
+    if ( !memcmp( datalyrics.data(), "\xEF\xBB\xBF", 3 ) )
+        datalyrics.remove( 0, 3 );
+
     if ( datalyrics.indexOf( '\r') != -1 )
         datalyrics.replace( "\r\n", "\n" );
 
