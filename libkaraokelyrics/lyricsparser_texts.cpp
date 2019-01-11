@@ -29,9 +29,32 @@ void LyricsParser_Texts::parse(QIODevice *file, LyricsLoader::Container &output,
 
     // TXT could be UltraStar or PowerKaraoke
     if ( lyrics.trimmed().startsWith( '#' ) )
-        return parseUStar( lyrics, output, properties );
+        parseUStar( lyrics, output, properties );
     else
-        return parsePowerKaraoke( lyrics, output, properties );
+        parsePowerKaraoke( lyrics, output, properties );
+}
+
+bool LyricsParser_Texts::isUltrastarLyrics(QIODevice *file, QString *mp3file)
+{
+    LyricsParser_Texts parser( 0 );
+    LyricsLoader::Container output;
+    LyricsLoader::Properties properties;
+
+    try
+    {
+        parser.parse( file, output, properties );
+    }
+    catch ( ... )
+    {
+        return false;
+    }
+
+    // TXT could be UltraStar or PowerKaraoke, if we dont have this prop this aint ultrastar
+    if ( !properties.contains( LyricsLoader::PROP_MUSICFILE ) )
+        return false;
+
+    *mp3file = properties[ LyricsLoader::PROP_MUSICFILE ];
+    return true;
 }
 
 void LyricsParser_Texts::parseUStar( const QByteArray& data, LyricsLoader::Container &output, LyricsLoader::Properties &properties)
@@ -150,7 +173,7 @@ void LyricsParser_Texts::parseUStar( const QByteArray& data, LyricsLoader::Conta
             else
             {
                 // Lyrics
-                QRegExp regex( "^[*Ff:]\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(.*)$" );
+                QRegExp regex( "^[*Ff:]\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*(.*)?$" );
 
                 if ( regex.indexIn( line ) == -1 )
                     throw("Invalid UltraStar file format");
@@ -166,7 +189,9 @@ void LyricsParser_Texts::parseUStar( const QByteArray& data, LyricsLoader::Conta
                     lyr.pitch |= Lyric::PITCH_GOLDEN;
 
                 lyr.duration = regex.cap( 2 ).toInt() * msecs_per_beat;
-                lyr.text = regex.cap( 4 );
+
+                if ( regex.captureCount() > 3 )
+                    lyr.text = regex.cap( 4 );
 
                 output.push_back( lyr );
             }

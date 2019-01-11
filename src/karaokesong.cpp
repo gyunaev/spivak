@@ -201,9 +201,10 @@ bool KaraokeSong::open()
 
         if ( !m_lyrics->load( lyricDevice.data(), lyricFile ) )
         {
+            QString errormsg = m_lyrics->errorMsg();
             delete m_lyrics;
-            m_lyrics = 0;
-            throw( QObject::tr("Can't load lyrics file %1: %2") .arg( lyricFile ) .arg( m_lyrics->errorMsg() ) );
+            m_lyrics = 0;            
+            throw( QObject::tr("Can't load lyrics file %1: %2") .arg( lyricFile ) .arg( errormsg ) );
         }
 
         // Destroy the object right away

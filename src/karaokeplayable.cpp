@@ -27,6 +27,7 @@
 #include "karaokeplayable_kfn.h"
 
 #include "libkaraokelyrics/lyricsloader.h"
+#include "libkaraokelyrics/lyricsparser_texts.h"
 
 KaraokePlayable::KaraokePlayable(const QString &baseFile, QTextCodec *filenameDecoder)
 {
@@ -77,27 +78,39 @@ bool KaraokePlayable::parse()
     // Find the missing component(s) if we miss anything.
     if ( m_musicObject.isEmpty() || m_lyricObject.isEmpty() )
     {
-        QStringList objects = enumerate();
-
-        foreach ( const QString& obj, objects )
+        // If this is the Ultrastar text file, the music file should be extracted from it
+        if ( m_musicObject.isEmpty() && m_lyricObject.endsWith( ".txt") )
         {
-            // Remember a matched video file
-            if ( m_backgroundVideoObject.isEmpty() && isVideoFile( obj ) )
-                m_backgroundVideoObject = obj;
+            QScopedPointer<QIODevice> lyricDevice( openObject( m_lyricObject ) );
 
-            // We do not want to match a complete file (i.e. LRC with MP4) so we ignore them
-            if ( isSupportedCompleteFile(obj) )
-                continue;
+            // If we cannot find music object here, we fail - no need to match other files
+            if ( !LyricsParser_Texts::isUltrastarLyrics( lyricDevice.data(), &m_musicObject ) )
+                return false;
+        }
+        else
+        {
+            QStringList objects = enumerate();
 
-            if ( m_lyricObject.isEmpty() && isSupportedLyricFile( obj ) )
-                m_lyricObject = obj;
+            foreach ( const QString& obj, objects )
+            {
+                // Remember a matched video file
+                if ( m_backgroundVideoObject.isEmpty() && isVideoFile( obj ) )
+                    m_backgroundVideoObject = obj;
 
-            if ( m_musicObject.isEmpty() && isSupportedMusicFile( obj ) )
-                m_musicObject = obj;
+                // We do not want to match a complete file (i.e. LRC with MP4) so we ignore them
+                if ( isSupportedCompleteFile(obj) )
+                    continue;
 
-            // ZIP archive with an image will use this image as background
-            if ( m_backgroundImageObject.isEmpty() && isImageFile( obj ) && isCompound() )
-                m_backgroundImageObject = obj;
+                if ( m_lyricObject.isEmpty() && isSupportedLyricFile( obj ) )
+                    m_lyricObject = obj;
+
+                if ( m_musicObject.isEmpty() && isSupportedMusicFile( obj ) )
+                    m_musicObject = obj;
+
+                // ZIP archive with an image will use this image as background
+                if ( m_backgroundImageObject.isEmpty() && isImageFile( obj ) && isCompound() )
+                    m_backgroundImageObject = obj;
+            }
         }
     }
 

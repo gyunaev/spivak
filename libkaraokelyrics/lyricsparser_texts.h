@@ -32,6 +32,8 @@ class LyricsParser_Texts : public LyricsParser
         // if there are any issues during parsing, otherwise fills up output.
         void parse( QIODevice * file, LyricsLoader::Container& output, LyricsLoader::Properties& properties );
 
+        static bool isUltrastarLyrics( QIODevice * file, QString * mp3file );
+
     private:
         void parseUStar( const QByteArray& text, LyricsLoader::Container& output, LyricsLoader::Properties& properties );
         void parsePowerKaraoke( const QByteArray& text, LyricsLoader::Container& output, LyricsLoader::Properties& properties );
