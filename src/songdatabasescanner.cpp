@@ -458,14 +458,8 @@ void SongDatabaseScanner::processingThread()
             }
         }
 
-        // Detecting the lyrics type
-        int p = entry.filePath.lastIndexOf( '.' );
-
-        if ( p == -1 )
-            continue;
-
-        // Just use the uppercase extension
-        entry.type = entry.filePath.mid( p + 1 ).toUpper();
+        // By default we set type to the uppercase extension for video files
+        entry.type = Util::fileExtension(entry.filePath).toUpper();
 
         // Read the karaoke file unless it is a video file
         if ( !KaraokePlayable::isVideoFile( entry.filePath ) )
@@ -477,6 +471,10 @@ void SongDatabaseScanner::processingThread()
                 Logger::debug( "SongDatabaseScanner: WARNING ignoring file %s as it cannot be parsed", qPrintable(entry.filePath) );
                 continue;
             }
+
+            // Record the type as lyric file type for non-KFN files
+            if ( !entry.filePath.endsWith( ".kfn", Qt::CaseInsensitive ) )
+                entry.type = Util::fileExtension( karaoke->lyricObject() ).toUpper();
 
             // For non-CDG files we can do the artist/title and language detection from source
             if ( !karaoke->lyricObject().endsWith( ".cdg", Qt::CaseInsensitive ) && m_collection[entry.colidx].detectLanguage && m_langDetector )
