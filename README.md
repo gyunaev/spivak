@@ -49,7 +49,11 @@ Apologies for the "make -jX" build being still broken.
 
 Copy the player executable from src/spivak somewhere, and copy all the plugins into the "plugins" subdirectory where spivak executable is located.
 
-## Contacts
+## Requesting support
 
-Please use Github issue tracker for feature requests.
+Please use Spivak forum for support requests: http://forum.ulduzsoft.com/forumdisplay.php?fid=10
+
+## Reporting bugs and requesting features
+
+Please use Github issue tracker for bugs feature requests.
 
