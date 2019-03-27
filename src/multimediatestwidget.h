@@ -22,7 +22,7 @@
 #include <QWidget>
 #include <QTemporaryFile>
 
-#include "mediaplayer.h"
+#include "libmediaplayer/mediaplayer.h"
 
 namespace Ui {
 class MultimediaTestWidget;
@@ -54,7 +54,7 @@ class MultimediaTestWidget : public QWidget
         Ui::MultimediaTestWidget *ui;
 
         // Here we use just QMediaPlayer to get deeper access to debugging facilities
-        MediaPlayer     m_player;
+        MediaPlayer  *  m_player;
 
         // Files to test play, and current testing
         QStringList     m_testExtensions;

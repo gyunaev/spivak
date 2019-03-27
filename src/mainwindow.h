@@ -88,6 +88,9 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
         // Crash generator to test symbol submitter
         void    generateCrash();
 
+        // Audio initialization finished from MediaPlayerInitializer
+        void    audioInitializationFinished(QString errorMsg );
+
     private:
         void    keyPressEvent(QKeyEvent * event);
         void    closeEvent(QCloseEvent *);

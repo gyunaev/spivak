@@ -23,7 +23,7 @@
 #include <QProcess>
 #include <QTemporaryFile>
 
-#include "mediaplayer.h"
+#include "../libmediaplayer/mediaplayer.h"
 #include "playerlyrics.h"
 #include "background.h"
 #include "songqueue.h"
@@ -102,7 +102,7 @@ class KaraokeSong : public QObject
         Background      *   m_background;
 
         // Player and rendering widget
-        MediaPlayer         m_player;
+        MediaPlayer      *  mPlayer;
         KaraokeWidget    *  m_widget;
 
         // Next redraw time

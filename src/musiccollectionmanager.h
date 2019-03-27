@@ -22,7 +22,7 @@
 #include <QObject>
 
 #include "songqueue.h"
-#include "mediaplayer.h"
+#include "libmediaplayer/mediaplayer.h"
 
 
 //

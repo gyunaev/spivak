@@ -22,7 +22,7 @@
 #include "actionhandler.h"
 #include "currentstate.h"
 #include "backgroundvideo.h"
-
+#include "pluginmanager.h"
 
 BackgroundVideo::BackgroundVideo()
     : QObject(), Background()
@@ -96,7 +96,7 @@ bool BackgroundVideo::initFromSettings()
         delete m_player;
     }
 
-    m_player = new MediaPlayer();
+    m_player = pPluginManager->createMediaPlayer();
     connect( m_player, SIGNAL(finished()), this, SLOT(finished()) );
     connect( m_player, SIGNAL(error(QString)), this, SLOT(errorplaying()) );
 

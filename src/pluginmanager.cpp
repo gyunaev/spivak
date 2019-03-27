@@ -32,6 +32,7 @@ static const char * pitchplugin = "plugin_pitchchanger";
 PluginManager::PluginManager( const QString& pluginPath )
 {
     m_pluginPath = pluginPath;
+    mCreateMediaPlayerFunction = 0;
 
     // We allow to override our plugin path
     if ( qEnvironmentVariableIsSet("SPIVAK_PLUGIN_PATH") )
@@ -65,6 +66,31 @@ void PluginManager::releaseLanguageDetector()
 Interface_MediaPlayerPlugin *PluginManager::loadPitchChanger()
 {
     return loadPlugin<Interface_MediaPlayerPlugin>( pitchplugin );
+}
+
+MediaPlayer *PluginManager::createMediaPlayer()
+{
+    if ( !mMediaPlayerLibrary.isLoaded() )
+    {
+        mMediaPlayerLibrary.setFileName( "mediaplayer" );
+
+        if ( !mMediaPlayerLibrary.load() )
+        {
+            Logger::error( "Failed to load media player library: %s", qPrintable( mMediaPlayerLibrary.errorString() ) );
+            return 0;
+        }
+
+        mCreateMediaPlayerFunction = (MediaPlayer * (*)()) mMediaPlayerLibrary.resolve( "createMediaPlayer" );
+
+        if ( !mCreateMediaPlayerFunction )
+        {
+            Logger::error( "Failed to resolve createMediaPlayer function in the media player library %s", qPrintable( mMediaPlayerLibrary.fileName() ) );
+            mMediaPlayerLibrary.unload();
+            return 0;
+        }
+    }
+
+    return mCreateMediaPlayerFunction();
 }
 
 void PluginManager::releasePlugin(const QString &name)

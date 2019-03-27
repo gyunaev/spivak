@@ -37,8 +37,8 @@ MultimediaTestWidget::MultimediaTestWidget(QWidget *parent) :
     // Files to test play, and current testing
     m_testExtensions << "wav" << "m4a" << "mp3" << "ogg" << "wma" << "mid";
 
-    connect( &m_player, SIGNAL(error(QString)), this, SLOT(error(QString)) );
-    connect( &m_player, SIGNAL(loaded()), this, SLOT(loaded()) );
+    connect( m_player, SIGNAL(error(QString)), this, SLOT(error(QString)) );
+    connect( m_player, SIGNAL(loaded()), this, SLOT(loaded()) );
 
     connect( ui->textBrowser, &QTextBrowser::anchorClicked, this, &MultimediaTestWidget::startTest );
 
@@ -141,7 +141,7 @@ void MultimediaTestWidget::testNext()
 
     Q_ASSERT( buf->data().size() > 0 );
 
-    m_player.loadMedia( buf, MediaPlayer::LoadAudioStream );
+    m_player->loadMedia( buf, MediaPlayer::LoadAudioStream );
 }
 
 

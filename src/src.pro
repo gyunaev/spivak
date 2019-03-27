@@ -4,9 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui widgets network concurrent
-#CONFIG += GOOGLEBREAKPAD
-
+QT       += core gui widgets network
 
 TARGET = spivak
 TEMPLATE = app
@@ -56,7 +54,6 @@ SOURCES += main.cpp\
     database_statement.cpp \
     actionhandler_webserver_socket.cpp \
     feedbackdialog.cpp \
-    mediaplayer.cpp \
     midisyntheser.cpp \
     midistripper.cpp \
     pluginmanager.cpp \
@@ -67,7 +64,8 @@ SOURCES += main.cpp\
     collectionproviderfs.cpp \
     collectionproviderhttp.cpp \
     songqueueitem.cpp \
-    songqueueitemretriever.cpp
+    songqueueitemretriever.cpp \
+    mediaplayerinitializer.cpp
 
 HEADERS  += mainwindow.h \
     settings.h \
@@ -116,12 +114,10 @@ HEADERS  += mainwindow.h \
     actionhandler_webserver_socket.h \
     feedbackdialog.h \
     crashhandler.h \
-    mediaplayer.h \
     midisyntheser.h \
     midistripper.h \
     pluginmanager.h \
     interface_languagedetector.h \
-    interface_mediaplayer.h \
     notification.h \
     messageboxautoclose.h \
     collectionentry.h \
@@ -129,7 +125,9 @@ HEADERS  += mainwindow.h \
     collectionproviderfs.h \
     collectionproviderhttp.h \
     songqueueitem.h \
-    songqueueitemretriever.h
+    songqueueitemretriever.h \
+    interface_mediaplayer_plugin.h \
+    mediaplayerinitializer.h
 
 FORMS    += mainwindow.ui \
     playerwidget.ui \
@@ -145,17 +143,8 @@ FORMS    += mainwindow.ui \
 RESOURCES += resources.qrc
 DEFINES += SQLITE_OMIT_LOAD_EXTENSION
 
-GOOGLEBREAKPAD {
-  SRC += crashhandler.cpp
-  LIBS += -L$$PWD/../extralibs/google-breakpad/lib -lgoogle-breakpad
-  INCLUDEPATH += $$PWD/../extralibs/google-breakpad/include/
-  mac: LIBS += /System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation /System/Library/Frameworks/CoreServices.framework/Versions/A/CoreServices
-  DEFINES += USE_BREAKPAD
-}
-
 INCLUDEPATH += $$PWD/.. $$PWD/../extralibs/include
 DEPENDPATH += $$PWD/../libkaraokelyrics
-
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libkaraokelyrics/release/ -lkaraokelyrics -L$$OUT_PWD/../libsonivox/src/release/ -lsonivox
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libkaraokelyrics/debug/ -lkaraokelyrics -L$$OUT_PWD/../libsonivox/src/debug/ -lsonivox
@@ -172,7 +161,6 @@ else:unix: {
 
 mac: {
     INCLUDEPATH += /Library/Frameworks/GStreamer.framework/Headers
-    LIBS += -L/Library/Frameworks/GStreamer.framework/Libraries
     LIBS += -L$$PWD/../extralibs/lib -lsonivox
 }
 
@@ -180,7 +168,7 @@ unix:!mac:{
    CONFIG += link_pkgconfig
    PKGCONFIG += sqlite3 libzip uchardet gstreamer-1.0 gstreamer-app-1.0
 } else: {
-    LIBS += -lzip -lsqlite3 -luchardet -lgstapp-1.0 -lgstreamer-1.0 -lglib-2.0 -lgobject-2.0
+    LIBS += -lzip -lsqlite3 -luchardet
 }
 
 win32:!win32-g++: QMAKE_CXXFLAGS+=/Zi

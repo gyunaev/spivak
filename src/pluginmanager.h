@@ -20,9 +20,12 @@
 #define PLUGINMANAGER_H
 
 #include <QString>
+#include <QLibrary>
 
 #include "interface_languagedetector.h"
-#include "interface_mediaplayer.h"
+#include "interface_mediaplayer_plugin.h"
+
+class MediaPlayer;
 
 // Loads and keeps state of loaded plugins
 class PluginManager
@@ -37,6 +40,9 @@ class PluginManager
         // This plugin is only loaded, no unload
         Interface_MediaPlayerPlugin * loadPitchChanger();
 
+        // This is not really a plugin yet, but is provided through the same interface
+        MediaPlayer * createMediaPlayer();
+
     private:
         // This function is used to load plugins with any interface, and auto-cast
         // return pointer to the interface
@@ -45,6 +51,10 @@ class PluginManager
         void    releasePlugin( const QString& name );
 
         QString     m_pluginPath;
+
+        // This is used to load media player library and resolve a pointer to creator function
+        QLibrary    mMediaPlayerLibrary;
+        MediaPlayer * (*mCreateMediaPlayerFunction)();
 };
 
 extern PluginManager * pPluginManager;
