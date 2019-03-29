@@ -5,8 +5,9 @@
 #-------------------------------------------------
 
 QT       += core gui widgets concurrent
-TARGET = libmediaplayer
+TARGET = mediaplayer_spivak
 TEMPLATE = lib
+CONFIG += dll
 
 DEFINES += LIBMEDIAPLAYER_LIBRARY
 
@@ -22,15 +23,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        mediaplayer.cpp \
     mediaplayer_gstreamer.cpp \
     mediaplayer_factory.cpp
 
 HEADERS += \
-        mediaplayer.h \
     mediaplayer_gstreamer.h \
     mediaplayer_factory.h \
-    interface_mediaplayer_factory.h
+    interface_mediaplayer.h
 
 unix {
     target.path = /usr/lib

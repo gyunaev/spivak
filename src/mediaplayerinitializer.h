@@ -9,7 +9,7 @@ class QBuffer;
 //
 // The role of this class is to initialize the audio system at startup in a separate thread
 // (this may be expensive operation requiring loading of dozen shared libraries), as well as
-// testing whether the MediaPlayer playback is working , by trying to load and play a
+// testing whether the MediaPlayer_GStreamer playback is working , by trying to load and play a
 // silent test file.
 //
 class MediaPlayerInitializer : public QThread

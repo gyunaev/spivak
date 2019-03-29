@@ -3,17 +3,19 @@
 #include <QTimer>
 
 #include "mediaplayerinitializer.h"
-#include "libmediaplayer/mediaplayer.h"
+#include "libmediaplayer/interface_mediaplayer.h"
 #include "pluginmanager.h"
 
 MediaPlayerInitializer::MediaPlayerInitializer()
     : QThread( 0 ), mPlayer(0)
 {
+    moveToThread( this );
 }
 
 MediaPlayerInitializer::~MediaPlayerInitializer()
 {
     delete mPlayer;
+    qDebug("initializer deleted");
 }
 
 void MediaPlayerInitializer::audioLoaded()
@@ -27,18 +29,12 @@ void MediaPlayerInitializer::audioFinished()
 {
     // If we are here, everything works fine and we're done
     emit audioInitializationFinished( "" );
-
-    // We are done
-    QThread::exit(0);
 }
 
 void MediaPlayerInitializer::audioError(QString text)
 {
     // Error
     emit audioInitializationFinished( text );
-
-    // We are done
-    QThread::exit(0);
 }
 
 void MediaPlayerInitializer::run()
@@ -48,9 +44,9 @@ void MediaPlayerInitializer::run()
 
     if ( mPlayer )
     {
-        connect( mPlayer, &MediaPlayer::error, this, &MediaPlayerInitializer::audioError );
-        connect( mPlayer, &MediaPlayer::loaded, this, &MediaPlayerInitializer::audioLoaded );
-        connect( mPlayer, &MediaPlayer::finished, this, &MediaPlayerInitializer::audioFinished );
+        connect( mPlayer->qObject(), SIGNAL( error( QString )), this, SLOT(audioError(QString)) );
+        connect( mPlayer->qObject(), SIGNAL( loaded() ), this, SLOT(audioLoaded()) );
+        connect( mPlayer->qObject(), SIGNAL( finished() ), this, SLOT(audioFinished()) );
 
         // Load the media file here - this would initialize the player and thus take a while.
         // This is why we are doing it in a separate thread so we don't block the UI
@@ -80,7 +76,4 @@ void MediaPlayerInitializer::run()
 
     // Run the thread loop so we can deliver signals and slots
     exec();
-
-    // And delete us once the thread loop finishes
-    deleteLater();
 }

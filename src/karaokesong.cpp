@@ -40,7 +40,7 @@
 #include "pluginmanager.h"
 
 #include "libkaraokelyrics/lyricsloader.h"
-#include "libmediaplayer/mediaplayer.h"
+#include "libmediaplayer/interface_mediaplayer.h"
 
 KaraokeSong::KaraokeSong( KaraokeWidget *w, const SongQueueItem &song )
 {
@@ -58,10 +58,10 @@ KaraokeSong::KaraokeSong( KaraokeWidget *w, const SongQueueItem &song )
     m_lastRedrawTime = -1;
 
     // Connect slots in widget - this way we're saving on declaring extra signals we'd just broadcast from a player
-    connect( mPlayer, SIGNAL( finished() ), w, SLOT(karaokeSongFinished()) );
-    connect( mPlayer, SIGNAL( loaded() ), this, SLOT(songLoaded()) );
-    connect( mPlayer, SIGNAL( error(QString) ), w, SLOT(karaokeSongError(QString)) );
-    connect( mPlayer, SIGNAL( durationChanged()), this, SLOT(durationChanged()) );
+    connect( mPlayer->qObject(), SIGNAL( finished() ), w, SLOT(karaokeSongFinished()) );
+    connect( mPlayer->qObject(), SIGNAL( loaded() ), this, SLOT(songLoaded()) );
+    connect( mPlayer->qObject(), SIGNAL( error(QString) ), w, SLOT(karaokeSongError(QString)) );
+    connect( mPlayer->qObject(), SIGNAL( durationChanged()), this, SLOT(durationChanged()) );
 
     // Use Karaoke actions here
     connect( pActionHandler, &ActionHandler::actionPlayerVolumeDown, this, &KaraokeSong::volumeDown );

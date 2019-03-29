@@ -28,6 +28,7 @@ PluginManager * pPluginManager;
 
 static const char * langplugin = "plugin_langdetect";
 static const char * pitchplugin = "plugin_pitchchanger";
+static const char * mediaplayer = "libmediaplayer_spivak";
 
 PluginManager::PluginManager( const QString& pluginPath )
 {
@@ -72,7 +73,7 @@ MediaPlayer *PluginManager::createMediaPlayer()
 {
     if ( !mMediaPlayerLibrary.isLoaded() )
     {
-        mMediaPlayerLibrary.setFileName( "mediaplayer" );
+        mMediaPlayerLibrary.setFileName( mediaplayer );
 
         if ( !mMediaPlayerLibrary.load() )
         {
@@ -80,11 +81,13 @@ MediaPlayer *PluginManager::createMediaPlayer()
             return 0;
         }
 
-        mCreateMediaPlayerFunction = (MediaPlayer * (*)()) mMediaPlayerLibrary.resolve( "createMediaPlayer" );
+        mCreateMediaPlayerFunction = (MediaPlayer * (*)()) mMediaPlayerLibrary.resolve( "create_media_player" );
 
         if ( !mCreateMediaPlayerFunction )
         {
-            Logger::error( "Failed to resolve createMediaPlayer function in the media player library %s", qPrintable( mMediaPlayerLibrary.fileName() ) );
+            Logger::error( "Failed to resolve function in the media player library %s: %s",
+                           qPrintable( mMediaPlayerLibrary.fileName() ),
+                           qPrintable( mMediaPlayerLibrary.errorString() ) );
             mMediaPlayerLibrary.unload();
             return 0;
         }

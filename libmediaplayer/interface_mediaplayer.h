@@ -1,23 +1,22 @@
 #ifndef MEDIAPLAYER_H
 #define MEDIAPLAYER_H
 
-#include <QObject>
 #include <QIODevice>
 #include <QPainter>
 
-class MediaPlayer_GStreamer;
+//#include "mediaplayer_factory.h"
 
 //
 // This class implements abstract media player interface.
 // The actual player instances are created by the createMediaPlayer() function.
 // The actual player is implemented in subclasses.
+// See also https://stackoverflow.com/questions/17943496/declare-abstract-signal-in-interface-class
 //
-class MediaPlayer : public QObject
+class MediaPlayer
 {
-    Q_OBJECT
     public:
-        MediaPlayer( QObject * parent );
-        ~MediaPlayer();
+        MediaPlayer( QObject * ) {}
+        virtual ~MediaPlayer() {}
 
         // Player state
         enum State
@@ -45,7 +44,7 @@ class MediaPlayer : public QObject
         };
 
         Q_DECLARE_FLAGS(LoadOptions, LoadOption)
-        Q_DECLARE_FLAGS(Capabilities, Capability)
+        Q_DECLARE_FLAGS(Capabilities, Capability)        
 
     signals:
         // The media file is loaded, and is ready to play
@@ -67,14 +66,19 @@ class MediaPlayer : public QObject
         // For logging
         virtual void    logging( const QString& facility, const QString& message ) = 0;
 
-    public slots:
+    public:
+
+        // Returns pointer to the player's QObject (which can be used to connect to signals)
+        // This is necessary since MediaPlayer_GStreamer interface is not inherited from QObject, and
+        // thus the applicaiton code will not otherwise allow connection without dynamic_cast.
+        virtual QObject* qObject() = 0;
 
         // Loads the media file, and plays audio, video or both
         virtual void    loadMedia( const QString &file, LoadOptions options ) = 0;
 
         // Loads the media file, and plays audio, video or both from a device.
         // Takes ownership of the device, and will delete it upon end
-        virtual void    loadMedia( QIODevice * device, MediaPlayer::LoadOptions options ) = 0;
+        virtual void    loadMedia( QIODevice * device, LoadOptions options ) = 0;
 
         //
         // Player actions
@@ -111,5 +115,6 @@ class MediaPlayer : public QObject
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(MediaPlayer::LoadOptions)
 Q_DECLARE_OPERATORS_FOR_FLAGS(MediaPlayer::Capabilities)
+Q_DECLARE_INTERFACE( MediaPlayer, "MediaPlayer" )
 
 #endif // MEDIAPLAYER_H
