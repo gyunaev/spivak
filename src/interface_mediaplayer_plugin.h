@@ -16,8 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  **************************************************************************/
 
-#ifndef INTERFACE_MEDIAPLAYER_H
-#define INTERFACE_MEDIAPLAYER_H
+#ifndef INTERFACE_MEDIAPLAYER_PLUGIN_H
+#define INTERFACE_MEDIAPLAYER_PLUGIN_H
 
 #include <QString>
 #include <QtPlugin>
@@ -42,9 +42,9 @@ class Interface_MediaPlayerPlugin
         virtual const char* parameterName() = 0;
 };
 
-#define IID_InterfaceMediaPlayerPlugin  "com.ulduzsoft.Skivak.Plugin.MediaPlayer-v1"
+#define IID_InterfaceMediaPlayerPlugin  "com.ulduzsoft.Skivak.Plugin.MediaPlayer_GStreamer-v1"
 
 Q_DECLARE_INTERFACE( Interface_MediaPlayerPlugin, IID_InterfaceMediaPlayerPlugin )
 
 
-#endif // INTERFACE_MEDIAPLAYER_H
+#endif // INTERFACE_MEDIAPLAYER_PLUGIN_H

@@ -27,6 +27,7 @@
 #include "eventor.h"
 #include "logger.h"
 #include "util.h"
+#include "pluginmanager.h"
 
 MusicCollectionManager * pMusicCollectionMgr;
 
@@ -171,12 +172,12 @@ void MusicCollectionManager::start()
         return;
     }
 
-    m_player = new MediaPlayer();
+    m_player = pPluginManager->createMediaPlayer();
 
-    connect( m_player, SIGNAL(finished()), this, SLOT( playerCurrentSongFinished()) );
-    connect( m_player, SIGNAL(error(QString)), this, SLOT(playerCurrentSongFinished()) );
-    connect( m_player, SIGNAL(loaded()), this, SLOT(songLoaded()) );
-    connect( m_player, SIGNAL(tagsChanged(QString,QString)), pEventor, SIGNAL( musicTagsChanged(QString,QString)) );
+    connect( m_player->qObject(), SIGNAL(finished()), this, SLOT( playerCurrentSongFinished()) );
+    connect( m_player->qObject(), SIGNAL(error(QString)), this, SLOT(playerCurrentSongFinished()) );
+    connect( m_player->qObject(), SIGNAL(loaded()), this, SLOT(songLoaded()) );
+    connect( m_player->qObject(), SIGNAL(tagsChanged(QString,QString)), pEventor, SIGNAL( musicTagsChanged(QString,QString)) );
 
     // Initiate loading the audio
     m_player->loadMedia( m_musicFiles[m_currentFile], MediaPlayer::LoadAudioStream );

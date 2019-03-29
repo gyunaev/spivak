@@ -49,6 +49,8 @@
 #include "eventor.h"
 #include "feedbackdialog.h"
 #include "pluginmanager.h"
+#include "mediaplayerinitializer.h"
+#include "messageboxautoclose.h"
 
 #include "ui_dialog_about.h"
 
@@ -171,8 +173,10 @@ MainWindow::MainWindow(QWidget *parent) :
     // Plugin manager
     pPluginManager = new PluginManager();
 
-    if ( !pSettings->firstTimeWizardShown )
-        QTimer::singleShot( 100, this, &MainWindow::menuShowWelcomeWizard );
+    // Audio initialization - the object is self-deleting, so no need to track it
+    mMediaPlayerInitializer = new MediaPlayerInitializer();
+    connect( mMediaPlayerInitializer, &MediaPlayerInitializer::audioInitializationFinished, this, &MainWindow::audioInitializationFinished, Qt::QueuedConnection );
+    mMediaPlayerInitializer->start();
 
     resize( pCurrentState->windowSizeMain );
 
@@ -470,6 +474,28 @@ void MainWindow::scanCollectionFinished()
 void MainWindow::generateCrash()
 {
     *((volatile char*) 0) = 1;
+}
+
+void MainWindow::audioInitializationFinished(QString errorMsg)
+{
+    // Non-empty errorMsg means audio initialization failed
+    if ( !errorMsg.isEmpty() )
+    {
+        MessageBoxAutoClose::critical( tr( "Failed to initialize audio"), tr("Failed to initialize the audio system:\n%1") .arg( errorMsg ) );
+    }
+    else
+    {
+        Logger::debug( "Audio system initialized successfully");
+
+        // Show the first-time wizard
+        if ( !pSettings->firstTimeWizardShown )
+            QTimer::singleShot( 100, this, &MainWindow::menuShowWelcomeWizard );
+    }
+
+    mMediaPlayerInitializer->exit(0);
+    mMediaPlayerInitializer->wait();
+    delete mMediaPlayerInitializer;
+    mMediaPlayerInitializer = 0;
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)

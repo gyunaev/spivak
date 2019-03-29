@@ -106,8 +106,6 @@ bool MIDISyntheser::open(const QByteArray &midiData)
     // We know the total time, and we play 44100*2*2 samples per second, so we can calculate the total size
     m_totalSize = (int) (((qint64) playTime * 44100 * 4) / 1000);
 
-    Logger::error( "MIDISyntheser: MIDI length %ld msec, matching WAV size %d bytes", playTime, m_totalSize );
-
     m_audioAvailable = 0;
     m_currentPosition = 0;
     m_audioEnded = false;

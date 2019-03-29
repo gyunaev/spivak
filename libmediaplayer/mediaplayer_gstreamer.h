@@ -16,60 +16,32 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  **************************************************************************/
 
-#ifndef MEDIAPLAYER_H
-#define MEDIAPLAYER_H
+#ifndef MEDIAPLAYER_GSTREAMER_H
+#define MEDIAPLAYER_GSTREAMER_H
 
 #include <QFlags>
-#include <QObject>
-#include <QFuture>
-#include <QPainter>
+#include <QMutex>
 
 #include <gst/gst.h>
 #include <gst/app/app.h>
 
 #include "interface_mediaplayer.h"
+#include "../src/interface_mediaplayer_plugin.h"
 
 // This media player is used by the app. However it doesn't implement anything itself,
 // it is just a front Qt-style interface (with signals and slots) for the interface.
-class MediaPlayer : public QObject
+class MediaPlayer_GStreamer : public QObject, public MediaPlayer
 {
     Q_OBJECT
+    Q_INTERFACES( MediaPlayer )
 
     public:
-        MediaPlayer();
-        ~MediaPlayer();
-
-        // Player state
-        enum State
-        {
-            StateReset,
-            StateStopped,
-            StatePlaying,
-            StatePaused,
-        };
-
-        // Options used in loadMedia
-        enum LoadOption
-        {
-            LoadAudioStream = 0x1,
-            LoadVideoStream = 0x2
-        };
-
-        // Capabilities used in getCapabilities and changeCapability
-        enum Capability
-        {
-            CapChangeVolume = 0x1,
-            CapChangePitch = 0x2,
-            CapChangeTempo = 0x4,
-            CapVoiceRemoval = 0x8,
-        };
-
-        Q_DECLARE_FLAGS(LoadOptions, LoadOption)
-        Q_DECLARE_FLAGS(Capabilities, Capability)
+        MediaPlayer_GStreamer( QObject * parent );
+        ~MediaPlayer_GStreamer();
 
     signals:
-        // The media file is loaded, and is ready to play (this however does not guarantee
-        // it will be played)
+        // The media file is loaded, and is ready to play
+        // (this however does not guarantee it will be played)
         void    loaded();
 
         // The media file has finished naturally
@@ -84,54 +56,59 @@ class MediaPlayer : public QObject
         // Media duration changed/became available
         void    durationChanged();
 
-    public slots:
+        // For logging
+        void    logging( const QString& facility, const QString& message );
 
+    public:
         // Loads the media file, and plays audio, video or both
-        void    loadMedia( const QString &file, LoadOptions options );
+        virtual void    loadMedia( const QString &file, LoadOptions options );
 
         // Loads the media file, and plays audio, video or both from a device.
         // Takes ownership of the device, and will delete it upon end
-        void    loadMedia( QIODevice * device, MediaPlayer::LoadOptions options );
+        virtual void    loadMedia( QIODevice * device, MediaPlayer_GStreamer::LoadOptions options );
 
         //
         // Player actions
         //
-        void    play();
-        void    pause();
-        void    seekTo( qint64 pos );
-        void    stop();
+        virtual void    play();
+        virtual void    pause();
+        virtual void    seekTo( qint64 pos );
+        virtual void    stop();
 
         // Reports player media position and duration. Returns -1 if unavailable.
-        qint64  position();
-        qint64  duration();
+        virtual qint64  position();
+        virtual qint64  duration();
 
         // Reports current player state
-        State   state() const;
+        virtual State   state() const;
 
         // Gets the media tags (if available)
-        void    mediaTags( QString& artist, QString& title );
+        virtual void    mediaTags( QString& artist, QString& title );
 
         // Sets the player capacity. The parameter is a value which differs:
         // CapChangeVolume: supports range from 0 (muted) - 100 (full)
         // CapChangePitch: supports range from -50 to +50 up to player interpretation
         // CapChangeTempo: supports range from -50 to +50 up to player interpretation
         // CapVoiceRemoval: supports values 0 (disabled) or 1 (enabled)
-        bool    setCapabilityValue( Capability cap, int value );
+        virtual bool    setCapabilityValue( Capability cap, int value );
 
         // Returns the supported player capabilities, which are settable (if available)
-        Capabilities capabilities();
+        virtual Capabilities capabilities();
 
         // Draws a last video frame using painter p on a rect. Does nothing if video is
         // not played, or not available.
-        void    drawVideoFrame( QPainter& p, const QRect& rect );
+        virtual void    drawVideoFrame( QPainter& p, const QRect& rect );
+
+        // Returns pointer to the player's QObject (which can be used to connect to signals)
+        // This is necessary since MediaPlayer_GStreamer interface is not inherited from QObject, and
+        // thus the applicaiton code will not otherwise allow connection without dynamic_cast.
+        virtual QObject* qObject();
+
+    private:
+        void    loadMediaGeneric();
 
         // Resets the pipeline
         void    reset();
-
-    private:
-        // Those three functions run concurrently, i.e. in a separate threads!
-        void    threadLoadMedia();
-        void    threadRunPipeline();
 
         // Sets up the source according to file type
         void    setupSource();
@@ -141,6 +118,9 @@ class MediaPlayer : public QObject
 
         // Stores the error, emits a message and prints into log
         void    reportError( const QString& text );
+
+        // Logging through signal
+        void    addlog( const char *type, const char * str, ... );
 
         bool    adjustPitch(int value);
         bool    toggleKaraokeSplitter(int value);
@@ -157,8 +137,8 @@ class MediaPlayer : public QObject
         static GstFlowReturn cb_new_sample( GstAppSink *appsink, gpointer user_data );
 
         // Decoder pad handling callbacks
-        static void cb_pad_added( GstElement *src, GstPad *new_pad, MediaPlayer *self );
-        static void cb_no_more_pads( GstElement *src, MediaPlayer *self );
+        static void cb_pad_added(GstElement *src, GstPad *new_pad, MediaPlayer_GStreamer *self );
+        static void cb_no_more_pads( GstElement *src, MediaPlayer_GStreamer *self );
 
         // see http://gstreamer.freedesktop.org/data/doc/gstreamer/head/manual/html/section-dynamic-pipelines.html#section-dynamic-changing
         static GstPadProbeReturn cb_event_probe_toggle_splitter( GstPad * pad, GstPadProbeInfo * info, gpointer user_data );
@@ -196,7 +176,7 @@ class MediaPlayer : public QObject
         int         m_tempoRatePercent;
         qint64      m_lastKnownPosition;
 
-        MediaPlayer::LoadOptions m_loadOptions;
+        MediaPlayer_GStreamer::LoadOptions m_loadOptions;
 
         // Current pipeline state
         QAtomicInt  m_playState;
@@ -214,8 +194,4 @@ class MediaPlayer : public QObject
         Interface_MediaPlayerPlugin *   m_pitchPlugin;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(MediaPlayer::LoadOptions)
-Q_DECLARE_OPERATORS_FOR_FLAGS(MediaPlayer::Capabilities)
-
-
-#endif // MEDIAPLAYER_H
+#endif // MEDIAPLAYER_GSTREAMER_H

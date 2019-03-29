@@ -37,14 +37,16 @@
 #include "midisyntheser.h"
 #include "midistripper.h"
 #include "eventor.h"
+#include "pluginmanager.h"
 
 #include "libkaraokelyrics/lyricsloader.h"
-
+#include "libmediaplayer/interface_mediaplayer.h"
 
 KaraokeSong::KaraokeSong( KaraokeWidget *w, const SongQueueItem &song )
 {
     m_widget = w;
     m_song = song;
+    mPlayer = pPluginManager->createMediaPlayer();
 
     pCurrentState->playerCapabilities = 0;
     m_lyrics = 0;
@@ -56,10 +58,10 @@ KaraokeSong::KaraokeSong( KaraokeWidget *w, const SongQueueItem &song )
     m_lastRedrawTime = -1;
 
     // Connect slots in widget - this way we're saving on declaring extra signals we'd just broadcast from a player
-    connect( &m_player, SIGNAL( finished() ), w, SLOT(karaokeSongFinished()) );
-    connect( &m_player, SIGNAL( loaded() ), this, SLOT(songLoaded()) );
-    connect( &m_player, SIGNAL( error(QString) ), w, SLOT(karaokeSongError(QString)) );
-    connect( &m_player, SIGNAL( durationChanged()), this, SLOT(durationChanged()) );
+    connect( mPlayer->qObject(), SIGNAL( finished() ), w, SLOT(karaokeSongFinished()) );
+    connect( mPlayer->qObject(), SIGNAL( loaded() ), this, SLOT(songLoaded()) );
+    connect( mPlayer->qObject(), SIGNAL( error(QString) ), w, SLOT(karaokeSongError(QString)) );
+    connect( mPlayer->qObject(), SIGNAL( durationChanged()), this, SLOT(durationChanged()) );
 
     // Use Karaoke actions here
     connect( pActionHandler, &ActionHandler::actionPlayerVolumeDown, this, &KaraokeSong::volumeDown );
@@ -85,11 +87,12 @@ KaraokeSong::KaraokeSong( KaraokeWidget *w, const SongQueueItem &song )
 
 KaraokeSong::~KaraokeSong()
 {
-    m_player.stop();
+    mPlayer->stop();
 
     delete m_lyrics;
     delete m_background;
     delete m_tempMusicFile;
+    delete mPlayer;
 }
 
 bool KaraokeSong::open()
@@ -112,7 +115,7 @@ bool KaraokeSong::open()
         // Load the video file and enable both video and audio streams.
         // It loads asynchronously, and emits loaded() signal afterward
         m_musicFileName = m_song.file;
-        m_player.loadMedia( m_musicFileName, MediaPlayer::LoadAudioStream | MediaPlayer::LoadVideoStream );
+        mPlayer->loadMedia( m_musicFileName, MediaPlayer::LoadAudioStream | MediaPlayer::LoadVideoStream );
         Logger::debug( "KaraokeSong: video file is being loaded" );
     }
     else
@@ -145,7 +148,7 @@ bool KaraokeSong::open()
                 if ( !midi->open( midiData ) )
                     throw QString("Cannot open MIDI file %1").arg( m_musicFileName );
 
-                m_player.loadMedia( midi, MediaPlayer::LoadAudioStream );
+                mPlayer->loadMedia( midi, MediaPlayer::LoadAudioStream );
                 Logger::debug( "KaraokeSong: MIDI file is being loaded via built-in MIDI sequencer" );
             }
             else
@@ -155,7 +158,7 @@ bool KaraokeSong::open()
                 midibuf->setData( midiData );
                 midibuf->open( QIODevice::ReadOnly );
 
-                m_player.loadMedia( midibuf, MediaPlayer::LoadAudioStream );
+                mPlayer->loadMedia( midibuf, MediaPlayer::LoadAudioStream );
                 Logger::debug( "KaraokeSong: MIDI file is being loaded via GStreamer" );
             }
         }
@@ -183,7 +186,7 @@ bool KaraokeSong::open()
 
             // Load the music file, enable only audio stream.
             // It loads asynchronously, and emits loaded() signal afterward
-            m_player.loadMedia( m_musicFileName, MediaPlayer::LoadAudioStream );
+            mPlayer->loadMedia( m_musicFileName, MediaPlayer::LoadAudioStream );
             Logger::debug( "KaraokeSong: music file is being loaded" );
         }
 
@@ -256,19 +259,19 @@ void KaraokeSong::start()
     // Indicate that we started
     pEventor->karaokeStarted( m_song );
 
-    pCurrentState->playerDuration = m_player.duration();
+    pCurrentState->playerDuration = mPlayer->duration();
     pCurrentState->playerState = CurrentState::PLAYERSTATE_PLAYING;
 
     if ( m_background )
         m_background->start();
 
     // Set the last remembered volume. We do not want notification, so no VolumeSet
-    m_player.setCapabilityValue( MediaPlayer::CapChangeVolume, pCurrentState->playerVolume );
+    mPlayer->setCapabilityValue( MediaPlayer::CapChangeVolume, pCurrentState->playerVolume );
 
     // Thus we notify the eventor manually
     pEventor->karaokeVolumeChanged( pCurrentState->playerVolume );
 
-    m_player.play();
+    mPlayer->play();
 
     pSongQueue->statusChanged( m_song.id, true );
     pNotification->clearOnScreenMessage();
@@ -279,7 +282,7 @@ void KaraokeSong::pause()
     if ( pCurrentState->playerState == CurrentState::PLAYERSTATE_PLAYING )
     {
         pCurrentState->playerState = CurrentState::PLAYERSTATE_PAUSED;
-        m_player.pause();
+        mPlayer->pause();
 
         if ( m_background )
             m_background->pause( true );
@@ -290,7 +293,7 @@ void KaraokeSong::pause()
     else
     {
         pCurrentState->playerState = CurrentState::PLAYERSTATE_PLAYING;
-        m_player.play();
+        mPlayer->play();
 
         if ( m_background )
             m_background->pause( false );
@@ -302,12 +305,12 @@ void KaraokeSong::pause()
 
 void KaraokeSong::seekForward()
 {
-    seekTo( qMin( m_player.duration() - 10000, m_player.position() + 10000 ) );
+    seekTo( qMin( mPlayer->duration() - 10000, mPlayer->position() + 10000 ) );
 }
 
 void KaraokeSong::seekBackward()
 {
-    qint64 pos = m_player.position() - 10000;
+    qint64 pos = mPlayer->position() - 10000;
 
     if ( pos < 0 )
         pos = 0;
@@ -317,13 +320,13 @@ void KaraokeSong::seekBackward()
 
 void KaraokeSong::seekTo(qint64 timing)
 {
-    m_player.seekTo( timing );
+    mPlayer->seekTo( timing );
 }
 
 qint64 KaraokeSong::draw(KaraokePainter &p)
 {
     // Update position
-    pCurrentState->playerPosition = m_player.position();
+    pCurrentState->playerPosition = mPlayer->position();
 
     qint64 time = pCurrentState->playerDuration;
 
@@ -339,7 +342,7 @@ qint64 KaraokeSong::draw(KaraokePainter &p)
     }
     else
     {
-        m_player.drawVideoFrame( p, p.rect() );
+        mPlayer->drawVideoFrame( p, p.rect() );
         time = 0;
     }
 
@@ -362,7 +365,7 @@ void KaraokeSong::stop()
         m_background = 0;
     }
 
-    m_player.stop();
+    mPlayer->stop();
 
     pSongQueue->statusChanged( m_song.id, false );
 
@@ -421,7 +424,7 @@ void KaraokeSong::volumeSet(int newvalue)
 
 void KaraokeSong::durationChanged()
 {
-    pCurrentState->playerDuration = m_player.duration();
+    pCurrentState->playerDuration = mPlayer->duration();
 }
 
 void KaraokeSong::pitchLower()
@@ -459,7 +462,7 @@ void KaraokeSong::toggleVoiceRemoval()
     if ( pCurrentState->playerCapabilities & MediaPlayer::CapVoiceRemoval )
     {
         pCurrentState->playerVoiceRemovalEnabled = !pCurrentState->playerVoiceRemovalEnabled;
-        m_player.setCapabilityValue( MediaPlayer::CapVoiceRemoval, pCurrentState->playerVoiceRemovalEnabled );
+        mPlayer->setCapabilityValue( MediaPlayer::CapVoiceRemoval, pCurrentState->playerVoiceRemovalEnabled );
 
         emit pEventor->karaokeParametersChanged();
     }
@@ -477,7 +480,7 @@ void KaraokeSong::songLoaded()
     pCurrentState->playerTempo = 50;
     pCurrentState->playerVoiceRemovalEnabled = false;
 
-    pCurrentState->playerCapabilities = m_player.capabilities();
+    pCurrentState->playerCapabilities = mPlayer->capabilities();
     m_widget->karaokeSongLoaded();
 }
 
@@ -486,7 +489,7 @@ void KaraokeSong::setVolume(int newvalue, bool notify)
     // Make sure the value is in 0-100 range
     int newvolume = qMax( 0, qMin( newvalue, 100 ) );
 
-    m_player.setCapabilityValue( MediaPlayer::CapChangeVolume, newvolume );
+    mPlayer->setCapabilityValue( MediaPlayer::CapChangeVolume, newvolume );
 
     pCurrentState->playerVolume = newvolume;
 
@@ -502,7 +505,7 @@ void KaraokeSong::setPitch(int newvalue, bool notify)
     if ( pCurrentState->playerCapabilities & MediaPlayer::CapChangePitch )
     {
         pCurrentState->playerPitch = newvalue;
-        m_player.setCapabilityValue( MediaPlayer::CapChangePitch, pCurrentState->playerPitch );
+        mPlayer->setCapabilityValue( MediaPlayer::CapChangePitch, pCurrentState->playerPitch );
 
         if ( notify )
         {
@@ -521,7 +524,7 @@ void KaraokeSong::setTempo(int newvalue, bool notify)
     if ( pCurrentState->playerCapabilities & MediaPlayer::CapChangeTempo )
     {
         pCurrentState->playerTempo = newvalue;
-        m_player.setCapabilityValue( MediaPlayer::CapChangeTempo, pCurrentState->playerTempo );
+        mPlayer->setCapabilityValue( MediaPlayer::CapChangeTempo, pCurrentState->playerTempo );
 
         if ( notify )
         {

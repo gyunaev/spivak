@@ -22,16 +22,27 @@
 #include <QDir>
 
 #include "logger.h"
+#include "libmediaplayer/interface_mediaplayer.h"
 #include "pluginmanager.h"
 
 PluginManager * pPluginManager;
 
 static const char * langplugin = "plugin_langdetect";
 static const char * pitchplugin = "plugin_pitchchanger";
+static const char * mediaplayer = "libmediaplayer_spivak";
+
+void PluginManager::logging(QString level, QString message)
+{
+    if ( level == "ERROR" )
+        Logger::error( "%s", qPrintable( message ) );
+    else
+        Logger::debug( "%s", qPrintable( message ) );
+}
 
 PluginManager::PluginManager( const QString& pluginPath )
 {
     m_pluginPath = pluginPath;
+    mCreateMediaPlayerFunction = 0;
 
     // We allow to override our plugin path
     if ( qEnvironmentVariableIsSet("SPIVAK_PLUGIN_PATH") )
@@ -65,6 +76,40 @@ void PluginManager::releaseLanguageDetector()
 Interface_MediaPlayerPlugin *PluginManager::loadPitchChanger()
 {
     return loadPlugin<Interface_MediaPlayerPlugin>( pitchplugin );
+}
+
+MediaPlayer *PluginManager::createMediaPlayer()
+{
+    if ( !mMediaPlayerLibrary.isLoaded() )
+    {
+        mMediaPlayerLibrary.setFileName( mediaplayer );
+
+        if ( !mMediaPlayerLibrary.load() )
+        {
+            Logger::error( "Failed to load media player library: %s", qPrintable( mMediaPlayerLibrary.errorString() ) );
+            return 0;
+        }
+
+        mCreateMediaPlayerFunction = (MediaPlayer * (*)()) mMediaPlayerLibrary.resolve( "create_media_player" );
+
+        if ( !mCreateMediaPlayerFunction )
+        {
+            Logger::error( "Failed to resolve function in the media player library %s: %s",
+                           qPrintable( mMediaPlayerLibrary.fileName() ),
+                           qPrintable( mMediaPlayerLibrary.errorString() ) );
+            mMediaPlayerLibrary.unload();
+            return 0;
+        }
+    }
+
+    MediaPlayer * p = mCreateMediaPlayerFunction();
+
+    if ( p )
+    {
+        connect( p->qObject(), SIGNAL( logging( QString, QString) ), this, SLOT(logging(QString,QString)) );
+    }
+
+    return p;
 }
 
 void PluginManager::releasePlugin(const QString &name)

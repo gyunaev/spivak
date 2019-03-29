@@ -25,7 +25,7 @@
 #include <QStringList>
 
 #include "songqueue.h"
-#include "mediaplayer.h"
+#include "libmediaplayer/interface_mediaplayer.h"
 
 //
 // Represents current state of a player.
