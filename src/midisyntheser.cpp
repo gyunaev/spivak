@@ -19,8 +19,6 @@
 #include "midisyntheser.h"
 #include "logger.h"
 
-#include <gst/gst.h>
-
 // EAS file i/o callbacks
 int MIDISyntheser::EAS_FILE_readAt( void *handle, void *buf, int offset, int size )
 {
@@ -106,8 +104,6 @@ bool MIDISyntheser::open(const QByteArray &midiData)
     // We know the total time, and we play 44100*2*2 samples per second, so we can calculate the total size
     m_totalSize = (int) (((qint64) playTime * 44100 * 4) / 1000);
 
-    Logger::error( "MIDISyntheser: MIDI length %ld msec, matching WAV size %d bytes", playTime, m_totalSize );
-
     m_audioAvailable = 0;
     m_currentPosition = 0;
     m_audioEnded = false;
@@ -138,8 +134,9 @@ qint64 MIDISyntheser::pos() const
 bool MIDISyntheser::seek(qint64 pos)
 {
     // Calculate the requested seek position in the MIDI stream.
-    // Since we have two channels and 2 bytes per channel at 44100 samples per second...
-    EAS_I32 timing = gst_util_uint64_scale( pos, GST_USECOND, 44100 * 2 * 2 );
+    // Since we have two channels and 2 bytes per channel at 44100 samples per second,
+    // we have 176,400 bytes per second
+    EAS_I32 timing = (pos * 10) / 1764;
 
     if ( (EAS_Locate( m_easData, m_easHandle, timing, EAS_FALSE )) != EAS_SUCCESS )
     {
