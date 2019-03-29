@@ -106,7 +106,7 @@ MediaPlayer *PluginManager::createMediaPlayer()
 
     if ( p )
     {
-        connect( p->qObject(), SIGNAL( addlog( QString, QString) ), this, SLOT(logging(QString,QString)) );
+        connect( p->qObject(), SIGNAL( logging( QString, QString) ), this, SLOT(logging(QString,QString)) );
     }
 
     return p;

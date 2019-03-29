@@ -98,6 +98,9 @@ bool BackgroundVideo::initFromSettings()
 
     m_player = pPluginManager->createMediaPlayer();
 
+    if ( !m_player )
+        return false;
+
     connect( m_player->qObject(), SIGNAL(finished()), this, SLOT(finished()) );
     connect( m_player->qObject(), SIGNAL(error(QString)), this, SLOT(errorplaying()) );
 
