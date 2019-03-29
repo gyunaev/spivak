@@ -22,8 +22,7 @@
 #include <QObject>
 
 #include "songqueue.h"
-#include "libmediaplayer/mediaplayer.h"
-
+#include "libmediaplayer/interface_mediaplayer.h"
 
 //
 // This class handles the music collection - scans, queue and playing.

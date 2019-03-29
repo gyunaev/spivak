@@ -97,11 +97,15 @@ bool BackgroundVideo::initFromSettings()
     }
 
     m_player = pPluginManager->createMediaPlayer();
-    connect( m_player, SIGNAL(finished()), this, SLOT(finished()) );
-    connect( m_player, SIGNAL(error(QString)), this, SLOT(errorplaying()) );
+
+    if ( !m_player )
+        return false;
+
+    connect( m_player->qObject(), SIGNAL(finished()), this, SLOT(finished()) );
+    connect( m_player->qObject(), SIGNAL(error(QString)), this, SLOT(errorplaying()) );
 
     // Autostart video
-    connect( m_player, SIGNAL(loaded()), m_player, SLOT(play()) );
+    connect( m_player->qObject(), SIGNAL(loaded()), m_player->qObject(), SLOT(play()) );
 
     if ( videofile.isEmpty() )
     {

@@ -16,8 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  **************************************************************************/
 
-#include <QtConcurrent>
-#include <QApplication>
+//#include <QApplication>
+#include <QObject>
+#include <QPainter>
+#include <QFile>
+#include <QUrl>
 
 #include <gst/gst.h>
 
@@ -25,8 +28,8 @@
 
 // FIXME: part-missing-plugins.txt
 
-MediaPlayer_GStreamer::MediaPlayer_GStreamer()
-    : MediaPlayer( 0 )
+MediaPlayer_GStreamer::MediaPlayer_GStreamer( QObject * parent )
+    : MediaPlayer( parent )
 {
     m_gst_pipeline = 0;
     m_gst_bus = 0;
@@ -69,7 +72,7 @@ void MediaPlayer_GStreamer::loadMedia(const QString &file, MediaPlayer_GStreamer
     m_mediaIODevice = 0;
     m_loadOptions = options;
 
-    QtConcurrent::run( this, &MediaPlayer_GStreamer::threadLoadMedia );
+    loadMediaGeneric();
 }
 
 void MediaPlayer_GStreamer::loadMedia(QIODevice *device, MediaPlayer_GStreamer::LoadOptions options)
@@ -79,7 +82,7 @@ void MediaPlayer_GStreamer::loadMedia(QIODevice *device, MediaPlayer_GStreamer::
     m_loadOptions = options;
     m_mediaIODevice = device;
 
-    QtConcurrent::run( this, &MediaPlayer_GStreamer::threadLoadMedia );
+    loadMediaGeneric();
 }
 
 void MediaPlayer_GStreamer::play()
@@ -179,7 +182,7 @@ bool MediaPlayer_GStreamer::setCapabilityValue( MediaPlayer_GStreamer::Capabilit
         // The UI gives us tempo rate as percentage, from 0 to 100 with 50 being normal value.
         // Thus we convert it into 75% - 125% range
         m_tempoRatePercent = 75 + value / 2;
-        addlog( "DEBUG",  "MediaPlayer: tempo change: UI %d -> player %d", value, m_tempoRatePercent );
+        addlog( "DEBUG",  "MediaPlayer_GStreamer: tempo change: UI %d -> player %d", value, m_tempoRatePercent );
         position();
         seekTo( m_lastKnownPosition );
 
@@ -301,7 +304,12 @@ void MediaPlayer_GStreamer::drawVideoFrame(QPainter &p, const QRect &rect)
     gst_buffer_unmap( buffer, &map );
 }
 
-void MediaPlayer_GStreamer::threadLoadMedia()
+QObject *MediaPlayer_GStreamer::qObject()
+{
+    return this;
+}
+
+void MediaPlayer_GStreamer::loadMediaGeneric()
 {
     m_duration = -1;
     m_errorsDetected = false;
@@ -699,9 +707,9 @@ void MediaPlayer_GStreamer::cb_source_need_data(GstAppSrc *src, guint length, gp
             GstFlowReturn ret = gst_app_src_push_buffer( src, buffer );
 
             if (ret == GST_FLOW_ERROR) {
-                qWarning()<<"appsrc: push buffer error";
+                self->addlog( "WARNING", "appsrc: push buffer error" );
             } else if (ret == GST_FLOW_FLUSHING) {
-                qWarning()<<"appsrc: push buffer wrong state";
+                self->addlog( "WARNING", "appsrc: push buffer wrong state" );
             }
         }
     }

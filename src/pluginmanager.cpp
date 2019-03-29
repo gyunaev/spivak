@@ -22,12 +22,22 @@
 #include <QDir>
 
 #include "logger.h"
+#include "libmediaplayer/interface_mediaplayer.h"
 #include "pluginmanager.h"
 
 PluginManager * pPluginManager;
 
 static const char * langplugin = "plugin_langdetect";
 static const char * pitchplugin = "plugin_pitchchanger";
+static const char * mediaplayer = "libmediaplayer_spivak";
+
+void PluginManager::logging(QString level, QString message)
+{
+    if ( level == "ERROR" )
+        Logger::error( "%s", qPrintable( message ) );
+    else
+        Logger::debug( "%s", qPrintable( message ) );
+}
 
 PluginManager::PluginManager( const QString& pluginPath )
 {
@@ -72,7 +82,7 @@ MediaPlayer *PluginManager::createMediaPlayer()
 {
     if ( !mMediaPlayerLibrary.isLoaded() )
     {
-        mMediaPlayerLibrary.setFileName( "mediaplayer" );
+        mMediaPlayerLibrary.setFileName( mediaplayer );
 
         if ( !mMediaPlayerLibrary.load() )
         {
@@ -80,17 +90,26 @@ MediaPlayer *PluginManager::createMediaPlayer()
             return 0;
         }
 
-        mCreateMediaPlayerFunction = (MediaPlayer * (*)()) mMediaPlayerLibrary.resolve( "createMediaPlayer" );
+        mCreateMediaPlayerFunction = (MediaPlayer * (*)()) mMediaPlayerLibrary.resolve( "create_media_player" );
 
         if ( !mCreateMediaPlayerFunction )
         {
-            Logger::error( "Failed to resolve createMediaPlayer function in the media player library %s", qPrintable( mMediaPlayerLibrary.fileName() ) );
+            Logger::error( "Failed to resolve function in the media player library %s: %s",
+                           qPrintable( mMediaPlayerLibrary.fileName() ),
+                           qPrintable( mMediaPlayerLibrary.errorString() ) );
             mMediaPlayerLibrary.unload();
             return 0;
         }
     }
 
-    return mCreateMediaPlayerFunction();
+    MediaPlayer * p = mCreateMediaPlayerFunction();
+
+    if ( p )
+    {
+        connect( p->qObject(), SIGNAL( logging( QString, QString) ), this, SLOT(logging(QString,QString)) );
+    }
+
+    return p;
 }
 
 void PluginManager::releasePlugin(const QString &name)

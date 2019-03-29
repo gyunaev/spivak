@@ -21,23 +21,22 @@
 
 #include <QFlags>
 #include <QMutex>
-#include <QObject>
-#include <QPainter>
 
 #include <gst/gst.h>
 #include <gst/app/app.h>
 
-#include "mediaplayer.h"
+#include "interface_mediaplayer.h"
 #include "../src/interface_mediaplayer_plugin.h"
 
 // This media player is used by the app. However it doesn't implement anything itself,
 // it is just a front Qt-style interface (with signals and slots) for the interface.
-class MediaPlayer_GStreamer : public MediaPlayer
+class MediaPlayer_GStreamer : public QObject, public MediaPlayer
 {
     Q_OBJECT
+    Q_INTERFACES( MediaPlayer )
 
     public:
-        MediaPlayer_GStreamer();
+        MediaPlayer_GStreamer( QObject * parent );
         ~MediaPlayer_GStreamer();
 
     signals:
@@ -66,7 +65,7 @@ class MediaPlayer_GStreamer : public MediaPlayer
 
         // Loads the media file, and plays audio, video or both from a device.
         // Takes ownership of the device, and will delete it upon end
-        virtual void    loadMedia( QIODevice * device, MediaPlayer::LoadOptions options );
+        virtual void    loadMedia( QIODevice * device, MediaPlayer_GStreamer::LoadOptions options );
 
         //
         // Player actions
@@ -100,9 +99,13 @@ class MediaPlayer_GStreamer : public MediaPlayer
         // not played, or not available.
         virtual void    drawVideoFrame( QPainter& p, const QRect& rect );
 
+        // Returns pointer to the player's QObject (which can be used to connect to signals)
+        // This is necessary since MediaPlayer_GStreamer interface is not inherited from QObject, and
+        // thus the applicaiton code will not otherwise allow connection without dynamic_cast.
+        virtual QObject* qObject();
+
     private:
-        // Those three functions run concurrently, i.e. in a separate threads!
-        void    threadLoadMedia();
+        void    loadMediaGeneric();
 
         // Resets the pipeline
         void    reset();
@@ -173,7 +176,7 @@ class MediaPlayer_GStreamer : public MediaPlayer
         int         m_tempoRatePercent;
         qint64      m_lastKnownPosition;
 
-        MediaPlayer::LoadOptions m_loadOptions;
+        MediaPlayer_GStreamer::LoadOptions m_loadOptions;
 
         // Current pipeline state
         QAtomicInt  m_playState;

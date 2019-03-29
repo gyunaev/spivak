@@ -19,7 +19,7 @@
 #ifndef BACKGROUNDVIDEO_H
 #define BACKGROUNDVIDEO_H
 
-#include "libmediaplayer/mediaplayer.h"
+#include "libmediaplayer/interface_mediaplayer.h"
 #include "background.h"
 
 

@@ -28,8 +28,14 @@
 class MediaPlayer;
 
 // Loads and keeps state of loaded plugins
-class PluginManager
+class PluginManager : public QObject
 {
+    Q_OBJECT
+
+    public slots:
+        // For plugin use
+        void    logging( QString level, QString message );
+
     public:
         PluginManager( const QString& pluginPath = "" );
 

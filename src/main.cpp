@@ -34,17 +34,6 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-#if defined (USE_BREAKPAD)
-    CrashHandler crashhandler;
-
-    // Are we invoked through crash handler?
-    if ( crashhandler.isHandlingCrash() )
-        return 0;
-
-    // Register it
-    crashhandler.registerHandler();
-#endif
-
     // Set data for QSettings
     QCoreApplication::setOrganizationName("ulduzsoft");
     QCoreApplication::setOrganizationDomain("ulduzsoft.com");

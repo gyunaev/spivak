@@ -22,7 +22,7 @@
 #include <QWidget>
 #include <QTemporaryFile>
 
-#include "libmediaplayer/mediaplayer.h"
+#include "libmediaplayer/interface_mediaplayer.h"
 
 namespace Ui {
 class MultimediaTestWidget;

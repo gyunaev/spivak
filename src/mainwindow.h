@@ -33,6 +33,7 @@ class SongDatabaseScanner;
 class QueueKaraokeWidget;
 class QueueMusicWidget;
 class WelcomeWizard;
+class MediaPlayerInitializer;
 
 class MainWindow : public QMainWindow, public Ui::MainWindow
 {
@@ -112,6 +113,9 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
 
         // To make sure we only have one WelcomeWizard
         WelcomeWizard       *   m_welcomeWizard;
+
+        // Media initializer
+        MediaPlayerInitializer * mMediaPlayerInitializer;
 };
 
 

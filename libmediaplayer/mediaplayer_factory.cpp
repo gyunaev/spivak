@@ -1,12 +1,7 @@
 #include "mediaplayer_factory.h"
 #include "mediaplayer_gstreamer.h"
 
-
-MediaPlayerFactory::MediaPlayerFactory()
+MediaPlayer *create_media_player()
 {
-}
-
-MediaPlayer *MediaPlayerFactory::create()
-{
-    return new MediaPlayer_GStreamer();
+    return new MediaPlayer_GStreamer( 0 );
 }
