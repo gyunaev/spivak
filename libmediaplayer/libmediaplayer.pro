@@ -7,7 +7,7 @@
 QT       += core gui widgets concurrent
 TARGET = mediaplayer_spivak
 TEMPLATE = lib
-CONFIG += dll
+CONFIG += dll c++11
 
 DEFINES += LIBMEDIAPLAYER_LIBRARY
 

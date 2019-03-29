@@ -8,6 +8,7 @@ QT       += core gui widgets network
 
 TARGET = spivak
 TEMPLATE = app
+CONFIG += c++11
 
 SOURCES += main.cpp\
     mainwindow.cpp \
