@@ -22,6 +22,7 @@
 #include <QDir>
 
 #include "logger.h"
+#include "libmediaplayer/interface_mediaplayer.h"
 #include "pluginmanager.h"
 
 PluginManager * pPluginManager;
@@ -29,6 +30,14 @@ PluginManager * pPluginManager;
 static const char * langplugin = "plugin_langdetect";
 static const char * pitchplugin = "plugin_pitchchanger";
 static const char * mediaplayer = "libmediaplayer_spivak";
+
+void PluginManager::logging(QString level, QString message)
+{
+    if ( level == "ERROR" )
+        Logger::error( "%s", qPrintable( message ) );
+    else
+        Logger::debug( "%s", qPrintable( message ) );
+}
 
 PluginManager::PluginManager( const QString& pluginPath )
 {
@@ -93,7 +102,14 @@ MediaPlayer *PluginManager::createMediaPlayer()
         }
     }
 
-    return mCreateMediaPlayerFunction();
+    MediaPlayer * p = mCreateMediaPlayerFunction();
+
+    if ( p )
+    {
+        connect( p->qObject(), SIGNAL( addlog( QString, QString) ), this, SLOT(logging(QString,QString)) );
+    }
+
+    return p;
 }
 
 void PluginManager::releasePlugin(const QString &name)
