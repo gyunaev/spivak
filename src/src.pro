@@ -160,13 +160,12 @@ else:unix: {
 }
 
 mac: {
-    INCLUDEPATH += /Library/Frameworks/GStreamer.framework/Headers
     LIBS += -L$$PWD/../extralibs/lib -lsonivox
 }
 
 unix:!mac:{
    CONFIG += link_pkgconfig
-   PKGCONFIG += sqlite3 libzip uchardet gstreamer-1.0 gstreamer-app-1.0
+   PKGCONFIG += sqlite3 libzip uchardet
 } else: {
     LIBS += -lzip -lsqlite3 -luchardet
 }
