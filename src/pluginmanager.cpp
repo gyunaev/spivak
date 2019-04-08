@@ -29,7 +29,12 @@ PluginManager * pPluginManager;
 
 static const char * langplugin = "plugin_langdetect";
 static const char * pitchplugin = "plugin_pitchchanger";
+
+#if defined (Q_OS_WIN)
+static const char * mediaplayer = "mediaplayer_spivak";
+#else
 static const char * mediaplayer = "libmediaplayer_spivak";
+#endif
 
 void PluginManager::logging(QString level, QString message)
 {
