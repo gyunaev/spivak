@@ -63,22 +63,23 @@ int main(int argc, char *argv[])
                 "Screen"
                 );
 
+    parser.addOption( fullScreenOption );
+    parser.addOption( fileNameOption );
+    parser.addOption( displayOption );
+    parser.addHelpOption();
+
+#if defined (Q_OS_WIN)
     const QCommandLineOption showConsoleOption(
                 QStringList() << "c" << "console",
                 "Show debug console"
                 );
 
-
-    parser.addOption( fullScreenOption );
-    parser.addOption( fileNameOption );
-    parser.addOption( displayOption );
-#if Q_OS_WIN
     parser.addOption( showConsoleOption );
 #endif
-    parser.addHelpOption();
+
     parser.process(a);
 
-#if Q_OS_WIN
+#if defined (Q_OS_WIN)
     // Show console on Windows
     if ( parser.isSet( showConsoleOption ) )
     {
