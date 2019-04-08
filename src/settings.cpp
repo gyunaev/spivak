@@ -164,6 +164,10 @@ QJsonObject Settings::toJson()
     // Encoding
     out[ "advanced/FallbackEncoding"] = fallbackEncoding;
 
+    // GStreamer path
+    if ( !pathGStreamerBinaries.isEmpty() )
+        out[ "advanced/gstreamerpath" ] = pathGStreamerBinaries;
+
     // Those are only set if not empty
     if ( !httpAccessCode.isEmpty() )
         out[ "http/SecureAccessCode"] = httpAccessCode;
@@ -266,6 +270,10 @@ void Settings::fromJson(const QJsonObject &data)
         playerLyricsFont.fromString( data.value( "player/LyricsFontString" ).toString() );
     else
         playerLyricsFont = QFont( data.value( "player/LyricsFont" ).toString( "arial" ) );
+
+    // GStreamer path
+    if ( data.contains( "advanced/gstreamerpath" ) )
+        pathGStreamerBinaries = data.value( "advanced/gstreamerpath" ).toString();
 
     // Collections
     collections.clear();

@@ -39,6 +39,13 @@ class MediaPlayerInitializer : public QThread
         void    run() override;
 
     private:
+        // Finds the path to installed GStreamer library
+        void    findGStreamerPath();
+
+        // Checks if the provided path is valid GStreamer path
+        // Sets PATH and returns true if it is.
+        bool    checkGStreamerPath(const QString& path);
+
         MediaPlayer * mPlayer;
 };
 

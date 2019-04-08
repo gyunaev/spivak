@@ -16,7 +16,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  **************************************************************************/
 
-#include <QApplication>
 #include <QObject>
 #include <QPainter>
 #include <QFile>
@@ -318,13 +317,6 @@ void MediaPlayer_GStreamer::loadMediaGeneric()
     if ( !gst_is_initialized() )
     {
         //qputenv( "GST_DEBUG", "*:4" );
-#ifdef WIN32
-        QString env = QString("GST_PLUGIN_PATH=%1\\gstreamer\\") .arg( QApplication::applicationDirPath() );
-        env.replace( "/", "\\" );
-        _putenv( qPrintable(env) );
-
-        addlog( "DEBUG",  "GstMediaPlayer: setting %s", qPrintable( env ) );
-#endif
         gst_init(0, 0);
     }
 

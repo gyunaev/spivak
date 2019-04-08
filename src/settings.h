@@ -119,6 +119,9 @@ class Settings
         // If true, first-time wizard has been shown already
         bool            firstTimeWizardShown;
 
+        // Path to GStreamer binaries (only useful on non-Linux and when asked from user)
+        QString         pathGStreamerBinaries;
+
         // Replaces the database path according to rules
         QString         replacePath( const QString& origpath );
 
