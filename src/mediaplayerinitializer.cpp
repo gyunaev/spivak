@@ -182,9 +182,9 @@ bool MediaPlayerInitializer::checkGStreamerPath( const QString &path )
 
     // Add the path to the system-specific path
 #ifdef WIN32
-    path.replace( "/", "\\" );
-    QString var = qgetenv( "PATH" ) + ";" + path;
-    qputenv( "PATH", var );
+    QString  fixedpath = path;
+    fixedpath.replace( "/", "\\" );
+    qputenv( "PATH", qgetenv( "PATH" ) + ";" + fixedpath.toUtf8() );
 #else
     qputenv( "LD_LIBRARY_PATH", qgetenv( "LD_LIBRARY_PATH" ) + ":" + path.toUtf8() );
 #endif
