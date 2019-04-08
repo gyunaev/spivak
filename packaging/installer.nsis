@@ -4,6 +4,7 @@
 ;Include Modern UI
 
 	!include "MUI.nsh"
+	!include x64.nsh
 
 ;--------------------------------
 ;General
@@ -19,6 +20,11 @@
 	InstallDir "$PROGRAMFILES\Ulduzsoft\Spivak"
 	InstallDirRegKey HKEY_LOCAL_MACHINE "SOFTWARE\Ulduzsoft\Spivak" ""
 	SetCompressor lzma
+
+	${If} ${Installx86_64}
+        SetRegView 64
+        StrCpy $INSTDIR "$PROGRAMFILES64\\Ulduzsoft\Spivak" 
+    ${EndIf}
 
 ;--------------------------------
 ;Variables
