@@ -22,6 +22,10 @@
 #include <QRect>
 #include <QScreen>
 
+#if defined (Q_OS_WIN)
+    #include <windows.h>
+#endif
+
 #include "actionhandler.h"
 #include "mainwindow.h"
 #include "logger.h"
