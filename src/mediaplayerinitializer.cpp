@@ -159,7 +159,7 @@ bool MediaPlayerInitializer::checkGStreamerPath( const QString &path )
     QString gstPluginPath;
 
     QStringList pluginpaths;
-    pluginpaths << "gstreamer" << "../lib/gstreamer-1.0";
+    pluginpaths << "plugins" << "../lib/gstreamer-1.0";
 
     // Try all possible plugin paths
     for ( QString pluginpath : pluginpaths )
