@@ -114,7 +114,6 @@ HEADERS  += mainwindow.h \
     database_statement.h \
     actionhandler_webserver_socket.h \
     feedbackdialog.h \
-    crashhandler.h \
     midisyntheser.h \
     midistripper.h \
     pluginmanager.h \

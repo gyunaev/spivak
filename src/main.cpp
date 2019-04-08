@@ -25,7 +25,6 @@
 #include "actionhandler.h"
 #include "mainwindow.h"
 #include "logger.h"
-#include "crashhandler.h"
 
 
 #include "midisyntheser.h"
@@ -64,13 +63,43 @@ int main(int argc, char *argv[])
                 "Screen"
                 );
 
-    parser.addOption(fullScreenOption);
-    parser.addOption(fileNameOption);
-    parser.addOption(displayOption);
+    const QCommandLineOption showConsoleOption(
+                QStringList() << "c" << "console",
+                "Show debug console"
+                );
+
+
+    parser.addOption( fullScreenOption );
+    parser.addOption( fileNameOption );
+    parser.addOption( displayOption );
+#if Q_OS_WIN
+    parser.addOption( showConsoleOption );
+#endif
+    parser.addHelpOption();
     parser.process(a);
 
+#if Q_OS_WIN
+    // Show console on Windows
+    if ( parser.isSet( showConsoleOption ) )
+    {
+        AllocConsole();
+
+        freopen("CONOUT$", "w", stdout);
+        freopen("CONOUT$", "w", stderr);
+
+        COORD coordInfo;
+        coordInfo.X = 130;
+        coordInfo.Y = 9000;
+
+        SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), coordInfo);
+        SetConsoleMode(GetStdHandle(STD_OUTPUT_HANDLE),ENABLE_QUICK_EDIT_MODE| ENABLE_EXTENDED_FLAGS);
+    }
+#endif
+
     const int displayNumber = parser.value(displayOption).toInt();
-    if(displayNumber && displayNumber < a.screens().size()) {
+
+    if ( displayNumber && displayNumber < a.screens().size() )
+    {
 
         const QRect resolution = a.screens()[displayNumber]
                 ->availableGeometry();
@@ -81,7 +110,8 @@ int main(int argc, char *argv[])
                     );
     }
 
-    if(parser.isSet(fullScreenOption)) {
+    if ( parser.isSet(fullScreenOption) )
+    {
         p.data()->toggleFullscreen();
     }
 
