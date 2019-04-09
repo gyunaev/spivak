@@ -168,10 +168,10 @@ bool KaraokeSong::open()
             if ( karaoke->isCompound() )
             {
                 // This temporary file will store the extracted music file
-                m_tempMusicFile = new QTemporaryFile( "karaokemedia-XXXXXXX." + Util::fileExtension( m_musicFileName ) );
+                m_tempMusicFile = new QTemporaryFile( QDir::tempPath() + QDir::separator() + "karaokemedia-XXXXXXX." + Util::fileExtension( m_musicFileName ) );
 
                 if ( !m_tempMusicFile->open() )
-                    throw QString( "Cannot open temporary file");
+                    throw QString( "Cannot open temporary file %1: %2") .arg( m_tempMusicFile->fileName() .arg( m_tempMusicFile->errorString() ) );
 
                 // Extract the music into a temporary file
                 if ( !karaoke->extract( m_musicFileName, m_tempMusicFile ) )
