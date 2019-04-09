@@ -5,6 +5,7 @@
 
 	!include "MUI.nsh"
 	!include x64.nsh
+	!include "logiclib.nsh"
 
 ;--------------------------------
 ;General
@@ -21,10 +22,12 @@
 	InstallDirRegKey HKEY_LOCAL_MACHINE "SOFTWARE\Ulduzsoft\Spivak" ""
 	SetCompressor lzma
 
-	${If} ${InstallType} == "x86_64"
-        SetRegView 64
-        StrCpy $INSTDIR "$PROGRAMFILES64\\Ulduzsoft\Spivak" 
-    ${EndIf}
+	Section
+		${If} ${InstallType} == "x86_64"
+		        SetRegView 64
+		        StrCpy $INSTDIR "$PROGRAMFILES64\\Ulduzsoft\Spivak" 
+		${EndIf}
+	SectionEnd
 
 ;--------------------------------
 ;Variables
