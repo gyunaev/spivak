@@ -7,6 +7,17 @@
 	!include x64.nsh
 	!include "logiclib.nsh"
 
+; Select 32/64bit path depending on what installer we build
+Function .onInit
+	${If} ${InstallType} == "x86_64"
+	        SetRegView 64
+	        StrCpy $INSTDIR "$PROGRAMFILES64\\Ulduzsoft\Spivak" 
+    ${Else}
+	        SetRegView 32
+	        StrCpy $INSTDIR "$PROGRAMFILES\\Ulduzsoft\Spivak" 
+	${EndIf}
+FunctionEnd
+	
 ;--------------------------------
 ;General
 
@@ -23,10 +34,6 @@
 	SetCompressor lzma
 
 	Section
-		${If} ${InstallType} == "x86_64"
-		        SetRegView 64
-		        StrCpy $INSTDIR "$PROGRAMFILES64\\Ulduzsoft\Spivak" 
-		${EndIf}
 	SectionEnd
 
 ;--------------------------------
