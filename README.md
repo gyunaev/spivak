@@ -1,5 +1,7 @@
 # Spivak - free cross-platform Karaoke Player [![Build Status](https://travis-ci.org/gyunaev/spivak.svg?branch=master)](https://travis-ci.org/gyunaev/spivak)
 
+![Screenshot](https://github.com/gyunaev/spivak/raw/mediaplayer_plugin/packaging/screenshot2.png "Screenshot")
+
 Spivak is a free, cross-platform (Linux/Windows/OS X) Karaoke player based on GStreamer and Qt5. It supports a wide range of Karaoke formats, with the goal of playing all more or less widespread Karaoke formats on all popular platforms. It also has strong support for foreign languages, so playing Karaoke in Japanese, Russian or Hindu is fully supported.
 
 Spivak has been designed to be a standalone Karaoke player, which could be used at your parties without a dedicated DJ. It is primarily controlled through its Web interface, so your guests can take care of themselves, searching and adding songs into the queue. The player will ensure fair rotation.
@@ -7,7 +9,6 @@ Spivak has been designed to be a standalone Karaoke player, which could be used 
 Currently Spivak is just out of beta, and already has impressive set of features, and is stable enough to survive a party without a single crash or hang. Its web interface has been redesigned and looks much better.
 
 Spivak is licensed under GNU GPL version 3, and is written by George Yunaev.
-
 
 ## Features
 
@@ -49,9 +50,12 @@ Apologies for the "make -jX" build being still broken.
 
 Copy the player executable from src/spivak somewhere, and copy all the plugins into the "plugins" subdirectory where spivak executable is located.
 
-## Requesting support
+## Screenshots
 
-Please use Spivak forum for support requests: http://forum.ulduzsoft.com/forumdisplay.php?fid=10
+![Screenshot](https://github.com/gyunaev/spivak/raw/mediaplayer_plugin/packaging/screenshot1.png "Screenshot")
+![Screenshot](https://github.com/gyunaev/spivak/raw/mediaplayer_plugin/packaging/screenshot2.png "Screenshot")
+![Screenshot](https://github.com/gyunaev/spivak/raw/mediaplayer_plugin/packaging/screenshot3.png "Screenshot")
+
 
 ## Reporting bugs and requesting features
 
