@@ -1,6 +1,6 @@
 # Spivak - free cross-platform Karaoke Player [![Build Status](https://travis-ci.org/gyunaev/spivak.svg?branch=master)](https://travis-ci.org/gyunaev/spivak)
 
-![Screenshot](https://github.com/gyunaev/spivak/raw/packaging/screenshot2.png "Screenshot")
+![Screenshot](https://github.com/gyunaev/spivak/raw/master/packaging/screenshot2.png "Screenshot")
 
 Spivak is a free, cross-platform (Linux/Windows/OS X) Karaoke player based on GStreamer and Qt5. It supports a wide range of Karaoke formats, with the goal of playing all more or less widespread Karaoke formats on all popular platforms. It also has strong support for foreign languages, so playing Karaoke in Japanese, Russian or Hindu is fully supported.
 
@@ -62,9 +62,9 @@ export LD_LIBRARY_PATH=`pwd`/../libmediaplayer
 
 ## Screenshots
 
-![Screenshot](https://github.com/gyunaev/spivak/raw/packaging/screenshot1.png "Screenshot")
-![Screenshot](https://github.com/gyunaev/spivak/raw/packaging/screenshot2.png "Screenshot")
-![Screenshot](https://github.com/gyunaev/spivak/raw/packaging/screenshot3.png "Screenshot")
+![Screenshot](https://github.com/gyunaev/spivak/raw/master/packaging/screenshot1.png "Screenshot")
+![Screenshot](https://github.com/gyunaev/spivak/raw/master/packaging/screenshot2.png "Screenshot")
+![Screenshot](https://github.com/gyunaev/spivak/raw/master/packaging/screenshot3.png "Screenshot")
 
 
 ## Reporting bugs and requesting features
