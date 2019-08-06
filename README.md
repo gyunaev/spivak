@@ -32,16 +32,14 @@ The player has been tested primarily on Linux, but has been briefly tested on Wi
 
 Currently the only way to test the player is to build it from source, which should be easy on Linux, but may be cumbersome on other OSes. You would need the following libraries:
 
-- Qt 5.5 (might work on prior versions too - this means the code may need changes which are doable - but will NOT work on Qt4);
+- Qt 5.6 (no, it will not work on prior versions without code changes);
 - GStreamer 1.0 (will NOT work on 0.10) and related libraries, notably Glib;
 - uchardet2 (for automatic charset decoding);
 - libzip (for handling ZIP and old KFN files);
 - libcld2 (to build Karaoke language detector plugin; optional);
 - sqlite3 (for karaoke database);
 
-**Please do not build your builds with Google breakpad module enabled**, as this would enable automatic crash reporting which is useless for me because I do not have your symbols file.
-
-To build, please comment out the line "CONFIG += GOOGLEBREAKPAD" in src/src.pro, and then build as usual:
+Spivak builds as usual:
 
     qmake (or qmake-qt5)
     make
