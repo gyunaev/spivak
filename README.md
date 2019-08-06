@@ -48,7 +48,17 @@ To build, please comment out the line "CONFIG += GOOGLEBREAKPAD" in src/src.pro,
     
 Apologies for the "make -jX" build being still broken.
 
-Copy the player executable from src/spivak somewhere, and copy all the plugins into the "plugins" subdirectory where spivak executable is located.
+The player executable `spivak` is located in `src/` but it requires `libmediaplayer_spivak` to be loadable via dlopen. This means that either all files from `libmediaplayer/libmediaplayer_spivak.so*` must be copied somewhere where ld.so can pick them up (such as /usr/lib64) or `LD_LIBRARY_PATH` must be set to that directory.
+
+You also need to copy all the plugins into either /usr/lib or into Spivak directory.
+
+If you're building it, you can run spivak as following:
+
+'''
+cd src
+export LD_LIBRARY_PATH=`pwd`/../libmediaplayer
+./spivak
+'''
 
 ## Screenshots
 
