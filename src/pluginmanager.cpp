@@ -91,7 +91,9 @@ MediaPlayer *PluginManager::createMediaPlayer()
 
         if ( !mMediaPlayerLibrary.load() )
         {
-            Logger::error( "Failed to load media player library: %s", qPrintable( mMediaPlayerLibrary.errorString() ) );
+            Logger::error( "Failed to load media player library %s via dlopen: %s",
+                           qPrintable( mMediaPlayerLibrary.fileName() ),
+                           qPrintable( mMediaPlayerLibrary.errorString() ) );
             return 0;
         }
 
