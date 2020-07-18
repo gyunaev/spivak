@@ -39,12 +39,18 @@ MultimediaTestWidget::MultimediaTestWidget(QWidget *parent) :
     m_testExtensions << "wav" << "m4a" << "mp3" << "ogg" << "wma" << "mid";
 
     m_player = pPluginManager->createMediaPlayer();
-    connect( m_player->qObject(), SIGNAL(error(QString)), this, SLOT(error(QString)) );
-    connect( m_player->qObject(), SIGNAL(loaded()), this, SLOT(loaded()) );
 
-    connect( ui->textBrowser, &QTextBrowser::anchorClicked, this, &MultimediaTestWidget::startTest );
+    if ( m_player )
+    {
+        connect( m_player->qObject(), SIGNAL(error(QString)), this, SLOT(error(QString)) );
+        connect( m_player->qObject(), SIGNAL(loaded()), this, SLOT(loaded()) );
 
-    append( tr("Please <a href=\"#\">click here to start the test</a>. The automatic test will be completely silent.") );
+        connect( ui->textBrowser, &QTextBrowser::anchorClicked, this, &MultimediaTestWidget::startTest );
+
+        append( tr("Please <a href=\"#\">click here to start the test</a>. The automatic test will be completely silent.") );
+    }
+    else
+        append( tr("Audio plugin is not loaded, audio test is not available.") );
 }
 
 MultimediaTestWidget::~MultimediaTestWidget()
