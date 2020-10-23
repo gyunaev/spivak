@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  **************************************************************************/
 
+#include <QPainterPath>
+
 #include "karaokepainter.h"
 #include "settings.h"
 
@@ -66,7 +68,7 @@ void KaraokePainter::setClipAreaMain()
 int KaraokePainter::largestFontSize(const QFont &font, int maxsize, int width, const QString &textline, int maxheight )
 {
     int minsize = 8;
-    int cursize;
+    int cursize = 10;
     QFont testfont( font );
 
     // We are trying to find the maximum font size which fits by doing the binary search
