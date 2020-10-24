@@ -61,7 +61,7 @@ void LyricsParser_Texts::parseUStar( const QByteArray& data, LyricsLoader::Conta
 {
     bool header = true;
     bool relative = false;
-    int bpm = -1;
+    double bpm = -1;
     int gap = -1;
     double msecs_per_beat = 0;
     int last_time_ms = 0;
@@ -124,7 +124,7 @@ void LyricsParser_Texts::parseUStar( const QByteArray& data, LyricsLoader::Conta
                 else if ( tag == "MP3FILE" || tag == "MP3" )
                     tagid = LyricsLoader::PROP_MUSICFILE;
                 else if ( tag == "BPM" )
-                    bpm = value.toInt();
+                    bpm = value.toDouble();
                 else if ( tag == "GAP" )
                     gap = qRound( value.toDouble() );   // May be a double value
                 else if ( tag == "RELATIVE" )
@@ -145,7 +145,7 @@ void LyricsParser_Texts::parseUStar( const QByteArray& data, LyricsLoader::Conta
                 if ( bpm == -1 || gap == -1 )
                     throw("BPM and/or GAP is missing.");
 
-                msecs_per_beat = (int) ((60.0 / (double) bpm / 4.0) * 1000.0);
+                msecs_per_beat = (60.0 / bpm / 4.0) * 1000.0;
                 header = false;
             }
         }
