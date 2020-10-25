@@ -57,7 +57,7 @@ bool Database::init()
                            SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX,
                            0 ) != SQLITE_OK )
     {
-        pActionHandler->error( QString("Error opening sqlite database: %1") .arg( sqlite3_errmsg(m_sqlitedb) ) );
+        pActionHandler->error( tr("Error opening sqlite database: %1") .arg( sqlite3_errmsg(m_sqlitedb) ) );
         return false;
     }
 
@@ -344,7 +344,7 @@ bool Database::execute( const QString &sql, const QStringList& args )
 
     if ( !stmt.prepare( m_sqlitedb, sql, args  ) )
     {
-        pActionHandler->error( QString("Error executing database command: %1\n%2").arg( sqlite3_errmsg( m_sqlitedb ) ) .arg(sql) );
+        pActionHandler->error( tr("Error executing database command: %1\n%2").arg( sqlite3_errmsg( m_sqlitedb ) ) .arg(sql) );
         return false;
     }
 
@@ -358,7 +358,7 @@ bool Database::execute( const QString &sql, const QStringList& args )
         return true;
     else
     {
-        pActionHandler->error( QString("Error executing database command: %1\n%2").arg( sqlite3_errmsg( m_sqlitedb ) ) .arg(sql) );
+        pActionHandler->error( tr("Error executing database command: %1\n%2").arg( sqlite3_errmsg( m_sqlitedb ) ) .arg(sql) );
         return false;
     }
 }

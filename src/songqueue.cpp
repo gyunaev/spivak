@@ -456,7 +456,7 @@ void SongQueue::save()
 
     if ( !fout.open( QIODevice::WriteOnly ) )
     {
-        pActionHandler->error( "Cannot store queue: " + fout.errorString() );
+        pActionHandler->error( tr("Cannot store queue: %1") .arg( fout.errorString() ) );
         return;
     }
 

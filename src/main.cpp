@@ -18,6 +18,7 @@
 
 #include <QApplication>
 #include <QScopedPointer>
+#include <QTranslator>
 #include <QCommandLineParser>
 #include <QRect>
 #include <QScreen>
@@ -42,6 +43,10 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("ulduzsoft.com");
     QCoreApplication::setApplicationName("spivak");
 
+    QTranslator translator;
+    translator.load( QLocale(), QLatin1String("spivak"), QLatin1String("_"), QLatin1String(":/i18n") );
+    QCoreApplication::installTranslator( &translator );
+
     // Init logger after crash settings
     Logger::init();
 
@@ -52,19 +57,19 @@ int main(int argc, char *argv[])
 
     const QCommandLineOption fullScreenOption(
                 QStringList() << "fs" << "fullScreen",
-                "Toggle full screen"
+                QCoreApplication::tr("Toggle full screen")
                 );
 
     const QCommandLineOption fileNameOption(
                 QStringList() << "file" << "fileName",
-                "File name to play",
-                "File name to play"
+                QCoreApplication::tr("File name to play"),
+                QCoreApplication::tr("File name to play")
                 );
 
     const QCommandLineOption displayOption(
                 QStringList() << "d" << "displayNumber",
-                "Display number",
-                "Screen"
+                QCoreApplication::tr("Display number"),
+                QCoreApplication::tr("Screen")
                 );
 
     parser.addOption( fullScreenOption );

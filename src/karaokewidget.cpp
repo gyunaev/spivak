@@ -141,7 +141,7 @@ void KaraokeWidget::playCurrent()
         Logger::error("KaraokeWidget::playCurrent %s: exception %s", qPrintable( current.file), qPrintable(ex) );
 
         MessageBoxAutoClose::critical(
-                    "Cannot play file",
+                    tr("Cannot play file"),
                     tr("Cannot play file %1:\n%2") .arg( current.file ) .arg( ex ) );
 
         delete karfile;

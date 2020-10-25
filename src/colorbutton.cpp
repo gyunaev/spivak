@@ -31,7 +31,7 @@ ColorButton::ColorButton( QWidget * parent )
 void ColorButton::setColor( const QColor& color )
 {
 	// After the constructor is called, UIC-generated code calls setLabel, so we overwrite it here
-	setText( tr("") );
+    setText( "" );
 
 	m_selectedColor = color;
     update();
