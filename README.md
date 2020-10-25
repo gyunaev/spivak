@@ -58,6 +58,11 @@ export LD_LIBRARY_PATH=`pwd`/../libmediaplayer
 ./spivak
 '''
 
+## Limitations
+
+- For complex karaoke formats (Ultrastar, KFM) only bare music+lyrics playing functionality is supported. Other features of those formats (such as background video or pitch analysis) are not supported, and there are no plans to support them. If those features are important to you, please use the dedicated players for those formats.
+- Newer KFN files use a different encryption and are not supported (yet?).
+
 ## Screenshots
 
 ![Screenshot](https://github.com/gyunaev/spivak/raw/master/packaging/screenshot1.png "Screenshot")
