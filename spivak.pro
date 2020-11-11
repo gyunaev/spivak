@@ -5,4 +5,4 @@
 SUBDIRS += libsonivox libmediaplayer libkaraokelyrics plugins src
 TEMPLATE = subdirs
 src.depends = libkaraokelyrics
-TRANSLATIONS = i18n/spivak_en_US.ts
+TRANSLATIONS = i18n/spivak_en_US.ts i18n/spivak_sk.ts
