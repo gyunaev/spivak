@@ -137,36 +137,56 @@ bool TableModelQueue::dropMimeData(const QMimeData *data, Qt::DropAction, int ro
     }
     else if ( data->formats().contains( "application/x-karaoke-song" ) )
     {
-        // What's the item id?
-        Database_SongInfo info;
+        quint32 size, songid;
+        QDataStream stream( data->data( "application/x-karaoke-song" ) );
 
-        int songid = data->data( "application/x-karaoke-song" ).toInt();
+        stream >> size;
+        qDebug( "size: %d", size );
 
-        if ( !pDatabase->songById( data->data( "application/x-karaoke-song" ).toInt(), info ) )
-            return false;
-
-        if ( !parent.isValid() )
+        while ( size > 0 )
         {
-            // Inserting the song
-            if ( row == -1 )
-                row = m_queue.size();
+            if ( stream.atEnd() )
+            {
+                qDebug("failed to serialize stream");
+                return false;
+            }
 
-            pSongQueue->insertSong( row,  "", songid );
+            size--;
+
+            // What's the item id?
+            Database_SongInfo info;
+
+            stream >> songid;
+
+            qDebug( ">> song id: %d",  songid );
+            if ( !pDatabase->songById( songid, info ) )
+                return false;
+
+            if ( !parent.isValid() )
+            {
+                // Inserting the song
+                if ( row == -1 )
+                    row = m_queue.size();
+
+                pSongQueue->insertSong( row,  "", songid );
+                continue;
+            }
+
+            if ( parent.row() == -1 )
+                return false;
+
+            // We're overwriting the current queued song; ask first
+            if ( QMessageBox::question( 0,
+                                        QObject::tr( "Replace the song?"),
+                                        QObject::tr( "Replace the song %1 for singer %2")
+                                            .arg( m_queue[parent.row()].title )
+                                            .arg( m_queue[parent.row()].singer ) ) != QMessageBox::Yes )
+                return false;
+
+            pSongQueue->replaceSong( parent.row(), songid );
             return true;
         }
 
-        if ( parent.row() == -1 )
-            return false;
-
-        // We're overwriting the current queued song; ask first
-        if ( QMessageBox::question( 0,
-                                    QObject::tr( "Replace the song?"),
-                                    QObject::tr( "Replace the song %1 for singer %2")
-                                        .arg( m_queue[parent.row()].title )
-                                        .arg( m_queue[parent.row()].singer ) ) != QMessageBox::Yes )
-            return false;
-
-        pSongQueue->replaceSong( parent.row(), songid );
         return true;
     }
     else
@@ -343,8 +363,23 @@ void TableModelSearch::sort(int column, Qt::SortOrder order)
 QMimeData *TableModelSearch::mimeData(const QModelIndexList &indexes) const
 {
     QMimeData * data = new QMimeData();
+    QByteArray mimedata;
+    QDataStream stream( &mimedata, QIODevice::WriteOnly );
 
-    data->setData( "application/x-karaoke-song", QByteArray::number( m_results[indexes[0].row()].id ) );
+    // Serialize all indexes into list
+    stream << (quint32) indexes.size();
+
+    for ( auto idx : indexes )
+    {
+        // Since this is called for every column, ignore the rest of columns
+        if ( idx.column() != 0 )
+            continue;
+
+        qDebug( "<< song id: %d", (quint32) m_results[idx.row()].id );
+        stream << m_results[idx.row()].id;
+    }
+
+    data->setData( "application/x-karaoke-song", mimedata );
     return data;
 }
 
