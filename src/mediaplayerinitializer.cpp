@@ -136,7 +136,7 @@ void MediaPlayerInitializer::findGStreamerPath()
                                    tr("Invalid GStreamer path"),
                                    tr("The selected GStreamer path is invalid.\n"
                                       "The shared library %1 file was not found at this path\n\n"
-                                      "Would you like to choose a path again?") ) == QMessageBox::Yes )
+                                      "Would you like to choose a path again?").arg( path ) ) == QMessageBox::Yes )
             {
                 // Ask again
                 continue;
