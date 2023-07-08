@@ -32,7 +32,7 @@ The player has been tested primarily on Linux, but has been briefly tested on Wi
 
 Currently the only way to test the player is to build it from source, which should be easy on Linux, but may be cumbersome on other OSes. You would need the following libraries:
 
-- Qt 5.6 (no, it will not work on prior versions without code changes);
+- Qt6 (it might work with later versions of Qt5 too);
 - GStreamer 1.0 (will NOT work on 0.10) and related libraries, notably Glib;
 - uchardet2 (for automatic charset decoding);
 - libzip (for handling ZIP and old KFN files);
@@ -41,7 +41,7 @@ Currently the only way to test the player is to build it from source, which shou
 
 Spivak builds as usual:
 
-    qmake (or qmake-qt5)
+    qmake6
     make
     
 Apologies for the "make -jX" build being still broken.
