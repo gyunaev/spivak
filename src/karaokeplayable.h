@@ -20,6 +20,7 @@
 #define KARAOKEOBJECT_H
 
 #include <QString>
+#include <QStringDecoder>
 #include <QIODevice>
 
 // Base class encapsulating various Karaoke song objects such as:
@@ -35,7 +36,7 @@ class KaraokePlayable
 
         // baseFile is a file which was enqueued. It may be music file (we need to find lyrics), lyrics file (we need to find music)
         // or a compound file (we need to find both)
-        static KaraokePlayable * create( const QString& baseFile, QTextCodec * filenameDecoder = 0 );
+        static KaraokePlayable * create( const QString& baseFile, QStringDecoder * filenameDecoder = 0 );
 
         static bool analyze( const QString& file );
 
@@ -85,7 +86,7 @@ class KaraokePlayable
         // Converts filename from archive to the Unicode string
         QString decodeFilename( const QByteArray& filename );
 
-        KaraokePlayable( const QString& baseFile, QTextCodec *filenameDecoder );
+        KaraokePlayable( const QString& baseFile, QStringDecoder *filenameDecoder );
 
         // Must be reimplemented in subclass.
         // Initializes the object
@@ -103,7 +104,7 @@ class KaraokePlayable
         QString     m_errorMsg;
 
         // Text decoder for filenames
-        QTextCodec* m_filenameDecoder;
+        QStringDecoder * m_filenameDecoder;
 };
 
 #endif // KARAOKEOBJECT_H

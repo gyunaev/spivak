@@ -30,7 +30,7 @@ struct zip;
 class KaraokePlayable_ZIP : public KaraokePlayable
 {
     public:
-        KaraokePlayable_ZIP( const QString &baseFile, QTextCodec *filenameDecoder );
+        KaraokePlayable_ZIP( const QString &baseFile, QStringDecoder *filenameDecoder );
         ~KaraokePlayable_ZIP();
 
         // Initializes the object

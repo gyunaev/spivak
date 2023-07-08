@@ -159,12 +159,12 @@ void LyricsParser_KFN::parse(QIODevice * file, LyricsLoader::Container& output, 
         lyricsForEncoding.append( it.value() );
 
     // Detect the encoding
-    QTextCodec * codec = detectEncoding( lyricsForEncoding, properties );
+    auto codec = std::make_unique<QStringDecoder*>( detectEncoding( lyricsForEncoding, properties ) );
 
     for ( QMap< int, QByteArray >::const_iterator it = sortedLyrics.begin(); it != sortedLyrics.end(); ++it )
     {
         qint64 timing = it.key() * 10;
-        Lyric lyr( timing, codec->toUnicode( it.value() ) );
+        Lyric lyr( timing, (*codec)->decode( it.value() ) );
 
         // Last line?
         if ( lyr.text.endsWith( '\n') )

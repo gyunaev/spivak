@@ -37,12 +37,12 @@ class PlayerLyricsTextCallback : public LyricsLoaderCallback
         }
 
         // This function must detect the used text codec for the data, and return it, or return 0 (we will fall back to UTF-8)
-        virtual QTextCodec * detectTextCodec( const QByteArray& data )
+        virtual QStringDecoder * detectTextCodec( const QByteArray& data )
         {
-            QTextCodec * enc = Util::detectEncoding( data );
+            QStringDecoder * enc = Util::detectEncoding( data );
 
             if ( !enc )
-                enc = QTextCodec::codecForName( qPrintable( pSettings->fallbackEncoding ) );
+                enc = new QStringDecoder( qPrintable( pSettings->fallbackEncoding ) );
 
             return enc;
         }

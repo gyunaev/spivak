@@ -279,7 +279,7 @@ void Settings::fromJson(const QJsonObject &data)
     collections.clear();
     QJsonArray colarray = data.value("collection").toArray();
 
-    Q_FOREACH( const QJsonValue& v, colarray )
+    for( const QJsonValue& v : colarray )
     {
         CollectionEntry entry;
         entry.fromJson( v.toObject() );

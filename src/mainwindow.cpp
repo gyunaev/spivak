@@ -22,7 +22,6 @@
 #include <QMessageBox>
 #include <QDialog>
 #include <QTimer>
-#include <QDesktopWidget>
 
 #if defined (Q_OS_WIN)
     #include <windows.h>
@@ -71,9 +70,6 @@ MainWindow::MainWindow(QWidget *parent) :
     m_welcomeWizard = 0;
 
     qRegisterMetaType<SongQueueItem>();
-
-    // We don't use any crypto
-    qsrand( (unsigned int) (long) pMainWindow * (unsigned int) QDateTime::currentMSecsSinceEpoch() );
 
     // Eventor is created first as it does not connect to anything, and others connect to it
     pEventor = new Eventor( this );
@@ -297,7 +293,7 @@ void MainWindow::toggleFullscreen()
 
         // In case we run without screen manager
         move( 0, 0 );
-        resize( QApplication::desktop()->size() );
+        resize( QApplication::primaryScreen()->size() );
 
         // Hide the mouse cursor
         QApplication::setOverrideCursor( Qt::BlankCursor );

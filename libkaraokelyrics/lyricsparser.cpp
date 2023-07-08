@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  **************************************************************************/
 
-#include <QTextCodec>
+#include <QStringDecoder>
 
 #include "lyricsparser.h"
 
@@ -53,13 +53,13 @@ QString LyricsParser::timeAsText(quint64 timing)
     int sec = (timing - min * 60000) / 1000;
     int msec = timing - (min * 60000 + sec * 1000 );
 
-    return QString().sprintf( "%02d:%02d.%04d", min, sec, msec );
+    return QString::asprintf( "%02d:%02d.%04d", min, sec, msec );
 }
 
-QTextCodec *LyricsParser::detectEncoding(const QByteArray &data, LyricsLoader::Properties &properties )
+QStringDecoder *LyricsParser::detectEncoding(const QByteArray &data, LyricsLoader::Properties &properties )
 {
     // Now detect encoding
-    QTextCodec * enc = 0;
+    QStringDecoder * enc = 0;
 
     //qDebug("Supplied text: %s", data.constData() );
 
@@ -67,7 +67,7 @@ QTextCodec *LyricsParser::detectEncoding(const QByteArray &data, LyricsLoader::P
         enc = m_callback->detectTextCodec(data);
 
     if ( !enc )
-        enc = QTextCodec::codecForName( "utf-8" );
+        enc = new QStringDecoder( QStringConverter::Utf8 );
     else
         properties[ LyricsLoader::PROP_DETECTED_ENCODING ] = enc->name();
 

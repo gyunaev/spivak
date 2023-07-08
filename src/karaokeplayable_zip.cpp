@@ -33,7 +33,7 @@
 #include "karaokeplayable_zip.h"
 #include "zip.h"
 
-KaraokePlayable_ZIP::KaraokePlayable_ZIP(const QString &baseFile, QTextCodec *filenameDecoder)
+KaraokePlayable_ZIP::KaraokePlayable_ZIP(const QString &baseFile, QStringDecoder *filenameDecoder)
     : KaraokePlayable( baseFile, filenameDecoder )
 {
     m_zip = 0;

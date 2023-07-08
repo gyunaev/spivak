@@ -18,7 +18,6 @@
 
 #include <QScopedPointer>
 #include <QStringList>
-#include <QTextCodec>
 #include <QBuffer>
 
 #include "karaokeplayable.h"
@@ -29,7 +28,7 @@
 #include "libkaraokelyrics/lyricsloader.h"
 #include "libkaraokelyrics/lyricsparser_texts.h"
 
-KaraokePlayable::KaraokePlayable(const QString &baseFile, QTextCodec *filenameDecoder)
+KaraokePlayable::KaraokePlayable(const QString &baseFile, QStringDecoder *filenameDecoder)
 {
     m_baseFile = baseFile;
     m_filenameDecoder = filenameDecoder;
@@ -40,7 +39,7 @@ KaraokePlayable::~KaraokePlayable()
 {
 }
 
-KaraokePlayable *KaraokePlayable::create(const QString &baseFile, QTextCodec *filenameDecoder)
+KaraokePlayable *KaraokePlayable::create(const QString &baseFile, QStringDecoder *filenameDecoder)
 {
     KaraokePlayable * obj;
 
@@ -227,7 +226,7 @@ bool KaraokePlayable::isSupportedCompleteFile(const QString &filename)
 QString KaraokePlayable::decodeFilename(const QByteArray &filename)
 {
     if ( m_filenameDecoder )
-        return m_filenameDecoder->toUnicode( filename );
+        return m_filenameDecoder->decode( filename );
     else
         return QString::fromUtf8( filename );
 }

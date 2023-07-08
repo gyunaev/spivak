@@ -16,9 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  **************************************************************************/
 
-#include <QNetworkConfigurationManager>
 #include <QNetworkInterface>
-#include <QNetworkSession>
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QSettings>
@@ -47,29 +45,7 @@ ActionHandler_WebServer::ActionHandler_WebServer( QObject * parent )
 
 void ActionHandler_WebServer::run()
 {
-    QNetworkConfigurationManager manager;
-
-    if ( manager.capabilities() & QNetworkConfigurationManager::NetworkSessionRequired )
-    {
-        // Get saved network configuration
-        QSettings settings;
-        const QString id = settings.value( "network/DefaultConfiguration", "" ).toString();
-
-        // If the saved network configuration is not currently discovered use the system default
-        QNetworkConfiguration config = manager.configurationFromIdentifier( id );
-
-        if (( config.state() & QNetworkConfiguration::Discovered ) != QNetworkConfiguration::Discovered)
-            config = manager.defaultConfiguration();
-
-        // Initiate a new session
-        m_networkSession = new QNetworkSession(config, this);
-        connect( m_networkSession, SIGNAL(opened()), this, SLOT(sessionOpened()) );
-        m_networkSession->open();
-    }
-    else
-    {
-        sessionOpened();
-    }
+    sessionOpened();
 
     // Run the thread loop
     exec();
@@ -99,22 +75,6 @@ void ActionHandler_WebServer::dnsLookupFinished(QHostInfo hinfo)
 
 void ActionHandler_WebServer::sessionOpened()
 {
-    // Save the used configuration
-    if ( m_networkSession )
-    {
-        QNetworkConfiguration config = m_networkSession->configuration();
-
-        QString id;
-
-        if (config.type() == QNetworkConfiguration::UserChoice)
-            id = m_networkSession->sessionProperty( QLatin1String("UserChoiceConfiguration") ).toString();
-        else
-            id = config.identifier();
-
-        QSettings settings;
-        settings.setValue( "network/DefaultConfiguration", id );
-    }
-
     // If we're reconnecting, delete the old one
     delete m_httpServer;
     m_httpServer = new QTcpServer(this);

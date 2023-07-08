@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License     *
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  **************************************************************************/
-
+#include <QRegularExpression>
 #include "lyricsparser_texts.h"
 
 LyricsParser_Texts::LyricsParser_Texts(LyricsLoaderCallback *callback )
@@ -99,22 +99,25 @@ void LyricsParser_Texts::parseUStar( const QByteArray& data, LyricsLoader::Conta
     }
 
     // Detect the encoding
-    QTextCodec * codec = detectEncoding( lyricsForEncoding, properties );
-    QStringList text = codec->toUnicode( data ).split( '\n' );
+    auto codec = std::make_unique<QStringDecoder*>( detectEncoding( lyricsForEncoding, properties ) );
+    QStringList text = QString( (*codec)->decode( data ) ).split( '\n' );
 
     // See http://www.ultrastarstuff.com/html/tutorialtxtfile.html
+
+    QRegularExpression regex( "^#([a-zA-Z0-9]+):\\s*(.*)$" );
+
     for ( int i = 0; i < text.size(); i++ )
     {
         QString line = text[i];
 
         if ( header )
         {
-            QRegExp regex( "^#([a-zA-Z0-9]+):\\s*(.*)$" );
+            QRegularExpressionMatch match = regex.match( line );
 
-            if ( regex.indexIn( line ) != -1 )
+            if ( match.hasMatch() )
             {
-                QString tag = regex.cap( 1 );
-                QString value = regex.cap( 2 );
+                QString tag = match.captured( 1 );
+                QString value = match.captured( 2 );
                 LyricsLoader::Property tagid = LyricsLoader::PROP_INVALID;
 
                 if ( tag == "TITLE" )
@@ -173,25 +176,26 @@ void LyricsParser_Texts::parseUStar( const QByteArray& data, LyricsLoader::Conta
             else
             {
                 // Lyrics
-                QRegExp regex( "^[*Ff:]\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*(.*)?$" );
+                QRegularExpression regex( "^[*Ff:]\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*(.*)?$" );
+                QRegularExpressionMatch match = regex.match( line );
 
-                if ( regex.indexIn( line ) == -1 )
+                if ( !match.hasMatch() )
                     throw("Invalid UltraStar file format");
 
-                timing = gap + (relative ? last_time_ms : 0) + regex.cap( 1 ).toInt() * msecs_per_beat;
+                timing = gap + (relative ? last_time_ms : 0) + match.captured( 1 ).toInt() * msecs_per_beat;
 
                 Lyric lyr( timing );
-                lyr.pitch = regex.cap( 3 ).toInt();
+                lyr.pitch = match.captured( 3 ).toInt();
 
                 if ( line[0] == 'F' )
                     lyr.pitch |= Lyric::PITCH_FREESTYLE;
                 else if ( line[0] == '*' )
                     lyr.pitch |= Lyric::PITCH_GOLDEN;
 
-                lyr.duration = regex.cap( 2 ).toInt() * msecs_per_beat;
+                lyr.duration = match.captured( 2 ).toInt() * msecs_per_beat;
 
-                if ( regex.captureCount() > 3 )
-                    lyr.text = regex.cap( 4 );
+                if ( match.lastCapturedIndex() > 3 )
+                    lyr.text = match.captured( 4 );
 
                 output.push_back( lyr );
             }
@@ -220,12 +224,12 @@ static int powerKaraokeTime( QString time )
 void LyricsParser_Texts::parsePowerKaraoke( const QByteArray& data, LyricsLoader::Container &output, LyricsLoader::Properties &properties )
 {
     // This format has no special markers, so we can feed it as-is
-    QTextCodec * codec = detectEncoding( data, properties );
+    auto codec = std::make_unique<QStringDecoder*>( detectEncoding( data, properties ) );
 
-    QStringList text = codec->toUnicode( data ).split( '\n' );
+    QStringList text = QString( (*codec)->decode( data )).split( '\n' );
 
     // For the PowerKaraoke format there is no header, just times.
-    QRegExp regex("^([0-9.:]+) ([0-9.:]+) (.*)");
+    QRegularExpression regex("^([0-9.:]+) ([0-9.:]+) (.*)");
 
     // Analyze each line
     for ( int i = 0; i < text.size(); i++ )
@@ -236,12 +240,13 @@ void LyricsParser_Texts::parsePowerKaraoke( const QByteArray& data, LyricsLoader
             continue;
 
         // Try to match the sync first
-        if ( line.indexOf( regex ) == -1 )
+        QRegularExpressionMatch match = regex.match( line );
+
+        if ( !match.hasMatch() )
             throw QString( "Invalid PowerKaraoke file" );
 
-        int start = powerKaraokeTime( regex.cap( 1 ) );
-        //int end = powerKaraokeTime( regex.cap( 2 ) );
-        QString text = regex.cap( 3 ).trimmed();
+        int start = powerKaraokeTime( match.captured( 1 ) );
+        QString text = match.captured( 3 ).trimmed();
 
         Lyric lyr( start );
 

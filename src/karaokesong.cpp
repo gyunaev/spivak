@@ -48,7 +48,7 @@ KaraokeSong::KaraokeSong( KaraokeWidget *w, const SongQueueItem &song )
     m_song = song;
     mPlayer = pPluginManager->createMediaPlayer();
 
-    pCurrentState->playerCapabilities = 0;
+    pCurrentState->playerCapabilities = (MediaPlayer::Capability) 0;
     m_lyrics = 0;
     m_background = 0;
     m_rating = 0;

@@ -27,7 +27,7 @@
 class KaraokePlayable_File : public KaraokePlayable
 {
     public:
-        KaraokePlayable_File( const QString &baseFile, QTextCodec *filenameDecoder );
+        KaraokePlayable_File(const QString &baseFile, QStringDecoder *filenameDecoder );
 
         bool        init();
 

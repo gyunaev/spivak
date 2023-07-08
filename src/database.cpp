@@ -374,7 +374,7 @@ bool Database::search(const QString &substr, QList<Database_SongInfo> &results, 
     QStringList searchdata;
     QString query;
 
-    Q_FOREACH( QString s, substr.split( " ", QString::SkipEmptyParts ) )
+    for( QString s : substr.split( " ", Qt::SkipEmptyParts ) )
     {
         searchdata << "% " + s.toUpper() + "%";
 

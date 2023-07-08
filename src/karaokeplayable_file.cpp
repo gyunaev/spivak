@@ -23,7 +23,7 @@
 #include "util.h"
 #include "karaokeplayable_file.h"
 
-KaraokePlayable_File::KaraokePlayable_File(const QString &baseFile, QTextCodec *filenameDecoder)
+KaraokePlayable_File::KaraokePlayable_File(const QString &baseFile, QStringDecoder *filenameDecoder)
     : KaraokePlayable( baseFile, filenameDecoder )
 {
 }

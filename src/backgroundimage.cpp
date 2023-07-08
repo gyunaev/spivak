@@ -24,6 +24,7 @@
 #include "settings.h"
 #include "currentstate.h"
 #include "backgroundimage.h"
+#include "util.h"
 
 #ifndef M_PI
     # define M_PI		3.14159265358979323846	/* pi */
@@ -101,8 +102,7 @@ qint64 BackgroundImage::draw(KaraokePainter &p)
         }
     }
 
-    if ( pSettings->playerBackgroundTransitionDelay > 0
-    && m_lastUpdated.elapsed() > (int) pSettings->playerBackgroundTransitionDelay * 1000 )
+    if ( pSettings->playerBackgroundTransitionDelay > 0 && m_nextUpdate < QTime::currentTime() )
         loadNewImage();
 
     return -1;
@@ -130,23 +130,22 @@ void BackgroundImage::loadNewImage()
         pActionHandler->warning( QString("BgImage: error loading image %1") .arg( pCurrentState->currentBackgroundObject() ) );
     }
 
-    m_lastUpdated = QTime::currentTime();
-    m_lastUpdated.start();
+    m_nextUpdate = QTime::currentTime().addSecs( pSettings->playerBackgroundTransitionDelay );
 
     // Start new transition
     m_percentage = 0;
 
     // Animation move
-    // Choose new base angle - make it sharp (in 20-50 degree range), as we don't want to have like 1% angle
+    // Choose new base angle - make it sharp (in 10-60 degree range), as we don't want to have like 1% angle
     //
-    int angle = qrand() % 50 + 10;
+    int angle = Util::randomNumber( 10, 60 );
 
     // And convert the angle to speed
     int mv_x = qMax( qRound( (sin( ((double) angle * M_PI) / 180 ) * (double) m_animationSpeed )), 1 );
     int mv_y = qMax( qRound( (cos( ((double) angle * M_PI) / 180 ) * (double) m_animationSpeed )), 1 );
 
     // And adjust speed and origin based on random intial direction
-    switch ( qrand() % 4 )
+    switch ( Util::randomNumber( 0, 4 ) )
     {
         case 0: // From left-top: x+, y+
             m_movementVelocity = QPoint( mv_x, mv_y );

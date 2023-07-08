@@ -18,7 +18,7 @@
 
 #include <math.h>
 
-#include <QTextCodec>
+#include <QStringConverter>
 
 #include "lyricsparser_midi.h"
 
@@ -432,7 +432,7 @@ void LyricsParser_MIDI::parse(QIODevice * file, LyricsLoader::Container &output,
     }
 
     // Detect the encoding
-    QTextCodec * codec = detectEncoding( lyricsForEncoding, properties );
+    auto codec = std::make_unique<QStringDecoder*>( detectEncoding( lyricsForEncoding, properties ) );
 
     for ( unsigned int i = 0; i < lyrics.size(); i++ )
     {
@@ -447,7 +447,7 @@ void LyricsParser_MIDI::parse(QIODevice * file, LyricsLoader::Container &output,
 
         //unsigned int mstime = (unsigned int)ceil( (lyrics_timing - firstNoteTime));
         unsigned int mstime = (unsigned int)ceil( (lyrics_timing));
-        output.push_back( Lyric( mstime, codec->toUnicode( lyrics[i].text ) ) );
+        output.push_back( Lyric( mstime, (*codec)->decode( lyrics[i].text ) ) );
     }
 }
 

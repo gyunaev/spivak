@@ -27,12 +27,13 @@ void LyricsParser_KOK::parse(QIODevice *file, LyricsLoader::Container &output, L
 {
     QByteArray data = load( file );
 
-    // This format has no special markers, so we can feed it as-is - just r
+    // This format has no special markers, so we can feed it as-is - just replace the marks (this is why we copied it)
     QByteArray encdetectdata = data;
-    QTextCodec * codec = detectEncoding( encdetectdata.replace( ';', ' ' ), properties );
+
+    auto codec = std::make_unique<QStringDecoder*>( detectEncoding( encdetectdata.replace( ';', ' ' ), properties ) );
 
     // J'ai ;7,9050634;tra;8,0651993;vail;8,2144914;lé;8,3789922;
-    Q_FOREACH ( QString line, codec->toUnicode( data ).split( '\n' ) )
+    Q_FOREACH ( QString line, QString( (*codec)->decode( data ) ).split( '\n' ) )
     {
         if ( line.isEmpty() )
             continue;

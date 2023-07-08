@@ -18,7 +18,6 @@
 
 #include <QMap>
 #include <QBuffer>
-#include <QTextCodec>
 #include <QStringList>
 
 #include "aes.h"
@@ -26,7 +25,7 @@
 #include "karaokeplayable_zip.h"
 #include "karaokeplayable_kfn.h"
 
-KaraokePlayable_KFN::KaraokePlayable_KFN(const QString &basename, QTextCodec *filenameDecoder)
+KaraokePlayable_KFN::KaraokePlayable_KFN(const QString &basename, QStringDecoder *filenameDecoder)
     : KaraokePlayable( basename, filenameDecoder )
 {
     m_kfnZip = 0;

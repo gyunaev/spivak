@@ -522,7 +522,7 @@ void SettingsDialog::updateLyricsPreview()
     pSettings->playerLyricsTextBeforeColor = ui->btnPlayerLyricsPast->color();
     pSettings->playerLyricsTextSpotColor = ui->btnPlayerLyricsSpotlight->color();
 
-    p.drawOutlineTextGradient( (img.width() - p.fontMetrics().width( sampleLine )) / 2,
+    p.drawOutlineTextGradient( (img.width() - p.fontMetrics().horizontalAdvance( sampleLine )) / 2,
                                p.fontMetrics().ascent(),
                                m_lyricAnimationValue,
                                sampleLine );

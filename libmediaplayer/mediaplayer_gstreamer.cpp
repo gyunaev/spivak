@@ -152,7 +152,7 @@ qint64 MediaPlayer_GStreamer::duration()
 
 MediaPlayer_GStreamer::State MediaPlayer_GStreamer::state() const
 {
-    return (State) m_playState.load();
+    return (State) m_playState.loadAcquire();
 }
 
 void MediaPlayer_GStreamer::mediaTags(QString &artist, QString &title)

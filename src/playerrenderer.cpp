@@ -46,7 +46,7 @@ void PlayerRenderer::stop()
 {
     if ( m_continue )
     {
-        m_continue.store( 0 );
+        m_continue.storeRelease( 0 );
         wait();
     }
 }

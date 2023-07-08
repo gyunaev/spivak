@@ -20,7 +20,7 @@
 #define LYRICSPARSER_H
 
 #include <QIODevice>
-#include <QTextCodec>
+#include <QStringConverter>
 #include <QByteArray>
 #include <QStringList>
 
@@ -63,7 +63,7 @@ class LyricsParser
         static Type getTypeByExtension( const QString& extension );
 
         // Called from lyric detectors
-        QTextCodec  *   detectEncoding( const QByteArray& data, LyricsLoader::Properties &properties );
+        QStringDecoder *   detectEncoding( const QByteArray& data, LyricsLoader::Properties &properties );
 
         // Pasword query
         QString         askLyricsPassword();

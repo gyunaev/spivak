@@ -65,7 +65,7 @@ QSizePolicy PlayerButton::sizePolicy () const
 	return QSizePolicy ( QSizePolicy::Fixed, QSizePolicy::Fixed );
 }
 
-void PlayerButton::enterEvent(QEvent * e)
+void PlayerButton::enterEvent(QEnterEvent * e)
 {
 	m_inButton = true;
 	update();

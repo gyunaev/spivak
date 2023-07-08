@@ -82,7 +82,7 @@ qint64 PlayerLyricTextLine::draw( KaraokePainter& p, qint64 time, int yoffset )
     if ( m_line.isEmpty() )
         return 0;
 
-    int x = (p.textRect().width() - p.fontMetrics().boundingRect( m_text ).width()) / 2 + p.textRect().x();
+    int x = (p.textRect().width() - p.fontMetrics().horizontalAdvance( m_text )) / 2 + p.textRect().x();
 \
     if ( time < m_start )
         p.drawOutlineText( x, yoffset, pSettings->playerLyricsTextBeforeColor, m_text );
@@ -104,7 +104,7 @@ qint64 PlayerLyricTextLine::draw( KaraokePainter& p, qint64 time, int yoffset )
             else
                 p.drawOutlineTextGradient( x, yoffset, percentage, m_line[i].text );
 
-            x += p.fontMetrics().width( m_line[i].text );
+            x += p.fontMetrics().horizontalAdvance( m_line[i].text );
         }
     }
 
@@ -121,13 +121,13 @@ void PlayerLyricTextLine::drawDisappear(KaraokePainter& p, int percentage, int y
     p.save();
     p.scale( scale_level, scale_level );
 
-    int x = (p.textRect().width() - p.fontMetrics().boundingRect( m_text ).width()) / 2 + p.textRect().x();
+    int x = (p.textRect().width() - p.fontMetrics().horizontalAdvance( m_text )) / 2 + p.textRect().x();
 
     // Draw the text string
     for ( int i = 0; i < m_line.size(); i++ )
     {
         p.drawOutlineText( x, yoffset, pSettings->playerLyricsTextAfterColor, m_line[i].text );
-        x += p.fontMetrics().width( m_line[i].text );
+        x += p.fontMetrics().horizontalAdvance( m_line[i].text );
     }
 
     p.restore();
@@ -135,7 +135,7 @@ void PlayerLyricTextLine::drawDisappear(KaraokePainter& p, int percentage, int y
 
 int PlayerLyricTextLine::screenWidth(const QFontMetrics &font)
 {
-    return font.boundingRect( m_text ).width();
+    return font.horizontalAdvance( m_text );
 }
 
 

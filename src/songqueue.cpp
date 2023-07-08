@@ -170,7 +170,7 @@ void SongQueue::addSong( SongQueueItem song, SongQueueItemRetriever * retriever 
                 if ( i < m_queue.size() )
                 {
                     // Yes; swap with the current one, and move on
-                    m_queue.swap( songidx, i );
+                    m_queue.swapItemsAt( songidx, i );
                     songidx++;
                 }
                 else

@@ -17,7 +17,7 @@
  **************************************************************************/
 
 #include <QMap>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QStringList>
 
 #include "lyricsparser_lrc.h"
@@ -62,8 +62,8 @@ void LyricsParser_LRC::parse( QIODevice * file, LyricsLoader::Container& output,
     }
 
     // Detect the encoding
-    QTextCodec * codec = detectEncoding( lyricsForEncoding, properties );
-    QStringList lyrics = codec->toUnicode( content ).split( '\n' );
+    auto codec = std::make_unique<QStringDecoder*>( detectEncoding( lyricsForEncoding, properties ) );
+    QStringList lyrics = QString( (*codec)->decode( content ) ).split( '\n' );
 
     bool header = true;
     qint64 last_time = -1;
@@ -71,17 +71,18 @@ void LyricsParser_LRC::parse( QIODevice * file, LyricsLoader::Container& output,
     // We use a map to support LRC1 multitime lyrics
     QMap< qint64, QString > templyrics;
 
+    QRegularExpression regex( "^\\[([a-zA-Z]+):\\s*(.*?)\\s*\\]$" );
+
     Q_FOREACH ( QString line, lyrics )
     {
         if ( header )
         {
-            QRegExp regex( "^\\[([a-zA-Z]+):\\s*(.*)\\s*\\]$" );
-            regex.setMinimal( true );
+            QRegularExpressionMatch match = regex.match( line );
 
-            if ( regex.indexIn( line ) != -1 )
+            if ( match.hasMatch() )
             {
-                QString tag = regex.cap( 1 );
-                QString value = regex.cap( 2 );
+                QString tag = match.captured( 1 );
+                QString value = match.captured( 2 );
 
                 if ( tag == "ti" )
                     properties[ LyricsLoader::PROP_TITLE ] = value.trimmed();
@@ -123,16 +124,16 @@ void LyricsParser_LRC::parse( QIODevice * file, LyricsLoader::Container& output,
             // [time]text (could be lrcv1 or v2)
             // [time]text[time]text (lrcv2); or
             // [time][time]text (lrcv1)
-            QRegExp regex( "\\[([\\d:\\.]+)\\]" );
-            int pos = regex.indexIn( line );
+            QRegularExpression regex( "\\[([\\d:\\.]+)\\]" );
+            QRegularExpressionMatch match = regex.match( line );
 
-            if ( pos != 0 )
+            if ( !match.hasMatch() )
                 throw("Invalid LRC file, time doesn't start at pos 0");
 
-            last_time = parseLRCTime( regex.cap( 1 ) );
+            last_time = parseLRCTime( match.captured( 1 ) );
 
             // We got the first timing, now see if it is followed by another time mark immediately
-            pos = regex.matchedLength();
+            int pos = match.capturedEnd( 0 );
 
             if ( pos >= line.length() )
                 throw("Invalid LRC file, invalid time");
@@ -145,14 +146,14 @@ void LyricsParser_LRC::parse( QIODevice * file, LyricsLoader::Container& output,
 
                 while ( pos + 1 >= line.length() && line[pos + 1] == '[' )
                 {
-                    int npos = regex.indexIn( line, pos + 1 );
+                    match = regex.match( line, pos + 1 );
 
-                    if ( npos != pos + 1 )
+                    if ( !match.hasMatch() )
                         throw("Invalid LRC file, neither V2 nor V1");
 
-                    qint64 time = parseLRCTime( regex.cap( 1 ) );
+                    qint64 time = parseLRCTime( match.captured( 1 ) );
                     v1timings.push_back( time );
-                    pos = npos;
+                    pos = match.capturedEnd( 0 );
                 }
 
                 // Now we're on the lyrics line; add it with appropriate timing

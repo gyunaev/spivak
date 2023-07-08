@@ -52,7 +52,7 @@ class BackgroundImage : public Background
         void    animateZoom( KaraokePainter& p );
 
         // Last time the image was updated
-        QTime   m_lastUpdated;
+        QTime   m_nextUpdate;
 
         // If transition is in progress, it is from current to new; otherwise new is always invalid
         QImage  m_currentImage;

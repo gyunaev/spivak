@@ -36,7 +36,7 @@ class PlayerButton : public QPushButton
 		QSize	minimumSizeHint() const;
 		QSize	sizeHint() const;
 		QSizePolicy sizePolicy () const;
-		void 	enterEvent(QEvent * e);
+        void 	enterEvent(QEnterEvent *e);
 		void	leaveEvent(QEvent * e);
 
 	private:

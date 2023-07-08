@@ -22,6 +22,7 @@
 #include <QFileInfo>
 #include <QCryptographicHash>
 #include <QFileInfo>
+#include <QRandomGenerator>
 #include <QByteArray>
 
 #include "util.h"
@@ -30,9 +31,9 @@
 #include "uchardet/uchardet.h"
 
 
-QTextCodec * Util::detectEncoding( const QByteArray &data )
+QStringDecoder *Util::detectEncoding( const QByteArray &data )
 {
-    QTextCodec * codec = 0;
+    QStringDecoder * codec = 0;
 
     uchardet_t ucd = uchardet_new();
 
@@ -49,7 +50,7 @@ QTextCodec * Util::detectEncoding( const QByteArray &data )
             if ( !strcmp( encoding, "x-mac-cyrillic") )
                 encoding = "windows-1251";
 
-            codec = QTextCodec::codecForName( encoding );
+            codec = new QStringDecoder( encoding );
         }
     }
 
@@ -75,6 +76,11 @@ QString Util::tickToString(qint64 tickvalue)
 
     QTime ct( 0, minute, second, msecond );
     return ct.toString( "mm:ss" );
+}
+
+unsigned int Util::randomNumber(unsigned int min, unsigned int max)
+{
+    return QRandomGenerator::securelySeeded().bounded( min, max );
 }
 
 void Util::enumerateDirectory(const QString &rootPaths, const QStringList &extensions, QStringList &files)

@@ -19,6 +19,7 @@
 #ifndef LYRICSLOADER_H
 #define LYRICSLOADER_H
 
+#include <QStringDecoder>
 #include <QIODevice>
 #include <QString>
 #include <QMap>
@@ -55,7 +56,7 @@ class LyricsLoaderCallback
         virtual ~LyricsLoaderCallback() { }
 
         // This function must detect the used text codec for the data, and return it, or return 0 (we will fall back to UTF-8)
-        virtual QTextCodec * detectTextCodec( const QByteArray& ) { return 0; }
+        virtual QStringDecoder * detectTextCodec( const QByteArray& ) { return 0; }
 
         // This function is called when the lyric file is password-protected, the client must return the non-empty password
         // or return an empty string if no password is provided

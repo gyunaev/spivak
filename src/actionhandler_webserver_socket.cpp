@@ -23,6 +23,7 @@
 #include <QJsonParseError>
 #include <QNetworkCookie>
 #include <QHostAddress>
+#include <QRegularExpression>
 #include <QCryptographicHash>
 
 #include "util.h"
@@ -78,9 +79,18 @@ void ActionHandler_WebServer_Socket::readyRead()
         QStringList header = QString::fromUtf8( m_httpRequest.left( bodyidx ) ).split( "\r\n" );
 
         // First line is formatted differently
-        QRegExp regex( "^([A-Za-z]+)\\s+(.+)\\s+HTTP/\\d\\.\\d" );
+        QRegularExpression regex( "^([A-Za-z]+)\\s+(.+)\\s+HTTP/\\d\\.\\d" );
 
-        if ( header.isEmpty() || regex.indexIn( header[0] ) == -1 )
+        if ( header.isEmpty() )
+        {
+            // Bad method
+            sendError( 400 );
+            return;
+        }
+
+        QRegularExpressionMatch match = regex.match( header[0] );
+
+        if ( !match.hasMatch() )
         {
             // Bad method
             sendError( 400 );
@@ -88,26 +98,27 @@ void ActionHandler_WebServer_Socket::readyRead()
         }
 
         // Get the method and URL
-        m_method = regex.cap( 1 );
-        m_url = regex.cap( 2 );
+        m_method = match.captured( 1 );
+        m_url = match.captured( 2 );
 
         // Parse the headers, get all we need
         int content_length = 0;
         bool requires_expect_100 = false;
+        QRegularExpression regexHeader( "^([A-Za-z0-9-]+):\\s+(.+)" );
 
         for ( int i = 1; i < header.size(); i++ )
         {
-            QRegExp regex( "^([A-Za-z0-9-]+):\\s+(.+)" );
+            match = regexHeader.match( header[i] );
 
-            if ( regex.indexIn( header[i] ) == -1 )
+            if ( !match.hasMatch() )
             {
                 Logger::error( "WebServer: bad header line %s, aborting", qPrintable(header[i]) );
                 sendError( 400 );
                 return;
             }
 
-            QString hdr = regex.cap( 1 );
-            QString value = regex.cap( 2 );
+            QString hdr = match.captured( 1 );
+            QString value = match.captured( 2 );
 
             if ( hdr.compare( "cookie", Qt::CaseInsensitive) == 0 )
             {

@@ -124,7 +124,7 @@ void KaraokePainter::drawOutlineText(int x, int y, const QColor &color, const QS
 
 void KaraokePainter::drawOutlineTextGradient(int x, int y, double percentage, const QString &text, int alpha )
 {
-    QLinearGradient gradient( x, y, x + fontMetrics().width( text ), y );
+    QLinearGradient gradient( x, y, x + fontMetrics().horizontalAdvance( text ), y );
 
     // Adjust colors with alpha
     QColor before = pSettings->playerLyricsTextBeforeColor;
@@ -150,7 +150,7 @@ void KaraokePainter::drawOutlineTextGradient(int x, int y, double percentage, co
 
 void KaraokePainter::drawCenteredOutlineTextGradient(int ypercentage, double percentage, const QString &text, int alpha)
 {
-    int x = (m_textRect.width() - fontMetrics().width( text ) ) / 2 + m_textRect.x();
+    int x = (m_textRect.width() - fontMetrics().horizontalAdvance( text ) ) / 2 + m_textRect.x();
     int y = (m_textRect.height() * ypercentage / 100 ) + fontMetrics().ascent() + m_textRect.y();
 
     drawOutlineTextGradient( x, y, percentage, text, alpha );
@@ -175,7 +175,7 @@ void KaraokePainter::drawOutlineTextInternal(int x, int y, const QColor &color, 
 
 void KaraokePainter::drawCenteredOutlineText(int ypercentage, const QColor &color, const QString &text)
 {
-    int x = (m_textRect.width() - fontMetrics().width( text ) ) / 2 + m_textRect.x();
+    int x = (m_textRect.width() - fontMetrics().horizontalAdvance( text ) ) / 2 + m_textRect.x();
     int y = (m_textRect.height() * ypercentage / 100 ) + fontMetrics().height() + m_textRect.y();
 
     drawOutlineText( x, y, color, text );

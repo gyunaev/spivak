@@ -261,6 +261,9 @@ void SongDatabaseScanner::scanCollectionsThread()
             qApp->processEvents( QEventLoop::ExcludeUserInputEvents, 500 );
         }
 
+        // We do not show error regardless on whether we succeeded here or not
+        m_stringProgress.clear();
+
         // If for this collection we already have the index file, just use it
         if ( m_providerStatus == 0 )
         {
@@ -304,7 +307,7 @@ void SongDatabaseScanner::scanCollectionsThread()
             QMap< QString, QString > musicFiles, lyricFiles;
             bool modtime_checked = true;
 
-            Q_FOREACH( QFileInfo fi, QDir( current ).entryInfoList( QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::DirsFirst ) )
+            for( auto& fi : QDir( current ).entryInfoList( QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::DirsFirst ) )
             {
                 // Re-add directories into the list
                 if ( fi.isDir() )
@@ -445,7 +448,7 @@ void SongDatabaseScanner::processingThread()
         if ( pDatabase->songByPath( entry.filePath, info ) )
         {
             // We have the song, does it have all the information?
-            if ( !info.artist.isEmpty() && !info.title.isEmpty() && !info.type.isEmpty() && info.language != 0 )
+            if ( !info.artist.isEmpty() && !info.title.isEmpty() && !info.type.isEmpty() && !info.language.isEmpty() )
             {
                 // Is it up-to-date?
                 if ( QFileInfo(entry.filePath).lastModified() <= QDateTime::fromMSecsSinceEpoch( info.added * 1000LL ) )

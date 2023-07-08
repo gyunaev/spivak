@@ -72,7 +72,7 @@ qint64 Notifications::drawTop( KaraokePainter &p )
 
     if ( remainingms == -1 || remainingms > 5000 )
     {
-        int textwidth = p.fontMetrics().width( m_notificationLine );
+        int textwidth = p.fontMetrics().horizontalAdvance( m_notificationLine );
 
         int drawpos = 0;
 
@@ -80,7 +80,7 @@ qint64 Notifications::drawTop( KaraokePainter &p )
         if ( textwidth > p.notificationRect().width() )
         {
             // We allow showing up to the whole width of the notification line minus 3/4 of the screen
-            int maxshownwidth = p.fontMetrics().width( m_notificationLine ) - ((p.notificationRect().width() * 3) / 4 );
+            int maxshownwidth = p.fontMetrics().horizontalAdvance( m_notificationLine ) - ((p.notificationRect().width() * 3) / 4 );
 
             // If scroll offset was reset or we scrolled past 3/4 of the last part, reset it
             if ( m_scrollOffset == INT32_MAX || (qAbs(m_scrollOffset) >= maxshownwidth ) )
@@ -164,7 +164,7 @@ qint64 Notifications::drawRegular(KaraokePainter &p)
 
                 // First draw it without filling
                 unsigned int boxwidth = p.textRect().width() / 4;
-                int startx = p.textRect().x() + p.fontMetrics().width( m_smallMessage + "aaa" );
+                int startx = p.textRect().x() + p.fontMetrics().horizontalAdvance( m_smallMessage + "aaa" );
 
                 QPen pen( black );
                 pen.setWidth( 3 );

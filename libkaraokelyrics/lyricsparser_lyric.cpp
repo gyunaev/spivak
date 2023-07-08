@@ -79,7 +79,7 @@ void LyricsParser_Lyric::parse(QIODevice *file, LyricsLoader::Container &output,
     }
 
     // Detect the encoding
-    QTextCodec * codec = detectEncoding( lyricsForEncoding, properties );
+    auto codec = std::make_unique<QStringDecoder*>( detectEncoding( lyricsForEncoding, properties ) );
 
     // And now we can fill up the lyrics container
     for ( QMap< unsigned int, QByteArray >::iterator it = lyrics.begin(); it != lyrics.end(); ++it )
@@ -95,7 +95,7 @@ void LyricsParser_Lyric::parse(QIODevice *file, LyricsLoader::Container &output,
             continue;
         }
 
-        QString text = codec->toUnicode( it.value() );
+        QString text = (*codec)->decode( it.value() );
 
         if ( text.startsWith('/') )
         {

@@ -19,8 +19,8 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <QStringDecoder>
 #include <QString>
-#include <QTextCodec>
 
 #include "settings.h"
 
@@ -37,7 +37,7 @@ class Util
         static QString cachedFile( const QString& filename );
 
         // Detects the encoding of a data
-        static QTextCodec * detectEncoding( const QByteArray& data );
+        static QStringDecoder * detectEncoding( const QByteArray& data );
 
         // Enumerates the directories recursively, and fills up a QStringList with the files matching a specific extension
         static void enumerateDirectory( const QString& rootPath, const QStringList& extensions, QStringList& files );
@@ -50,6 +50,9 @@ class Util
 
         // Convert ticks (int64 ms) to a proper time string
         static QString tickToString( qint64 tickvalue );
+
+        // Random number in range [ min, max ) - i.e. including min but not including max
+        static unsigned int randomNumber( unsigned int min, unsigned int max );
 
     private:
         Util();

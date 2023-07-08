@@ -30,7 +30,7 @@ class KaraokePlayable_ZIP;
 class KaraokePlayable_KFN : public KaraokePlayable
 {
     public:
-        KaraokePlayable_KFN( const QString& basename, QTextCodec *filenameDecoder );
+        KaraokePlayable_KFN(const QString& basename, QStringDecoder *filenameDecoder );
 
         // Initializes the object
         bool        init();
