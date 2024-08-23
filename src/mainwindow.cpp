@@ -477,7 +477,10 @@ void MainWindow::audioInitializationFinished(QString errorMsg)
     // Non-empty errorMsg means audio initialization failed
     if ( !errorMsg.isEmpty() )
     {
-        MessageBoxAutoClose::critical( tr( "Failed to initialize audio"), tr("Failed to initialize the audio system:\n%1") .arg( errorMsg ) );
+        MessageBoxAutoClose::critical( tr( "Failed to initialize audio"),
+                                       tr("Failed to initialize the audio system:\n%1\n"
+                                          "\nPlease fix this error (most likely missing gstreamer - see app output) before using the player.") .arg( errorMsg ) );
+        exit(0);
     }
     else
     {
