@@ -548,7 +548,8 @@ GstElement *MediaPlayer_GStreamer::createVideoSink()
     gst_caps_unref(sinkCaps);
 
     // Set up the callbacks
-    GstAppSinkCallbacks callbacks = { 0, 0, 0, 0, 0 };
+    GstAppSinkCallbacks callbacks;
+    memset( &callbacks, 0, sizeof(callbacks) );
     callbacks.new_sample = cb_new_sample;
 
     gst_app_sink_set_callbacks( GST_APP_SINK(sink), &callbacks, this, NULL );
