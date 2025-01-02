@@ -11,7 +11,9 @@ TEMPLATE = app
 CONFIG += c++11
 
 SOURCES += main.cpp\
+    languagedetector.cpp \
     mainwindow.cpp \
+    mediaplayer.cpp \
     settings.cpp \
     playerlyrics.cpp \
     playerlyricscdg.cpp \
@@ -57,7 +59,6 @@ SOURCES += main.cpp\
     feedbackdialog.cpp \
     midisyntheser.cpp \
     midistripper.cpp \
-    pluginmanager.cpp \
     notification.cpp \
     messageboxautoclose.cpp \
     collectionentry.cpp \
@@ -69,6 +70,8 @@ SOURCES += main.cpp\
     mediaplayerinitializer.cpp
 
 HEADERS  += mainwindow.h \
+    languagedetector.h \
+    mediaplayer.h \
     settings.h \
     playerlyrics.h \
     playerlyricscdg.h \
@@ -116,8 +119,6 @@ HEADERS  += mainwindow.h \
     feedbackdialog.h \
     midisyntheser.h \
     midistripper.h \
-    pluginmanager.h \
-    interface_languagedetector.h \
     notification.h \
     messageboxautoclose.h \
     collectionentry.h \
@@ -126,7 +127,6 @@ HEADERS  += mainwindow.h \
     collectionproviderhttp.h \
     songqueueitem.h \
     songqueueitemretriever.h \
-    interface_mediaplayer_plugin.h \
     mediaplayerinitializer.h
 
 FORMS    += mainwindow.ui \
@@ -141,7 +141,7 @@ FORMS    += mainwindow.ui \
     feedbackdialog.ui
 
 RESOURCES += resources.qrc
-DEFINES += SQLITE_OMIT_LOAD_EXTENSION
+DEFINES += SQLITE_OMIT_LOAD_EXTENSION HAVE_LIBCLD2
 
 INCLUDEPATH += $$PWD/.. $$PWD/../extralibs/include
 DEPENDPATH += $$PWD/../libkaraokelyrics
@@ -165,9 +165,11 @@ mac: {
 
 unix:!mac:{
    CONFIG += link_pkgconfig
-   PKGCONFIG += sqlite3 libzip uchardet
+   PKGCONFIG += sqlite3 libzip uchardet cld2 gstreamer-1.0 gstreamer-app-1.0
 } else: {
-    LIBS += -lzip -lsqlite3 -luchardet
+    INCLUDEPATH += /Library/Frameworks/GStreamer.framework/Headers
+    LIBS += -L/Library/Frameworks/GStreamer.framework/Libraries
+    LIBS += -lzip -lsqlite3 -luchardet -lcld2 -lgstapp-1.0 -lgstreamer-1.0 -lglib-2.0 -lgobject-2.0
 }
 
 win32:!win32-g++: QMAKE_CXXFLAGS+=/Zi

@@ -23,7 +23,7 @@
 #include <QProcess>
 #include <QTemporaryFile>
 
-#include "../libmediaplayer/interface_mediaplayer.h"
+#include "mediaplayer.h"
 #include "playerlyrics.h"
 #include "background.h"
 #include "songqueue.h"
@@ -84,8 +84,6 @@ class KaraokeSong : public QObject
         void    tempoSlower();
         void    tempoFaster();
         void    tempoSet( int newvalue );
-
-        void    toggleVoiceRemoval();
 
     private slots:
         void    songLoaded();

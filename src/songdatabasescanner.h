@@ -31,7 +31,7 @@
 #include "collectionentry.h"
 
 class SongDatabaseScannerWorkerThread;
-class Interface_LanguageDetector;
+class LanguageDetector;
 
 class SongDatabaseScanner : public QObject
 {
@@ -121,7 +121,7 @@ class SongDatabaseScanner : public QObject
         QMap<int,CollectionEntry>   m_collection;
 
         // An optional plugin (auto-loaded) to detect the lyric language
-        Interface_LanguageDetector    *       m_langDetector;
+        LanguageDetector    *       m_langDetector;
 
         // Thread pool of scanners
         QList< QThread * >          m_threadPool;

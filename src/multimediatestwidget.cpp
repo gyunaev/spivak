@@ -24,7 +24,7 @@
 #include "util.h"
 #include "logger.h"
 #include "multimediatestwidget.h"
-#include "pluginmanager.h"
+#include "mediaplayer.h"
 #include "ui_multimediatestwidget.h"
 
 #define PLAY_FROM_RESOURCES
@@ -38,7 +38,7 @@ MultimediaTestWidget::MultimediaTestWidget(QWidget *parent) :
     // Files to test play, and current testing
     m_testExtensions << "wav" << "m4a" << "mp3" << "ogg" << "wma" << "mid";
 
-    m_player = pPluginManager->createMediaPlayer();
+    m_player = new MediaPlayer();
 
     if ( m_player )
     {

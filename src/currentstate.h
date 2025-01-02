@@ -25,7 +25,7 @@
 #include <QStringList>
 
 #include "songqueue.h"
-#include "libmediaplayer/interface_mediaplayer.h"
+#include "mediaplayer.h"
 
 //
 // Represents current state of a player.
@@ -69,7 +69,6 @@ class CurrentState : public QObject
         int                     playerVolume;
         int                     playerPitch;
         int                     playerTempo;
-        bool                    playerVoiceRemovalEnabled;
         int                     playerLyricsDelay;
 
         // For video only, stores last position

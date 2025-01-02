@@ -47,7 +47,6 @@
 #include "logger.h"
 #include "eventor.h"
 #include "feedbackdialog.h"
-#include "pluginmanager.h"
 #include "mediaplayerinitializer.h"
 #include "messageboxautoclose.h"
 
@@ -165,9 +164,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // Music window - just created, not shown
     m_queueMusicWindow = new QueueMusicWidget( 0 );
     connect( m_queueMusicWindow, SIGNAL(closed(QObject*)), this, SLOT(windowClosed(QObject*)) );
-
-    // Plugin manager
-    pPluginManager = new PluginManager();
 
     // Audio initialization - the object is self-deleting, so no need to track it
     mMediaPlayerInitializer = new MediaPlayerInitializer();

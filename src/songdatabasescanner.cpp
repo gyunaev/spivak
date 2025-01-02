@@ -29,8 +29,8 @@
 #include "songdatabasescanner.h"
 #include "database.h"
 #include "playerlyricstext.h"
-#include "pluginmanager.h"
 #include "collectionprovider.h"
+#include "languagedetector.h"
 #include "eventor.h"
 #include "util.h"
 
@@ -101,8 +101,7 @@ SongDatabaseScanner::~SongDatabaseScanner()
     if ( !m_threadPool.isEmpty() )
         stopScan();
 
-    if ( m_langDetector )
-        pPluginManager->releaseLanguageDetector();
+    delete m_langDetector;
 }
 
 bool SongDatabaseScanner::startScan()
@@ -123,7 +122,7 @@ bool SongDatabaseScanner::startScan()
 
     if ( need_lang_detector )
     {
-        m_langDetector = pPluginManager->loadLanguageDetector();
+        m_langDetector = LanguageDetector::create();
 
         if ( !m_langDetector )
         {

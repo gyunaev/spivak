@@ -49,7 +49,6 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     // adjust values into 0-100 from 100-x
     connect( spinPitch, SIGNAL(valueChanged(int)), this, SLOT(spinPitchChanged(int)) );
     connect( spinTempo, SIGNAL(valueChanged(int)), this, SLOT(spinTempoChanged(int)) );
-    connect( boxVoiceRemoval, SIGNAL(clicked(bool)), this, SIGNAL(toggledVoiceRemoval(bool)) );
 
     sliderVolume->setMinimum( 0 );
     sliderVolume->setMaximum( 100 );
@@ -148,14 +147,6 @@ void PlayerWidget::applyCapabilities()
     }
     else
         spinTempo->setEnabled( false );
-
-    if ( pCurrentState->playerCapabilities & MediaPlayer::CapVoiceRemoval )
-    {
-        boxVoiceRemoval->setEnabled( true );
-        boxVoiceRemoval->setChecked( pCurrentState->playerVoiceRemovalEnabled );
-    }
-    else
-        boxVoiceRemoval->setEnabled( false );
 }
 
 void PlayerWidget::hideCapabilities()

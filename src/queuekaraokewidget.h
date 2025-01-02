@@ -84,9 +84,6 @@ class QueueKaraokeWidget : public QWidget
         // Tempo spin has moved by the user
         void    tempoSpinChanged( int percentage );
 
-        // Voice removal toggled
-        void    toggledVoiceRemoval( bool enabled );
-
         // Timer-called update for player when we're playing
         void    timerUpdatePlayer();
 

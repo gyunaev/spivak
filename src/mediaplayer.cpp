@@ -23,12 +23,16 @@
 
 #include <gst/gst.h>
 
-#include "mediaplayer_gstreamer.h"
+#include "mediaplayer.h"
+
+#ifdef HAVE_PITCH_PLUGIN
+    #include "pitchplugin.h"
+#endif
 
 // FIXME: part-missing-plugins.txt
 
-MediaPlayer_GStreamer::MediaPlayer_GStreamer( QObject * parent )
-    : MediaPlayer( parent )
+MediaPlayer::MediaPlayer( QObject * parent )
+    : QObject( parent )
 {
     m_gst_pipeline = 0;
     m_gst_bus = 0;
@@ -50,15 +54,20 @@ MediaPlayer_GStreamer::MediaPlayer_GStreamer( QObject * parent )
     m_tempoRatePercent = 100;
     m_playState = StateReset;
     m_errorsDetected = false;
+
+#ifdef HAVE_PITCH_PLUGIN
+    m_pitchPlugin = new PitchPlugin();
+#else
     m_pitchPlugin = 0;
+#endif
 }
 
-MediaPlayer_GStreamer::~MediaPlayer_GStreamer()
+MediaPlayer::~MediaPlayer()
 {
     reset();
 }
 
-void MediaPlayer_GStreamer::loadMedia(const QString &file, MediaPlayer_GStreamer::LoadOptions options )
+void MediaPlayer::loadMedia(const QString &file, int load_options )
 {
     reset();
 
@@ -69,27 +78,27 @@ void MediaPlayer_GStreamer::loadMedia(const QString &file, MediaPlayer_GStreamer
         m_mediaFile = file;
 
     m_mediaIODevice = 0;
-    m_loadOptions = options;
+    m_loadOptions = load_options;
 
     loadMediaGeneric();
 }
 
-void MediaPlayer_GStreamer::loadMedia(QIODevice *device, MediaPlayer_GStreamer::LoadOptions options)
+void MediaPlayer::loadMedia(QIODevice *device, int load_options)
 {
     reset();
 
-    m_loadOptions = options;
+    m_loadOptions = load_options;
     m_mediaIODevice = device;
 
     loadMediaGeneric();
 }
 
-void MediaPlayer_GStreamer::play()
+void MediaPlayer::play()
 {
     setPipelineState( GST_STATE_PLAYING );
 }
 
-void MediaPlayer_GStreamer::pause()
+void MediaPlayer::pause()
 {
     GstState state = GST_STATE(m_gst_pipeline);
 
@@ -97,7 +106,7 @@ void MediaPlayer_GStreamer::pause()
         setPipelineState( GST_STATE_PAUSED );
 }
 
-void MediaPlayer_GStreamer::seekTo(qint64 pos)
+void MediaPlayer::seekTo(qint64 pos)
 {
     // Calculate the new tempo rate as it is used to change the tempo (that's actually the only way in GStreamer)
     //
@@ -114,12 +123,12 @@ void MediaPlayer_GStreamer::seekTo(qint64 pos)
     gst_element_send_event( m_gst_pipeline, seek_event );
 }
 
-void MediaPlayer_GStreamer::stop()
+void MediaPlayer::stop()
 {
     setPipelineState( GST_STATE_READY );
 }
 
-qint64 MediaPlayer_GStreamer::position()
+qint64 MediaPlayer::position()
 {
     gint64 pos;
 
@@ -134,7 +143,7 @@ qint64 MediaPlayer_GStreamer::position()
     return m_lastKnownPosition;
 }
 
-qint64 MediaPlayer_GStreamer::duration()
+qint64 MediaPlayer::duration()
 {
     // If we didn't know it yet, query the stream duration
     if ( m_duration == -1 )
@@ -150,22 +159,22 @@ qint64 MediaPlayer_GStreamer::duration()
     return (m_duration * 100) / m_tempoRatePercent;
 }
 
-MediaPlayer_GStreamer::State MediaPlayer_GStreamer::state() const
+MediaPlayer::State MediaPlayer::state() const
 {
     return (State) m_playState.loadAcquire();
 }
 
-void MediaPlayer_GStreamer::mediaTags(QString &artist, QString &title)
+void MediaPlayer::mediaTags(QString &artist, QString &title)
 {
     artist = m_mediaArtist;
     title = m_mediaTitle;
 }
 
-bool MediaPlayer_GStreamer::setCapabilityValue( MediaPlayer_GStreamer::Capability cap, int value)
+bool MediaPlayer::setCapabilityValue( MediaPlayer::Capability cap, int value)
 {
     switch ( cap )
     {
-    case MediaPlayer_GStreamer::CapChangeVolume:
+    case MediaPlayer::CapChangeVolume:
         if ( m_gst_audio_volume )
         {
             g_object_set( G_OBJECT(m_gst_audio_volume), "volume", (double) value / 100, NULL );
@@ -173,10 +182,10 @@ bool MediaPlayer_GStreamer::setCapabilityValue( MediaPlayer_GStreamer::Capabilit
         }
         break;
 
-    case MediaPlayer_GStreamer::CapChangePitch:
+    case MediaPlayer::CapChangePitch:
         return adjustPitch( value );
 
-    case MediaPlayer_GStreamer::CapChangeTempo:
+    case MediaPlayer::CapChangeTempo:
 
         // The UI gives us tempo rate as percentage, from 0 to 100 with 50 being normal value.
         // Thus we convert it into 75% - 125% range
@@ -191,42 +200,31 @@ bool MediaPlayer_GStreamer::setCapabilityValue( MediaPlayer_GStreamer::Capabilit
                                    Qt::QueuedConnection );
 
         break;
-
-    case MediaPlayer_GStreamer::CapVoiceRemoval:
-        return toggleKaraokeSplitter( value );
     }
 
     return false;
 }
 
-MediaPlayer_GStreamer::Capabilities MediaPlayer_GStreamer::capabilities()
+MediaPlayer::Capabilities MediaPlayer::capabilities()
 {
-    MediaPlayer_GStreamer::Capabilities caps( 0 );
+    MediaPlayer::Capabilities caps( 0 );
 
     if ( m_gst_audio_volume )
-        caps |= MediaPlayer_GStreamer::CapChangeVolume;
+        caps |= MediaPlayer::CapChangeVolume;
 
     if ( m_pitchPlugin )
-        caps |= MediaPlayer_GStreamer::CapChangePitch;
+        caps |= MediaPlayer::CapChangePitch;
 
     if ( m_gst_audio_tempo )
-        caps |= MediaPlayer_GStreamer::CapChangeTempo;
-
-    // This element is not precreated (as it is rarely needed)
-    GstElement * splitter = gst_element_factory_make("audiokaraoke", "karaoketest" );
-
-    if ( splitter )
-    {
-        g_object_unref( splitter );
-        caps |= MediaPlayer_GStreamer::CapVoiceRemoval;
-    }
+        caps |= MediaPlayer::CapChangeTempo;
 
     return caps;
 }
 
 
-bool MediaPlayer_GStreamer::adjustPitch( int newvalue )
+bool MediaPlayer::adjustPitch( int newvalue )
 {
+#ifdef HAVE_PITCH_PLUGIN
     if ( !m_gst_audio_pitchadjust )
         return false;
 
@@ -236,9 +234,12 @@ bool MediaPlayer_GStreamer::adjustPitch( int newvalue )
     g_object_set( G_OBJECT(m_gst_audio_pitchadjust), m_pitchPlugin->parameterName(), value, NULL );
 
     return true;
+#else
+    return false;
+#endif
 }
 
-bool MediaPlayer_GStreamer::toggleKaraokeSplitter( int value )
+bool MediaPlayer::toggleKaraokeSplitter( int value )
 {
     // Do nothing if the status did not change
     if ( (m_gst_audio_karaokesplitter && value) || (!m_gst_audio_karaokesplitter && !value) )
@@ -254,7 +255,7 @@ bool MediaPlayer_GStreamer::toggleKaraokeSplitter( int value )
     return true;
 }
 
-void MediaPlayer_GStreamer::drawVideoFrame(QPainter &p, const QRect &rect)
+void MediaPlayer::drawVideoFrame(QPainter &p, const QRect &rect)
 {
     QMutexLocker m( &m_lastVideoSampleMutex );
 
@@ -303,12 +304,12 @@ void MediaPlayer_GStreamer::drawVideoFrame(QPainter &p, const QRect &rect)
     gst_buffer_unmap( buffer, &map );
 }
 
-QObject *MediaPlayer_GStreamer::qObject()
+QObject *MediaPlayer::qObject()
 {
     return this;
 }
 
-void MediaPlayer_GStreamer::loadMediaGeneric()
+void MediaPlayer::loadMediaGeneric()
 {
     m_duration = -1;
     m_errorsDetected = false;
@@ -366,7 +367,7 @@ void MediaPlayer_GStreamer::loadMediaGeneric()
     g_signal_connect( m_gst_decoder, "pad-added", G_CALLBACK (cb_pad_added), this );
 
     // Pre-create video elements if we need them
-    if ( (m_loadOptions & MediaPlayer_GStreamer::LoadVideoStream) != 0 )
+    if ( (m_loadOptions & MediaPlayer::LoadVideoStream) != 0 )
     {
         m_gst_video_colorconv = createElement( "videoconvert", "videoconvert" );
         m_gst_video_sink = createVideoSink();
@@ -386,7 +387,7 @@ void MediaPlayer_GStreamer::loadMediaGeneric()
     }
 
     // Pre-create audio elements if we need them
-    if ( (m_loadOptions & MediaPlayer_GStreamer::LoadAudioStream) != 0 )
+    if ( (m_loadOptions & MediaPlayer::LoadAudioStream) != 0 )
     {
         // Load the pitch plugin if it is available
         // FIXME
@@ -408,9 +409,11 @@ void MediaPlayer_GStreamer::loadMediaGeneric()
         m_gst_audio_tempo = createElement( "scaletempo", "tempo", false );
 
         // If we have the pitch changer
-        if ( m_pitchPlugin && m_pitchPlugin->init() )
+#ifdef HAVE_PITCH_PLUGIN
+        if ( m_pitchPlugin )
             m_gst_audio_pitchadjust = createElement( m_pitchPlugin->elementName(), "audiopitchchanger", false );
         else
+#endif
             m_gst_audio_pitchadjust = 0;
 
         // Start linking
@@ -450,7 +453,7 @@ void MediaPlayer_GStreamer::loadMediaGeneric()
     setPipelineState( GST_STATE_PAUSED );
 }
 
-void MediaPlayer_GStreamer::reset()
+void MediaPlayer::reset()
 {
     if ( m_lastVideoSample )
     {
@@ -497,7 +500,7 @@ void MediaPlayer_GStreamer::reset()
     m_mediaTitle.clear();
 }
 
-void MediaPlayer_GStreamer::setPipelineState(GstState state)
+void MediaPlayer::setPipelineState(GstState state)
 {
     GstStateChangeReturn ret = gst_element_set_state( m_gst_pipeline, state );
 
@@ -505,7 +508,7 @@ void MediaPlayer_GStreamer::setPipelineState(GstState state)
         reportError( QString("Unable to set the pipeline to the playing state") );
 }
 
-void MediaPlayer_GStreamer::reportError(const QString &text)
+void MediaPlayer::reportError(const QString &text)
 {
     addlog( "ERROR", "GstMediaPlayer: Reported error: %s", qPrintable(text));
 
@@ -519,7 +522,7 @@ void MediaPlayer_GStreamer::reportError(const QString &text)
     }
 }
 
-GstElement *MediaPlayer_GStreamer::createElement(const char *type, const char *name, bool mandatory)
+GstElement *MediaPlayer::createElement(const char *type, const char *name, bool mandatory)
 {
     GstElement * e = gst_element_factory_make ( type, name );
 
@@ -535,7 +538,7 @@ GstElement *MediaPlayer_GStreamer::createElement(const char *type, const char *n
     return e;
 }
 
-GstElement *MediaPlayer_GStreamer::createVideoSink()
+GstElement *MediaPlayer::createVideoSink()
 {
     GstElement * sink = createElement("appsink", "videosink");
 
@@ -558,7 +561,7 @@ GstElement *MediaPlayer_GStreamer::createVideoSink()
 
 
 /* This function will be called by the pad-added signal */
-void MediaPlayer_GStreamer::cb_pad_added (GstElement *src, GstPad *new_pad, MediaPlayer_GStreamer * self )
+void MediaPlayer::cb_pad_added (GstElement *src, GstPad *new_pad, MediaPlayer * self )
 {
     GstPad *sink_pad = 0;
     GstPadLinkReturn ret;
@@ -575,7 +578,7 @@ void MediaPlayer_GStreamer::cb_pad_added (GstElement *src, GstPad *new_pad, Medi
 
     if ( g_str_has_prefix (new_pad_type, "video/x-raw") )
     {
-        if ( (self->m_loadOptions & MediaPlayer_GStreamer::LoadVideoStream) == 0 )
+        if ( (self->m_loadOptions & MediaPlayer::LoadVideoStream) == 0 )
         {
             self->addlog( "DEBUG",  "GstMediaPlayer:  Stream has video type, but video is not enabled, ignoring." );
             goto exit;
@@ -605,7 +608,7 @@ void MediaPlayer_GStreamer::cb_pad_added (GstElement *src, GstPad *new_pad, Medi
     }
     else if ( g_str_has_prefix (new_pad_type, "audio/x-raw") )
     {
-        if ( (self->m_loadOptions & MediaPlayer_GStreamer::LoadAudioStream) == 0 )
+        if ( (self->m_loadOptions & MediaPlayer::LoadAudioStream) == 0 )
         {
             self->addlog( "DEBUG",  "GstMediaPlayer:  Stream has audio type, but audio is not enabled, ignoring." );
             goto exit;
@@ -639,7 +642,7 @@ exit:
         gst_object_unref (sink_pad);
 }
 
-void MediaPlayer_GStreamer::setupSource()
+void MediaPlayer::setupSource()
 {
     // If we got QIODevice, we use appsrc
     if ( m_mediaIODevice )
@@ -658,8 +661,8 @@ void MediaPlayer_GStreamer::setupSource()
         }
 
         GstAppSrcCallbacks callbacks = { 0, 0, 0, 0, 0 };
-        callbacks.need_data = &MediaPlayer_GStreamer::cb_source_need_data;
-        callbacks.seek_data = &MediaPlayer_GStreamer::cb_source_seek_data;
+        callbacks.need_data = &MediaPlayer::cb_source_need_data;
+        callbacks.seek_data = &MediaPlayer::cb_source_seek_data;
 
         gst_app_src_set_callbacks( GST_APP_SRC(m_gst_source), &callbacks, this, 0 );
 
@@ -680,9 +683,9 @@ void MediaPlayer_GStreamer::setupSource()
     }
 }
 
-void MediaPlayer_GStreamer::cb_source_need_data(GstAppSrc *src, guint length, gpointer user_data)
+void MediaPlayer::cb_source_need_data(GstAppSrc *src, guint length, gpointer user_data)
 {
-    MediaPlayer_GStreamer * self = reinterpret_cast<MediaPlayer_GStreamer*>( user_data );
+    MediaPlayer * self = reinterpret_cast<MediaPlayer*>( user_data );
     qint64 totalread = 0;
 
     if ( !self->m_mediaIODevice->atEnd() )
@@ -712,17 +715,17 @@ void MediaPlayer_GStreamer::cb_source_need_data(GstAppSrc *src, guint length, gp
         gst_app_src_end_of_stream( src );
 }
 
-gboolean MediaPlayer_GStreamer::cb_source_seek_data(GstAppSrc *, guint64 offset, gpointer user_data)
+gboolean MediaPlayer::cb_source_seek_data(GstAppSrc *, guint64 offset, gpointer user_data)
 {
-    MediaPlayer_GStreamer * self = reinterpret_cast<MediaPlayer_GStreamer*>( user_data );
+    MediaPlayer * self = reinterpret_cast<MediaPlayer*>( user_data );
 
     // If we operate in raw mode, the offset is time - we should convert to the file offset
     return self->m_mediaIODevice->seek( offset );
 }
 
-GstFlowReturn MediaPlayer_GStreamer::cb_new_sample(GstAppSink *appsink, gpointer user_data)
+GstFlowReturn MediaPlayer::cb_new_sample(GstAppSink *appsink, gpointer user_data)
 {
-    MediaPlayer_GStreamer * self = reinterpret_cast<MediaPlayer_GStreamer*>( user_data );
+    MediaPlayer * self = reinterpret_cast<MediaPlayer*>( user_data );
     GstSample * sample = gst_app_sink_pull_sample(  appsink );
 
     if ( sample )
@@ -738,9 +741,9 @@ GstFlowReturn MediaPlayer_GStreamer::cb_new_sample(GstAppSink *appsink, gpointer
     return GST_FLOW_OK;
 }
 
-GstPadProbeReturn MediaPlayer_GStreamer::cb_event_probe_toggle_splitter(GstPad *pad, GstPadProbeInfo *info, gpointer user_data)
+GstPadProbeReturn MediaPlayer::cb_event_probe_toggle_splitter(GstPad *pad, GstPadProbeInfo *info, gpointer user_data)
 {
-    MediaPlayer_GStreamer * self = reinterpret_cast<MediaPlayer_GStreamer*>( user_data );
+    MediaPlayer * self = reinterpret_cast<MediaPlayer*>( user_data );
 
     // remove the probe first
     gst_pad_remove_probe( pad, GST_PAD_PROBE_INFO_ID (info) );
@@ -789,9 +792,9 @@ GstPadProbeReturn MediaPlayer_GStreamer::cb_event_probe_toggle_splitter(GstPad *
     return GST_PAD_PROBE_OK;
 }
 
-GstBusSyncReply MediaPlayer_GStreamer::cb_busMessageDispatcher( GstBus *bus, GstMessage *msg, gpointer user_data )
+GstBusSyncReply MediaPlayer::cb_busMessageDispatcher( GstBus *bus, GstMessage *msg, gpointer user_data )
 {
-    MediaPlayer_GStreamer * self = reinterpret_cast<MediaPlayer_GStreamer*>( user_data );
+    MediaPlayer * self = reinterpret_cast<MediaPlayer*>( user_data );
     Q_UNUSED(bus);
 
     GError *err;
@@ -908,7 +911,7 @@ GstBusSyncReply MediaPlayer_GStreamer::cb_busMessageDispatcher( GstBus *bus, Gst
     return GST_BUS_DROP;
 }
 
-void MediaPlayer_GStreamer::addlog(const char *type, const char *fmt, ... )
+void MediaPlayer::addlog(const char *type, const char *fmt, ... )
 {
     va_list vl;
     char buf[1024];

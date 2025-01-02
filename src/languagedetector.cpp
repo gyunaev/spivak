@@ -20,7 +20,10 @@
 
 #include "languagedetector.h"
 #include <stdio.h>
-#include "cld2/public/compact_lang_det.h"
+
+#ifdef HAVE_LIBCLD2
+    #include "cld2/public/compact_lang_det.h"
+#endif
 
 static const char * lang_table[CLD2::NUM_LANGUAGES] =
 {
@@ -210,18 +213,28 @@ static const char * lang_table[CLD2::NUM_LANGUAGES] =
 };
 
 LanguageDetector::LanguageDetector()
-    : QObject()
 {
+}
+
+LanguageDetector *LanguageDetector::create()
+{
+#ifdef HAVE_LIBCLD2
+    return new LanguageDetector();
+#else
+    return nullptr;
+#endif
 }
 
 QString LanguageDetector::detectLanguage(const QByteArray &data)
 {
+#ifdef HAVE_LIBCLD2
     bool is_reliable;
 
     CLD2::Language lang = CLD2::DetectLanguage( data.constData(), data.length(), true,  &is_reliable );
 
-    if ( lang >=0 && lang < CLD2::NUM_LANGUAGES )
+    if ( lang >=0 && lang < CLD2::NUM_LANGUAGES && is_reliable )
         return lang_table[lang];
+#endif
 
     return 0;
 }

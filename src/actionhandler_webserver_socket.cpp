@@ -643,11 +643,7 @@ bool ActionHandler_WebServer_Socket::controlStatus(QJsonDocument &)
         else
             outobj["tempo"] = "disabled";
 
-        if ( pCurrentState->playerCapabilities & MediaPlayer::CapVoiceRemoval )
-            outobj["voiceremoval"] = pCurrentState->playerVoiceRemovalEnabled;
-        else
-            outobj["voiceremoval"] = "disabled";
-
+        outobj["voiceremoval"] = "disabled";
         outobj["song"] = escapeHTML( m_currentSong );
     }
     else

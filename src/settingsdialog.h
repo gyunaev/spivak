@@ -26,7 +26,7 @@ namespace Ui {
 class SettingsDialog;
 }
 
-class Interface_LanguageDetector;
+class LanguageDetector;
 
 class SettingsDialog : public QDialog
 {
@@ -77,7 +77,7 @@ public:
         QTimer  m_lyricAnimationTimer;
 
         // Language detector plugin
-        Interface_LanguageDetector * m_langdetector;
+        LanguageDetector * m_langdetector;
 };
 
 #endif // SETTINGSDIALOG_H

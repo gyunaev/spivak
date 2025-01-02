@@ -56,9 +56,6 @@ class PlayerWidget : public QWidget, public Ui::PlayerWidget
         // Tempo spin has moved by the user
         void    tempoSpinChanged( int percentage );
 
-        // Voice removal toggled
-        void    toggledVoiceRemoval( bool enabled );
-
 	public slots:
         // Text showing the current player song or status
         void    setText( QString text );

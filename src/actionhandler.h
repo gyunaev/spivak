@@ -96,7 +96,6 @@ class ActionHandler : public QObject
         void    actionKaraokePlayerPitchDecrease();
         void    actionKaraokePlayerTempoIncrease();
         void    actionKaraokePlayerTempoDecrease();
-        void    actionKaraokePlayerToggleVoiceRemoval();
         void    actionKaraokePlayerChangePitch(int);   // from a slider or some kind of adaptive control
         void    actionKaraokePlayerChangeTempo(int);   // from a slider or some kind of adaptive control
         void    actionKaraokePlayerChangeVoiceRemoval(int); // from a slider or some kind of adaptive control

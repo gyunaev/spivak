@@ -159,12 +159,6 @@ void QueueKaraokeWidget::tempoSpinChanged(int percentage)
     emit pActionHandler->actionKaraokePlayerChangeTempo( percentage );
 }
 
-void QueueKaraokeWidget::toggledVoiceRemoval(bool enabled)
-{
-    emit pActionHandler->actionKaraokePlayerChangeVoiceRemoval( enabled );
-}
-
-
 void QueueKaraokeWidget::show()
 {
     // A layout takes kind of weird ownership of its widgets - you cannot delete them while it is present,
@@ -195,7 +189,6 @@ void QueueKaraokeWidget::show()
     connect( m_player, &PlayerWidget::volumeSliderMoved, this, &QueueKaraokeWidget::movedPlayerVolumeSlider );
     connect( m_player, &PlayerWidget::pitchSpinChanged, this, &QueueKaraokeWidget::pitchSpinChanged );
     connect( m_player, &PlayerWidget::tempoSpinChanged, this, &QueueKaraokeWidget::tempoSpinChanged );
-    connect( m_player, &PlayerWidget::toggledVoiceRemoval, this, &QueueKaraokeWidget::toggledVoiceRemoval );
 
     connect( pEventor, &Eventor::karaokeParametersChanged, m_player, &PlayerWidget::applyCapabilities );
 

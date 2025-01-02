@@ -21,8 +21,7 @@
 #include <QMessageBox>
 #include <QInputDialog>
 
-#include "pluginmanager.h"
-#include "interface_languagedetector.h"
+#include "languagedetector.h"
 #include "songdatabasescanner.h"
 #include "actionhandler.h"
 #include "currentstate.h"
@@ -98,7 +97,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     connect( ui->boxCollectionTypeHTTP, &QRadioButton::clicked, this, &SettingsDialog::collectionTypeChanged );
 
     // Prepare the languages if the interface is available
-    m_langdetector = pPluginManager->loadLanguageDetector();
+    m_langdetector = LanguageDetector::create();
 
     ui->boxCollectionLanguage->addItem( "No language" );
 
@@ -313,9 +312,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 SettingsDialog::~SettingsDialog()
 {
     // If we loaded the language detector, release it
-    if ( m_langdetector )
-        pPluginManager->releaseLanguageDetector();
-
+    delete m_langdetector;
     delete ui;
 }
 

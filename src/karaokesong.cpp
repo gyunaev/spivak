@@ -34,19 +34,19 @@
 #include "currentstate.h"
 #include "util.h"
 #include "karaokeplayable.h"
+#include "mediaplayer.h"
 #include "midisyntheser.h"
 #include "midistripper.h"
 #include "eventor.h"
-#include "pluginmanager.h"
+#include "mediaplayer.h"
 
 #include "libkaraokelyrics/lyricsloader.h"
-#include "libmediaplayer/interface_mediaplayer.h"
 
 KaraokeSong::KaraokeSong( KaraokeWidget *w, const SongQueueItem &song )
 {
     m_widget = w;
     m_song = song;
-    mPlayer = pPluginManager->createMediaPlayer();
+    mPlayer = new MediaPlayer();
 
     pCurrentState->playerCapabilities = (MediaPlayer::Capability) 0;
     m_lyrics = 0;
@@ -78,11 +78,8 @@ KaraokeSong::KaraokeSong( KaraokeWidget *w, const SongQueueItem &song )
     connect( pActionHandler, &ActionHandler::actionKaraokePlayerPitchIncrease, this, &KaraokeSong::pitchHigher );
     connect( pActionHandler, &ActionHandler::actionKaraokePlayerTempoDecrease, this, &KaraokeSong::tempoSlower );
     connect( pActionHandler, &ActionHandler::actionKaraokePlayerTempoIncrease, this, &KaraokeSong::tempoFaster );
-    connect( pActionHandler, &ActionHandler::actionKaraokePlayerToggleVoiceRemoval, this, &KaraokeSong::toggleVoiceRemoval );
     connect( pActionHandler, &ActionHandler::actionKaraokePlayerChangePitch, this, &KaraokeSong::pitchSet );
     connect( pActionHandler, &ActionHandler::actionKaraokePlayerChangeTempo, this, &KaraokeSong::tempoSet );
-
-    connect( pActionHandler, SIGNAL( actionKaraokePlayerChangeVoiceRemoval(int)), this, SLOT( toggleVoiceRemoval()) );
 }
 
 KaraokeSong::~KaraokeSong()
@@ -457,17 +454,6 @@ void KaraokeSong::tempoSet(int newvalue)
     setTempo( newvalue, false );
 }
 
-void KaraokeSong::toggleVoiceRemoval()
-{
-    if ( pCurrentState->playerCapabilities & MediaPlayer::CapVoiceRemoval )
-    {
-        pCurrentState->playerVoiceRemovalEnabled = !pCurrentState->playerVoiceRemovalEnabled;
-        mPlayer->setCapabilityValue( MediaPlayer::CapVoiceRemoval, pCurrentState->playerVoiceRemovalEnabled );
-
-        emit pEventor->karaokeParametersChanged();
-    }
-}
-
 void KaraokeSong::songLoaded()
 {
     // We might end up in a situation where the music is loaded, but the lyrics aren't.
@@ -478,7 +464,6 @@ void KaraokeSong::songLoaded()
 
     pCurrentState->playerPitch = 50;
     pCurrentState->playerTempo = 50;
-    pCurrentState->playerVoiceRemovalEnabled = false;
 
     pCurrentState->playerCapabilities = mPlayer->capabilities();
     m_widget->karaokeSongLoaded();

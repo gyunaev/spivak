@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>451</width>
-    <height>189</height>
+    <height>193</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -194,13 +194,6 @@ p, li { white-space: pre-wrap; }
         <string/>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
-        <item>
-         <widget class="QCheckBox" name="boxVoiceRemoval">
-          <property name="text">
-           <string>VoiceRm    </string>
-          </property>
-         </widget>
-        </item>
         <item>
          <widget class="QLabel" name="label_2">
           <property name="text">

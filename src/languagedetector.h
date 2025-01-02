@@ -19,26 +19,25 @@
 #ifndef LANGUAGEDETECTOR_H
 #define LANGUAGEDETECTOR_H
 
-#include <QObject>
 #include <QString>
-#include "../../src/interface_languagedetector.h"
 
 // Interface for libcld.so - it is 4Mb library, no need to keep it loaded all the time,
 // as it is only used during scanning (and even there it is not really necessary)
-class LanguageDetector : public QObject, public Interface_LanguageDetector
+// Separating this allows to load libcld.so only when neeeded on platforms with limited resources
+class LanguageDetector
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA( IID "com.ulduzsoft.Skivak.Plugin.LanguageDetector" )
-    Q_INTERFACES( Interface_LanguageDetector )
-
     public:
-        LanguageDetector();
+        // Returns the object if language detector is available, otherwise returns null
+        static LanguageDetector * create();
 
         // Takes care about the language ID conversion too
-        QString  detectLanguage( const QByteArray& data ) Q_DECL_OVERRIDE;
+        QString  detectLanguage( const QByteArray& data );
 
         // This returns all languages
-        QStringList  languages() Q_DECL_OVERRIDE;
+        QStringList  languages();
+
+    private:
+        LanguageDetector();
 };
 
 #endif // LANGUAGEDETECTOR_H

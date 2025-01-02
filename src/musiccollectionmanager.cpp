@@ -27,7 +27,6 @@
 #include "eventor.h"
 #include "logger.h"
 #include "util.h"
-#include "pluginmanager.h"
 
 MusicCollectionManager * pMusicCollectionMgr;
 
@@ -172,7 +171,7 @@ void MusicCollectionManager::start()
         return;
     }
 
-    m_player = pPluginManager->createMediaPlayer();
+    m_player = new MediaPlayer();
 
     connect( m_player->qObject(), SIGNAL(finished()), this, SLOT( playerCurrentSongFinished()) );
     connect( m_player->qObject(), SIGNAL(error(QString)), this, SLOT(playerCurrentSongFinished()) );

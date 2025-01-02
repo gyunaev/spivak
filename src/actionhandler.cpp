@@ -261,10 +261,6 @@ bool ActionHandler::cmdAction(int event )
         emit actionKaraokePlayerTempoDecrease();
         break;
 
-    case ACTION_PLAYER_TOGGLE_VOICE_REMOVAL:
-        emit actionKaraokePlayerToggleVoiceRemoval();
-        break;
-
     default:
         return false;
     }
