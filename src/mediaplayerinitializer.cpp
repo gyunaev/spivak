@@ -10,26 +10,17 @@
 #include "mediaplayerinitializer.h"
 #include "mediaplayer.h"
 #include "settings.h"
+#include "logger.h"
 
-#if defined (Q_OS_WIN)
-static const char * GSTREAMER_LIBRARY_NAME = "libgstreamer-1.0-0.dll";
-static const char * GSTREAMER_PLUGIN_NAME = "libgstaudioconvert.dll";
-#elif defined (Q_OS_MAC)
-#CHECKME
-static const char * GSTREAMER_LIBRARY_NAME = "libgstreamer-1.0.dylib";
-static const char * GSTREAMER_PLUGIN_NAME = "libgstaudioconvert.dylib";
-#else
-static const char * GSTREAMER_LIBRARY_NAME = "libgstreamer-1.0.so";
-static const char * GSTREAMER_PLUGIN_NAME = "libgstaudioconvert.so";
-#endif
 
 MediaPlayerInitializer::MediaPlayerInitializer()
     : QThread( 0 ), mPlayer(0)
 {
-    // Finds path to GStreamer library and presets the settings if needed
-    findGStreamerPath();
-
     moveToThread( this );
+
+#ifdef WIN32
+    qputenv( "GST_PLUGIN_PATH", "gstplugins" );
+#endif
 }
 
 MediaPlayerInitializer::~MediaPlayerInitializer()
@@ -87,107 +78,4 @@ void MediaPlayerInitializer::run()
 
     // Run the thread loop so we can deliver signals and slots
     exec();
-}
-
-void MediaPlayerInitializer::findGStreamerPath()
-{
-    // Try to load GStreamer library as-is
-    QLibrary lib( GSTREAMER_LIBRARY_NAME );
-
-    if ( lib.load() )
-    {
-        // We are good, its in the system path. No need to set mGStreamerPath
-        qDebug("Found GStreamer libraries in PATH/LD_LIBRARY_PATH");
-        lib.unload();
-        return;
-    }
-
-    // Try to find GStreamer path. First check the one we have in settings
-    if ( !pSettings->pathGStreamerBinaries.isEmpty() && checkGStreamerPath( pSettings->pathGStreamerBinaries ) )
-        return;
-
-    // Now try the app install directory
-    if ( checkGStreamerPath( QApplication::applicationDirPath() + QDir::separator() + "gstreamer" ) )
-        return;
-
-    // Now try the default installation directory C:\GStreamer\1.0\<arch>\bin
-    if ( checkGStreamerPath( QString("C:\\GStreamer\\1.0\\%1\\bin\\")
-                                      .arg( QSysInfo::buildCpuArchitecture() == "i386" ? "x86" : "x86_64" ) ) )
-        return;
-
-    // Nothing found. Ask the user.
-    while ( true )
-    {
-        QString path = QFileDialog::getExistingDirectory( 0,
-                                                          tr("Please choose GStreamer directory"),
-                                                          "" );
-
-        if ( !checkGStreamerPath( path ) )
-        {
-            if ( QMessageBox::question( 0,
-                                   tr("Invalid GStreamer path"),
-                                   tr("The selected GStreamer path is invalid.\n"
-                                      "The shared library %1 file was not found at this path\n\n"
-                                      "Would you like to choose a path again?").arg( path ) ) == QMessageBox::Yes )
-            {
-                // Ask again
-                continue;
-            }
-
-            // Do not ask, use default and hope its loaded
-            break;
-        }
-    }
-}
-
-bool MediaPlayerInitializer::checkGStreamerPath( const QString &path )
-{
-    QString libpath = path + QDir::separator() + GSTREAMER_LIBRARY_NAME;
-
-    if ( !QFile::exists( libpath ) )
-        return false;
-
-    // We found the path. Now try to find the plugin path
-    QString gstPluginPath;
-
-    QStringList pluginpaths;
-    pluginpaths << "plugins" << "../lib/gstreamer-1.0";
-
-    // Try all possible plugin paths
-    for ( QString pluginpath : pluginpaths )
-    {
-        QString checkpath = path + QDir::separator() + pluginpath + QDir::separator() + GSTREAMER_PLUGIN_NAME;
-
-        if ( QFile::exists( checkpath ) )
-        {
-            qDebug("Detected GST plugin path %s", qPrintable( checkpath ) );
-            gstPluginPath = path + QDir::separator() + pluginpath;
-            break;
-        }
-    }
-
-    if ( gstPluginPath.isEmpty() )
-    {
-        qDebug("GST plugin path is not detected in GST path %s, ignoring", qPrintable( path ) );
-        return false;
-    }
-
-    // Add the path to the system-specific path
-#ifdef WIN32
-    QString  fixedpath = path;
-    fixedpath.replace( "/", "\\" );
-    qputenv( "PATH", qgetenv( "PATH" ) + ";" + fixedpath.toUtf8() );
-#else
-    qputenv( "LD_LIBRARY_PATH", qgetenv( "LD_LIBRARY_PATH" ) + ":" + path.toUtf8() );
-#endif
-
-    gstPluginPath.replace( "/", QDir::separator() );
-    qputenv( "GST_PLUGIN_PATH", gstPluginPath.toUtf8() );
-
-    qDebug("GStreamer loader: load path is set to %s, plugin path %s",
-           qPrintable( path ),
-           qPrintable( gstPluginPath ) );
-
-    pSettings->pathGStreamerBinaries = path;
-    return true;
 }
