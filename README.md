@@ -6,7 +6,7 @@ Spivak is a free, cross-platform (Linux/Windows/OS X) Karaoke player based on GS
 
 Spivak has been designed to be a standalone Karaoke player, which could be used at your parties without a dedicated DJ. It is primarily controlled through its Web interface, so your guests can take care of themselves, searching and adding songs into the queue. The player will ensure fair rotation.
 
-Currently Spivak is just out of beta, and already has impressive set of features, and is stable enough to survive a party without a single crash or hang. Its web interface has been redesigned and looks much better.
+Spivak has been used on many parties for years and has been quite stable.
 
 Spivak is licensed under GNU GPL version 3, and is written by George Yunaev.
 
