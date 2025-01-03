@@ -66,9 +66,6 @@ class Notifications : public QObject
     private:
         void    reset();
 
-        // This doesn't lock mutex, so should be only called internally
-        void    updateWelcomeMessage();
-
     private:
         QFont           m_font;
         int             m_lastScreenHeight;

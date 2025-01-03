@@ -26,6 +26,7 @@
 #include "eventor.h"
 #include "actionhandler.h"
 #include "notification.h"
+#include "version.h"
 
 Notifications * pNotification;
 
@@ -45,7 +46,6 @@ Notifications::Notifications(QObject *parent)
     connect( pEventor, &Eventor::webserverUrlChanged, this, &Notifications::webServerUrlChanged, Qt::QueuedConnection );
 
     reset();
-    updateWelcomeMessage();
 }
 
 Notifications::~Notifications()
@@ -114,26 +114,46 @@ qint64 Notifications::drawRegular(KaraokePainter &p)
 
     QMutexLocker m( &m_mutex );
 
-    if ( !m_karaokePlaying && !m_customMessage.isEmpty() )
+    if ( !m_karaokePlaying )
     {
-        m_customFont.setPointSize( p.largestFontSize( m_customFont, pSettings->playerLyricsFontMaxSize, p.textRect().width(), m_customMessage ));
+        // Create custom messages on specific y percentage
+        QString message1, message2, message3;
 
+        // First message
+        if ( pSettings->isRegistered() && !pSettings->notificationCustomMessage1.isEmpty() )
+            message1 = pSettings->notificationCustomMessage1;
+        else
+            message1 = tr("Spivak Karaoke Player v.%1.%2").arg( APP_VERSION_MAJOR ).arg( APP_VERSION_MINOR );
+
+        // Second message
+        if ( pSettings->isRegistered() && !pSettings->notificationCustomMessage2.isEmpty() )
+            message2 = pSettings->notificationCustomMessage2;
+        else
+            message2 = pSettings->isRegistered() ? "Registered version" : "Free version";
+
+        // Third message could be overwritten by custom message
+        if ( !m_customMessage.isEmpty() )
+            message3 = m_customMessage;
+        else if ( pSettings->isRegistered() && !pSettings->notificationCustomMessage3.isEmpty() )
+            message3 = pSettings->notificationCustomMessage3;
+        else
+            message3 = m_webserverURL.isEmpty() ? "Please select a song" : m_webserverURL;
+
+        // Calc the maximum font size among three messages
+        int fontSize = qMin( p.largestFontSize( m_customFont, pSettings->playerLyricsFontMaxSize, p.textRect().width(), message1 ),
+                           qMin( p.largestFontSize( m_customFont, pSettings->playerLyricsFontMaxSize, p.textRect().width(), message2 ),
+                                 p.largestFontSize( m_customFont, pSettings->playerLyricsFontMaxSize, p.textRect().width(), message3 ) ) );
+
+        m_customFont.setPointSize( fontSize );
         p.setFont( m_customFont );
-        p.drawCenteredOutlineTextGradient( 50, m_customMessageAnimationValue, m_customMessage );
+
+        // Draw all three lines
+        p.drawCenteredOutlineTextGradient( 10, fmod (m_customMessageAnimationValue, 1.0), message1 );
+        p.drawCenteredOutlineTextGradient( 40, fmod (m_customMessageAnimationValue + 0.3, 1.0), message2 );
+        p.drawCenteredOutlineTextGradient( 70, fmod (m_customMessageAnimationValue + 0.7, 1.0), message3 );
 
         // Do a round-trip animation when the spot goes back and forth
         m_customMessageAnimationValue += m_customMessageAnimationAdder;
-
-        if ( m_customMessageAnimationValue >= 1.0 )
-        {
-            m_customMessageAnimationValue = 1.0;
-            m_customMessageAnimationAdder = -m_customMessageAnimationAdder;
-        }
-        else if ( m_customMessageAnimationValue < 0.0 )
-        {
-            m_customMessageAnimationValue = 0.0;
-            m_customMessageAnimationAdder = -m_customMessageAnimationAdder;
-        }
     }
 
     if ( !m_smallMessage.isEmpty() )
@@ -247,7 +267,6 @@ void Notifications::songStopped()
 {
     QMutexLocker m( &m_mutex );
     m_karaokePlaying = false;
-    updateWelcomeMessage();
 }
 
 void Notifications::settingsChanged()
@@ -256,8 +275,6 @@ void Notifications::settingsChanged()
 
     // This forces changing the notification font
     m_lastScreenHeight = 0;
-
-    updateWelcomeMessage();
 }
 
 void Notifications::setOnScreenMessage(const QString &message)
@@ -291,12 +308,6 @@ void Notifications::showMessage(int percentage, const QString &message, int show
 void Notifications::webServerUrlChanged(QString newurl)
 {
     m_webserverURL = newurl;
-    updateWelcomeMessage();
-}
-
-void Notifications::updateWelcomeMessage()
-{
-    m_customMessage = m_webserverURL.isEmpty() ? "Please select a song" : m_webserverURL;
 }
 
 void Notifications::reset()

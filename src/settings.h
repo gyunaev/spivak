@@ -124,10 +124,15 @@ class Settings
         QString         pathGStreamerBinaries;
 
         // Registration info
-        QString                 registerCertificate;
-        QString                 registeredName;
-        QString                 registeredDigest;
-        QDateTime               registeredUntil;
+        QString         registerCertificate;
+        QString         registeredName;
+        QString         registeredDigest;
+        QDateTime       registeredUntil;
+
+        // Custom messages for main screen
+        QString         notificationCustomMessage1;
+        QString         notificationCustomMessage2;
+        QString         notificationCustomMessage3;
 
         // Replaces the database path according to rules
         QString         replacePath( const QString& origpath );

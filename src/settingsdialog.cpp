@@ -254,6 +254,17 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 
     ui->boxSaveQueueOnExit->setChecked( pSettings->queueSaveOnExit );
 
+    // Main Screen customization tab
+    if ( pSettings->isRegistered() )
+    {
+        ui->lblCustomMessages->hide();
+        ui->leCustomMessage1->setText( pSettings->notificationCustomMessage1 );
+        ui->leCustomMessage2->setText( pSettings->notificationCustomMessage2 );
+        ui->leCustomMessage3->setText( pSettings->notificationCustomMessage3 );
+    }
+    else
+        ui->groupDisplayMessages->setEnabled( false );
+
     // Web server
     ui->boxWebEnable->setChecked( pSettings->httpEnabled );
     ui->boxWebAllowAddSong->setChecked( pSettings->httpEnableAddQueue );
@@ -778,10 +789,13 @@ void SettingsDialog::accept()
 
     // Full screen
     pSettings->startInFullscreen = ui->boxForceFullScreen->isChecked();
-
     pSettings->playerUseBuiltinMidiSynth = ui->rbMidiBuiltin->isChecked();
-
     pSettings->fallbackEncoding = ui->boxFallbackEncoding->currentData().toString();
+
+    // Main display
+    pSettings->notificationCustomMessage1 = ui->leCustomMessage1->text();
+    pSettings->notificationCustomMessage2 = ui->leCustomMessage2->text();
+    pSettings->notificationCustomMessage3 = ui->leCustomMessage3->text();
 
     // Music
     QStringList origMusicPaths = pSettings->musicCollections;

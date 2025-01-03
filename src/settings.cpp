@@ -193,6 +193,11 @@ QJsonObject Settings::toJson()
     out[ "notification/TopColor"] = notificationTopColor.name();
     out[ "notification/CenterColor"] = notificationCenterColor.name();
 
+    // Custom messages
+    out[ "notification/CustomMessage1"] = notificationCustomMessage1;
+    out[ "notification/CustomMessage2"] = notificationCustomMessage2;
+    out[ "notification/CustomMessage3"] = notificationCustomMessage3;
+
     // Store the cache dir only if the location is changed (i.e. not standard)
     if ( QStandardPaths::writableLocation( QStandardPaths::CacheLocation ) != cacheDir )
         out[ "player/cacheDir"] = cacheDir;
@@ -264,6 +269,9 @@ void Settings::fromJson(const QJsonObject &data)
     // Notification
     notificationTopColor = QColor( data.value( "notification/TopColor" ).toString( "white" ) );
     notificationCenterColor = QColor( data.value( "notification/CenterColor" ).toString( "white" ) );
+    notificationCustomMessage1 = data.value( "notification/CustomMessage1" ).toString();
+    notificationCustomMessage2 = data.value( "notification/CustomMessage2" ).toString();
+    notificationCustomMessage3 = data.value( "notification/CustomMessage3" ).toString();
 
     // Music collection
     musicCollections = toStringList( data.value( "musicCollection/Paths" ) );
