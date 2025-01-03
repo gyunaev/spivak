@@ -149,8 +149,8 @@ qint64 Notifications::drawRegular(KaraokePainter &p)
 
         // Draw all three lines
         p.drawCenteredOutlineTextGradient( 10, fmod (m_customMessageAnimationValue, 1.0), message1 );
-        p.drawCenteredOutlineTextGradient( 40, fmod (m_customMessageAnimationValue + 0.3, 1.0), message2 );
-        p.drawCenteredOutlineTextGradient( 70, fmod (m_customMessageAnimationValue + 0.7, 1.0), message3 );
+        p.drawCenteredOutlineTextGradient( 40, fmod (m_customMessageAnimationValue + 0.5, 1.0), message2 );
+        p.drawCenteredOutlineTextGradient( 70, fmod (m_customMessageAnimationValue + 0.25, 1.0), message3 );
 
         // Do a round-trip animation when the spot goes back and forth
         m_customMessageAnimationValue += m_customMessageAnimationAdder;
