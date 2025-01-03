@@ -171,13 +171,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     resize( pCurrentState->windowSizeMain );
 
-    // Generate a crash if defined (to test crash handler)
-    if ( hasCmdLineOption( "--crashplease") )
-    {
-        qDebug("crashing in 2 seconds");
-        QTimer::singleShot( 2000, this, SLOT(generateCrash()) );
-    }
-
     setScreensaverSuppression( true );
 }
 
