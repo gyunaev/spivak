@@ -214,9 +214,6 @@ class MediaPlayer : public QObject
         // Media information from tags
         QString     m_mediaArtist;
         QString     m_mediaTitle;
-
-        // Pitch adjuster, once implemented
-        PitchAdjuster * m_pitchPlugin;
 };
 
 #endif // MEDIAPLAYER_H

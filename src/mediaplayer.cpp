@@ -24,10 +24,7 @@
 #include <gst/gst.h>
 
 #include "mediaplayer.h"
-
-#ifdef HAVE_PITCH_PLUGIN
-    #include "pitchplugin.h"
-#endif
+#include "settings.h"
 
 // FIXME: part-missing-plugins.txt
 
@@ -54,12 +51,6 @@ MediaPlayer::MediaPlayer( QObject * parent )
     m_tempoRatePercent = 100;
     m_playState = StateReset;
     m_errorsDetected = false;
-
-#ifdef HAVE_PITCH_PLUGIN
-    m_pitchPlugin = new PitchPlugin();
-#else
-    m_pitchPlugin = 0;
-#endif
 }
 
 MediaPlayer::~MediaPlayer()
@@ -212,7 +203,7 @@ MediaPlayer::Capabilities MediaPlayer::capabilities()
     if ( m_gst_audio_volume )
         caps |= MediaPlayer::CapChangeVolume;
 
-    if ( m_pitchPlugin )
+    if ( m_gst_audio_pitchadjust )
         caps |= MediaPlayer::CapChangePitch;
 
     if ( m_gst_audio_tempo )
@@ -224,19 +215,15 @@ MediaPlayer::Capabilities MediaPlayer::capabilities()
 
 bool MediaPlayer::adjustPitch( int newvalue )
 {
-#ifdef HAVE_PITCH_PLUGIN
     if ( !m_gst_audio_pitchadjust )
         return false;
 
     // Let's spread it to 0.5 ... +1.5
     double value = (newvalue / 200.0) + 0.75;
 
-    g_object_set( G_OBJECT(m_gst_audio_pitchadjust), m_pitchPlugin->parameterName(), value, NULL );
+    g_object_set( G_OBJECT(m_gst_audio_pitchadjust), "pitch", value, NULL );
 
     return true;
-#else
-    return false;
-#endif
 }
 
 bool MediaPlayer::toggleKaraokeSplitter( int value )
@@ -409,11 +396,9 @@ void MediaPlayer::loadMediaGeneric()
         m_gst_audio_tempo = createElement( "scaletempo", "tempo", false );
 
         // If we have the pitch changer
-#ifdef HAVE_PITCH_PLUGIN
-        if ( m_pitchPlugin )
-            m_gst_audio_pitchadjust = createElement( m_pitchPlugin->elementName(), "audiopitchchanger", false );
+        if ( pSettings->isRegistered() )
+            m_gst_audio_pitchadjust = createElement( "pitch", qPrintable( pSettings->registeredDigest ), false );
         else
-#endif
             m_gst_audio_pitchadjust = 0;
 
         // Start linking
@@ -494,7 +479,6 @@ void MediaPlayer::reset()
     m_errorsDetected = false;
     m_mediaLoading = true;
     m_tempoRatePercent = 100;
-    m_pitchPlugin = 0;
 
     m_mediaArtist.clear();
     m_mediaTitle.clear();
