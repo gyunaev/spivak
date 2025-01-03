@@ -91,6 +91,7 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
 
         // Audio initialization finished from MediaPlayerInitializer
         void    audioInitializationFinished(QString errorMsg );
+        void    registrationLinkClicked( QString link );
 
     private:
         void    keyPressEvent(QKeyEvent * event);

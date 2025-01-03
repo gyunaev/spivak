@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>445</width>
-    <height>276</height>
+    <width>536</width>
+    <height>556</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="groupRegistered">
      <property name="title">
       <string>Registration status</string>
      </property>
@@ -31,10 +31,29 @@
     </widget>
    </item>
    <item>
-    <widget class="QPlainTextEdit" name="leLicense">
-     <property name="placeholderText">
-      <string>Please enter your license here</string>
+    <widget class="QGroupBox" name="groupRegistration">
+     <property name="title">
+      <string>Registration</string>
      </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QLabel" name="lblReginfo">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Spivak Karaoke Player is free software, and you're permitted to use it according to the terms of GPLv3 license without any payment. &lt;/p&gt;&lt;p&gt;Registration is completely optional, and allows me to spend more time working on Spivak, as well as giving you access to the following features:&lt;/p&gt;&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ability to change the song pitch; &lt;/li&gt;&lt;li style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ability to customize the welcome screen which is shown when no song is being played; &lt;/li&gt;&lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ability to request features and receive email support; &lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Registration is available on the following link: &lt;/p&gt;&lt;p&gt;&lt;a href=&quot;http://www.ulduzsoft.com/spivak-karaoke-player/registration/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;http://www.ulduzsoft.com/spivak-karaoke-player/registration/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Once you receive your registration code by email, please enter it below:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPlainTextEdit" name="leLicense">
+        <property name="placeholderText">
+         <string>Please enter your license here</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>

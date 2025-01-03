@@ -21,6 +21,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDialog>
+#include <QDesktopServices>
 #include <QTimer>
 
 #if defined (Q_OS_WIN)
@@ -479,6 +480,11 @@ void MainWindow::audioInitializationFinished(QString errorMsg)
     mMediaPlayerInitializer = 0;
 }
 
+void MainWindow::registrationLinkClicked(QString link)
+{
+    QDesktopServices::openUrl( link );
+}
+
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     pActionHandler->keyEvent( event );
@@ -529,6 +535,7 @@ void MainWindow::menuRegistration()
 
     if ( pSettings->isRegistered() )
     {
+        ui_dlg.groupRegistration->hide();
         ui_dlg.lblStatus->setText( tr("<p>Application is registered to: <b>%1</b><br>Registration valid until: <b>%2</b><br>Registration ID: %3<p>Thank you for supporting this open source project!")
                                    .arg( pSettings->registeredName )
                                    .arg( pSettings->registeredUntil.toString( "dd MMM yyyy") )
@@ -537,7 +544,10 @@ void MainWindow::menuRegistration()
         ui_dlg.leLicense->hide();
     }
     else
-        ui_dlg.lblStatus->setText( tr("Application is not registered") );
+    {
+        ui_dlg.groupRegistered->hide();
+        connect( ui_dlg.lblReginfo, SIGNAL(linkActivated(QString)), this, SLOT(registrationLinkClicked(QString)) );
+    }
 
     if ( dlg.exec() == QDialog::Accepted && !pSettings->isRegistered() )
     {
