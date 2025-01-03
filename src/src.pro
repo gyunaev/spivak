@@ -170,6 +170,10 @@ unix:!mac:{
     LIBS += -lzip -lsqlite3 -luchardet -lcld2 -lgstapp-1.0 -lgstreamer-1.0 -lglib-2.0 -lgobject-2.0
 }
 
-win32:!win32-g++: QMAKE_CXXFLAGS+=/Zi
-win32:!win32-g++: QMAKE_LFLAGS+= /INCREMENTAL:NO /Debug
+win32:!win32-g++: {
+	QMAKE_CXXFLAGS+=/Zi
+	QMAKE_LFLAGS+= /INCREMENTAL:NO /Debug
+	LIBS += crypt32.lib
+}
+
 win32:RC_ICONS += images/application.ico

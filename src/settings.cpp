@@ -28,6 +28,11 @@
 #include <QSslCertificate>
 #include <QSslError>
 
+#if defined (WIN32)
+	#include <windows.h>
+	#include <wincrypt.h>
+#endif
+
 #include "util.h"
 #include "settings.h"
 #include "logger.h"
@@ -451,16 +456,46 @@ QString Settings::validateCert(const QString &pemdata)
     registeredUntil = QDateTime();
     registeredDigest.clear();
 
-    QList<QSslCertificate> ca = QSslCertificate::fromData( QByteArray( (char*) cacert_der, 1423), QSsl::Der );
-    QList<QSslCertificate> uc = QSslCertificate::fromData( "-----BEGIN CERTIFICATE-----\n" + pemdata.toLatin1() + "\n-----END CERTIFICATE-----");
+    QByteArray derdata = QByteArray::fromBase64( pemdata.toLatin1() );
+    QList<QSslCertificate> uc = QSslCertificate::fromData( derdata, QSsl::Der );
 
-    if ( ca.length() != 1 || uc.length() != 1 || !uc[0].expiryDate().isValid() )
+    if ( uc.length() != 1 || !uc[0].expiryDate().isValid() )
         return "The license is not valid";
 
-    QList<QSslError> err = QSslCertificate::verify( QList<QSslCertificate> { uc[0], ca[0] } );
+#if defined WIN32
+    PCCERT_CONTEXT pCertCA = nullptr, pCertUser = nullptr;
+    bool validated = false;
+
+    // Create a certificate context from the first buffer (certificate to be verified)
+    pCertCA = CertCreateCertificateContext(X509_ASN_ENCODING, cacert_der, sizeof(cacert_der));
+    pCertUser = CertCreateCertificateContext(X509_ASN_ENCODING, (BYTE*)derdata.data(), derdata.size() );
+
+    if ( pCertCA 
+    && pCertUser 
+    && CryptVerifyCertificateSignature(NULL, X509_ASN_ENCODING, pCertUser->pbCertEncoded, pCertUser->cbCertEncoded, &pCertCA->pCertInfo->SubjectPublicKeyInfo) )
+    {
+	validated = true;
+    }
+
+    if (pCertCA)
+        CertFreeCertificateContext(pCertCA);
+
+    if (pCertUser)
+        CertFreeCertificateContext(pCertUser);
+
+    if ( !validated )
+        return "The license is not valid for this program";
+#else
+    QList<QSslCertificate> ca = QSslCertificate::fromData( QByteArray( (char*) cacert_der, 1423), QSsl::Der );
+
+    if ( ca.length() != 1 )
+        return "The license is not valid";
+
+    QList<QSslError> err = QSslCertificate::verify( QList<QSslCertificate> { uc[0] } );
 
     if ( err.length() != 1 || err[0].error() != 10 || err[0].certificate().digest().toHex() != "7c43aa933e91a0ec331258ec28a1572a" )
         return "The license is not valid for this program";
+#endif
 
     registeredName = uc[0].subjectDisplayName();
     registeredUntil = uc[0].expiryDate();
