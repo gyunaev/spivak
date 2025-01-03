@@ -24,7 +24,7 @@
      <x>0</x>
      <y>0</y>
      <width>400</width>
-     <height>24</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -41,10 +41,11 @@
     <property name="title">
      <string>&amp;Help</string>
     </property>
-    <addaction name="actionSend_the_feedback"/>
+    <addaction name="actionRun_First_Time_Wizard"/>
+    <addaction name="actionRegistration"/>
+    <addaction name="separator"/>
     <addaction name="action_About"/>
     <addaction name="separator"/>
-    <addaction name="actionRun_First_Time_Wizard"/>
    </widget>
    <widget class="QMenu" name="menuPlayer">
     <property name="title">
@@ -158,6 +159,11 @@
   <action name="actionSend_the_feedback">
    <property name="text">
     <string>&amp;Send the feedback...</string>
+   </property>
+  </action>
+  <action name="actionRegistration">
+   <property name="text">
+    <string>Registration...</string>
    </property>
   </action>
  </widget>

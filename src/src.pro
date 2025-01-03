@@ -56,7 +56,6 @@ SOURCES += main.cpp\
     database_songinfo.cpp \
     database_statement.cpp \
     actionhandler_webserver_socket.cpp \
-    feedbackdialog.cpp \
     midisyntheser.cpp \
     midistripper.cpp \
     notification.cpp \
@@ -116,7 +115,6 @@ HEADERS  += mainwindow.h \
     database_songinfo.h \
     database_statement.h \
     actionhandler_webserver_socket.h \
-    feedbackdialog.h \
     midisyntheser.h \
     midistripper.h \
     notification.h \
@@ -132,13 +130,13 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui \
     playerwidget.ui \
     dialog_about.ui \
+    registrationdialog.ui \
     settingsdialog.ui \
     queuekaraokewidget.ui \
     queuekaraokewidget_addeditdialog.ui \
     queuemusicwidget.ui \
     multimediatestwidget.ui \
-    welcome_wizard.ui \
-    feedbackdialog.ui
+    welcome_wizard.ui
 
 RESOURCES += resources.qrc
 DEFINES += SQLITE_OMIT_LOAD_EXTENSION HAVE_LIBCLD2

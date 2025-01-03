@@ -64,7 +64,7 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
         void    menuToggleWindowQueueMusic();
 
         void    menuShowWelcomeWizard();
-        void    menuSendFeedback();
+        void    menuRegistration();
 
         // Toggle full screen mode
         void    toggleFullscreen();

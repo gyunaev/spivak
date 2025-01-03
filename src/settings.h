@@ -23,6 +23,7 @@
 #include <QFont>
 #include <QColor>
 #include <QJsonValue>
+#include <QDateTime>
 
 #include "collectionentry.h"
 
@@ -122,6 +123,12 @@ class Settings
         // Path to GStreamer binaries (only useful on non-Linux and when asked from user)
         QString         pathGStreamerBinaries;
 
+        // Registration info
+        QString                 registerCertificate;
+        QString                 registeredName;
+        QString                 registeredDigest;
+        QDateTime               registeredUntil;
+
         // Replaces the database path according to rules
         QString         replacePath( const QString& origpath );
 
@@ -132,6 +139,10 @@ class Settings
 
         QJsonObject     toJson();
         void            fromJson( const QJsonObject& data );
+
+        // Validates and fills up the Registration info
+        QString         validateCert( const QString& pemdata );
+        bool            isRegistered() const;
 
     private:
         QJsonValue      fromStringList( const QStringList& list );

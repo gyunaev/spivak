@@ -46,12 +46,11 @@
 #include "songqueue.h"
 #include "logger.h"
 #include "eventor.h"
-#include "feedbackdialog.h"
 #include "mediaplayerinitializer.h"
 #include "messageboxautoclose.h"
 
 #include "ui_dialog_about.h"
-
+#include "ui_registrationdialog.h"
 
 MainWindow * pMainWindow;
 
@@ -137,7 +136,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect( actionShow_karaoke_queue_window, &QAction::triggered, this, &MainWindow::menuToggleWindowQueueKaraoke );
     connect( actionShow_music_queue_window, &QAction::triggered, this, &MainWindow::menuToggleWindowQueueMusic );
     connect( actionRun_First_Time_Wizard, &QAction::triggered, this, &MainWindow::menuShowWelcomeWizard );
-    connect( actionSend_the_feedback, &QAction::triggered, this, &MainWindow::menuSendFeedback );
+    connect( actionRegistration, &QAction::triggered, this, &MainWindow::menuRegistration );
 
     // Connect song scanner slots
     connect( pEventor, &Eventor::scanCollectionStarted, this, &MainWindow::scanCollectionStarted, Qt::QueuedConnection );
@@ -362,12 +361,6 @@ void MainWindow::menuShowWelcomeWizard()
     }
 }
 
-void MainWindow::menuSendFeedback()
-{
-    FeedbackDialog dlg;
-    dlg.exec();
-}
-
 
 void MainWindow::windowClosed(QObject *widget)
 {
@@ -532,4 +525,42 @@ bool MainWindow::hasCmdLineOption(const QString &option)
     }
 
     return false;
+}
+
+void MainWindow::menuRegistration()
+{
+    QDialog dlg;
+    Ui::RegistrationDialog ui_dlg;
+
+    ui_dlg.setupUi( &dlg );
+
+    if ( pSettings->isRegistered() )
+    {
+        ui_dlg.lblStatus->setText( tr("<p>Application is registered to: <b>%1</b><br>Registration valid until: <b>%2</b><br>Registration ID: %3<p>Thank you for supporting this open source project!")
+                                   .arg( pSettings->registeredName )
+                                   .arg( pSettings->registeredUntil.toString( "dd MMM yyyy") )
+                                   .arg( pSettings->registeredDigest ) );
+
+        ui_dlg.leLicense->hide();
+    }
+    else
+        ui_dlg.lblStatus->setText( tr("Application is not registered") );
+
+    if ( dlg.exec() == QDialog::Accepted && !pSettings->isRegistered() )
+    {
+        QString err = pSettings->validateCert( ui_dlg.leLicense->toPlainText() );
+
+        if ( err.isEmpty() )
+        {
+            QMessageBox::information( 0,
+                                   tr("Thank you for registering"),
+                                   tr("Your application has been registered. Thank you!"));
+        }
+        else
+        {
+            QMessageBox::critical( 0,
+                                   tr("Registration failed"),
+                                   tr("Registration failed: %1").arg(err) );
+        }
+    }
 }
