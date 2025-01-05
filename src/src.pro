@@ -4,6 +4,11 @@
 #
 #-------------------------------------------------
 
+# Dump all qmake variables
+#for(var, $$list($$enumerate_vars())) {
+#    message($$var $$eval($$var))
+#}
+
 QT       += core gui widgets network
 
 TARGET = spivak
@@ -141,39 +146,36 @@ FORMS    += mainwindow.ui \
 RESOURCES += resources.qrc
 DEFINES += SQLITE_OMIT_LOAD_EXTENSION HAVE_LIBCLD2
 
-INCLUDEPATH += $$PWD/.. $$PWD/../extralibs/include
-DEPENDPATH += $$PWD/../libkaraokelyrics
+SRCROOT=$$PWD/../
+INCLUDEPATH += $$SRCROOT/3rdparty $$SRCROOT $$SRCROOT/3rdparty/sqlite3
+DEPENDPATH += $$SRCROOT/libkaraokelyrics
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libkaraokelyrics/release/ -lkaraokelyrics -L$$OUT_PWD/../libsonivox/src/release/ -lsonivox
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libkaraokelyrics/debug/ -lkaraokelyrics -L$$OUT_PWD/../libsonivox/src/debug/ -lsonivox
-else:unix: LIBS += -L$$OUT_PWD/../libkaraokelyrics/ -lkaraokelyrics -L$$OUT_PWD/../libsonivox/src/ -lsonivox
-
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libkaraokelyrics/release/libkaraokelyrics.a $$OUT_PWD/../libsonivox/src/release/libsonivox.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libkaraokelyrics/debug/libkaraokelyrics.a $$OUT_PWD/../libsonivox/src/debug/libsonivox.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libkaraokelyrics/release/karaokelyrics.lib $$OUT_PWD/../libsonivox/src/release/sonivox.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libkaraokelyrics/debug/karaokelyrics.lib $$OUT_PWD/../libsonivox/src/debug/sonivox.lib
-else:unix: {
-    LIBS += -L$$PWD/../extralibs/lib -lsonivox
-    PRE_TARGETDEPS += $$OUT_PWD/../libkaraokelyrics/libkaraokelyrics.a $$OUT_PWD/../libsonivox/src/libsonivox.a
-}
-
-mac: {
-    LIBS += -L$$PWD/../extralibs/lib -lsonivox
-}
-
+# Handle libzip and GStreamer dependency with pkgconfig on Linux, specify exact paths on Mac
 unix:!mac:{
-   CONFIG += link_pkgconfig
-   PKGCONFIG += sqlite3 libzip uchardet cld2 gstreamer-1.0 gstreamer-app-1.0
+    CONFIG += link_pkgconfig
+    PKGCONFIG += libzip gstreamer-1.0 gstreamer-app-1.0
 } else: {
     INCLUDEPATH += /Library/Frameworks/GStreamer.framework/Headers
-    LIBS += -L/Library/Frameworks/GStreamer.framework/Libraries
-    LIBS += -lzip -lsqlite3 -luchardet -lcld2 -lgstapp-1.0 -lgstreamer-1.0 -lglib-2.0 -lgobject-2.0
+    LIBS += -L/Library/Frameworks/GStreamer.framework/Libraries -lgstapp-1.0 -lgstreamer-1.0 -lglib-2.0 -lgobject-2.0 -lzip
 }
 
-win32:!win32-g++: {
-	QMAKE_CXXFLAGS+=/Zi
-	QMAKE_LFLAGS+= /INCREMENTAL:NO /Debug
-	LIBS += crypt32.lib
+# Windows builds debug/release libs in different directories while other platforms use a single dir
+win32: {
+
+    RC_ICONS += images/application.ico
+    QMAKE_CXXFLAGS+=/Zi
+    QMAKE_LFLAGS+= /INCREMENTAL:NO /Debug
+    LIBS += crypt32.lib
+
+    CONFIG(debug, debug|release) {
+        LIBSUBDIR="debug"
+    } else: {
+        LIBSUBDIR="release"
+    }
+} else: {
+    LIBSUBDIR=""
 }
 
-win32:RC_ICONS += images/application.ico
+BUILDROOT=$$OUT_PWD/../
+LIBS += -L$$BUILDROOT/3rdparty/cld2 -L$$BUILDROOT/3rdparty/libsonivox/src/$$LIBSUBDIR -L$$BUILDROOT/3rdparty/uchardet/$$LIBSUBDIR -L$$BUILDROOT/3rdparty/sqlite3 -L$$BUILDROOT/libkaraokelyrics/$$LIBSUBDIR
+LIBS += -lsqlite3 -luchardet -lcld2 -lsonivox -lkaraokelyrics

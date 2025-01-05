@@ -1,5 +1,5 @@
 TARGET = cld2
-CONFIG = warn_on staticlib c++11
+CONFIG = warn_on staticlib
 TEMPLATE = lib
 SOURCES += internal/cldutil.cc \
   internal/cldutil_shared.cc \

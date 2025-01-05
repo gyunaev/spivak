@@ -34,7 +34,6 @@ mkdir -p usr/lib64/spivak/plugins usr/bin usr/lib
 
 # Copy the Spivak executable and plugins there
 strip --strip-all "../spivak/src/spivak" -o "usr/bin/spivak"
-strip --strip-all "../spivak/plugins/languagedetector/plugin_langdetect.so" -o "usr/lib64/spivak/plugins/plugin_langdetect.so"
 
 # Copy the application icon and desktop file into current dir (appimage expects them here)
 cp ../spivak/packaging/spivak.desktop .

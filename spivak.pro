@@ -5,7 +5,8 @@
    warning(Spivak generally requires Qt6 but Qt $$[QT_VERSION] was detected. Your build may fail. Make sure you invoke proper qmake i.e. qmake6 instead of qmake)
 }
 
-SUBDIRS += libsonivox libkaraokelyrics src
+SUBDIRS += 3rdparty libkaraokelyrics src
 TEMPLATE = subdirs
+libkaraokelyrics.depends = 3rdparty
 src.depends = libkaraokelyrics
 TRANSLATIONS = i18n/spivak_en_US.ts i18n/spivak_sk.ts

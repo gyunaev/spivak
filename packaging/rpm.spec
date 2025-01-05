@@ -23,5 +23,3 @@ George Yunaev
 /usr/share/applications/spivak.desktop
 %defattr(-,root,root)
 /usr/share/pixmaps/spivak.png
-%defattr(-,root,root)
-/usr/lib64/spivak/plugins/plugin_langdetect.so
