@@ -45,13 +45,18 @@ so playing Karaoke in Japanese, Russian or Hindu is fully supported.
 Author:
 -------
 George Yunaev
+
+
 %files
 %defattr(-,root,root)
 /usr/bin/spivak
 %defattr(-,root,root)
-/usr/share/applications/spivak.desktop
+%{_datadir}/applications/spivak.desktop
 %defattr(-,root,root)
-/usr/share/icons/hicolor/64x64/apps/spivak.png
+%dir %{_datadir}/icons/hicolor/
+%dir %{_datadir}/icons/hicolor/64x64/
+%dir %{_datadir}/icons/hicolor/64x64/apps/
+%{_datadir}/icons/hicolor/64x64/apps/spivak.png
 
 %prep
 %setup
