@@ -51,7 +51,7 @@ George Yunaev
 %defattr(-,root,root)
 /usr/share/applications/spivak.desktop
 %defattr(-,root,root)
-/usr/share/pixmaps/spivak.png
+/usr/share/icons/hicolor/64x64/apps/spivak.png
 
 %prep
 %setup
