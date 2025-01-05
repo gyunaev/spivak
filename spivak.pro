@@ -10,3 +10,14 @@ TEMPLATE = subdirs
 libkaraokelyrics.depends = 3rdparty
 src.depends = libkaraokelyrics
 TRANSLATIONS = i18n/spivak_en_US.ts i18n/spivak_sk.ts
+
+INSTALLS += target desktopfile icon
+
+target.path = /$(DESTDIR)/usr/bin
+target.files = src/spivak
+
+icon.path = /$(DESTDIR)/usr/share/icons/hicolor/64x64/apps
+icon.files = packaging/spivak.png
+
+desktopfile.path = /$(DESTDIR)/usr/share/applications
+desktopfile.files = packaging/spivak.desktop

@@ -58,4 +58,8 @@ George Yunaev
 
 %build
 qmake6
-make
+%make_build
+
+
+%install
+make install INSTALL_ROOT="%buildroot"
