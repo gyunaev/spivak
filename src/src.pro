@@ -179,3 +179,8 @@ win32: {
 BUILDROOT=$$OUT_PWD/../
 LIBS += -L$$BUILDROOT/3rdparty/cld2 -L$$BUILDROOT/3rdparty/libsonivox/src/$$LIBSUBDIR -L$$BUILDROOT/3rdparty/uchardet/$$LIBSUBDIR -L$$BUILDROOT/3rdparty/sqlite3 -L$$BUILDROOT/libkaraokelyrics/$$LIBSUBDIR
 LIBS += -lsqlite3 -luchardet -lcld2 -lsonivox -lkaraokelyrics
+
+INSTALLS += executable
+
+executable.path = /$(DESTDIR)/usr/bin
+executable.files = spivak

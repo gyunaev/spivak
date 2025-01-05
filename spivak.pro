@@ -11,10 +11,7 @@ libkaraokelyrics.depends = 3rdparty
 src.depends = libkaraokelyrics
 TRANSLATIONS = i18n/spivak_en_US.ts i18n/spivak_sk.ts
 
-INSTALLS += executable executable  desktopfile icon
-
-executable.path = /$(DESTDIR)/usr/bin
-executable.files = src/spivak
+INSTALLS += desktopfile icon
 
 icon.path = /$(DESTDIR)/usr/share/icons/hicolor/64x64/apps
 icon.files = packaging/spivak.png
