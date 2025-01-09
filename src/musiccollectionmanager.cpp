@@ -173,10 +173,10 @@ void MusicCollectionManager::start()
 
     m_player = new MediaPlayer();
 
-    connect( m_player->qObject(), SIGNAL(finished()), this, SLOT( playerCurrentSongFinished()) );
-    connect( m_player->qObject(), SIGNAL(error(QString)), this, SLOT(playerCurrentSongFinished()) );
-    connect( m_player->qObject(), SIGNAL(loaded()), this, SLOT(songLoaded()) );
-    connect( m_player->qObject(), SIGNAL(tagsChanged(QString,QString)), pEventor, SIGNAL( musicTagsChanged(QString,QString)) );
+    connect( m_player, SIGNAL(finished()), this, SLOT( playerCurrentSongFinished()) );
+    connect( m_player, SIGNAL(error(QString)), this, SLOT(playerCurrentSongFinished()) );
+    connect( m_player, SIGNAL(loaded()), this, SLOT(songLoaded()) );
+    connect( m_player, SIGNAL(tagsChanged(QString,QString)), pEventor, SIGNAL( musicTagsChanged(QString,QString)) );
 
     // Initiate loading the audio
     m_player->loadMedia( m_musicFiles[m_currentFile], MediaPlayer::LoadAudioStream );

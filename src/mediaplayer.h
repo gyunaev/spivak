@@ -27,10 +27,8 @@
 #include <gst/gst.h>
 #include <gst/app/app.h>
 
-class PitchAdjuster;
 
-// This media player is used by the app. However it doesn't implement anything itself,
-// it is just a front Qt-style interface (with signals and slots) for the interface.
+// Gtreamer-based media player
 class MediaPlayer : public QObject
 {
     Q_OBJECT
@@ -124,11 +122,6 @@ class MediaPlayer : public QObject
         // not played, or not available.
         virtual void    drawVideoFrame( QPainter& p, const QRect& rect );
 
-        // Returns pointer to the player's QObject (which can be used to connect to signals)
-        // This is necessary since MediaPlayer interface is not inherited from QObject, and
-        // thus the applicaiton code will not otherwise allow connection without dynamic_cast.
-        virtual QObject* qObject();
-
     private:
         void    loadMediaGeneric();
 
@@ -148,7 +141,6 @@ class MediaPlayer : public QObject
         void    addlog( const char *type, const char * str, ... );
 
         bool    adjustPitch(int value);
-        bool    toggleKaraokeSplitter(int value);
 
         // Element creation
         GstElement * createElement( const char * type, const char * name, bool mandatory = true );
@@ -166,7 +158,6 @@ class MediaPlayer : public QObject
         static void cb_no_more_pads( GstElement *src, MediaPlayer *self );
 
         // see http://gstreamer.freedesktop.org/data/doc/gstreamer/head/manual/html/section-dynamic-pipelines.html#section-dynamic-changing
-        static GstPadProbeReturn cb_event_probe_toggle_splitter( GstPad * pad, GstPadProbeInfo * info, gpointer user_data );
         static GstPadProbeReturn cb_event_probe_add_pitcher( GstPad * pad, GstPadProbeInfo * info, gpointer user_data );
 
         // Bus callback
@@ -186,7 +177,6 @@ class MediaPlayer : public QObject
         GstElement *m_gst_audioconverter2;
         GstElement *m_gst_audio_volume;
         GstElement *m_gst_audiosink;
-        GstElement *m_gst_audio_karaokesplitter;
         GstElement *m_gst_audio_tempo;
         GstElement *m_gst_audio_pitchadjust;
 

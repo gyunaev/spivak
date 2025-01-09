@@ -42,8 +42,8 @@ MultimediaTestWidget::MultimediaTestWidget(QWidget *parent) :
 
     if ( m_player )
     {
-        connect( m_player->qObject(), SIGNAL(error(QString)), this, SLOT(error(QString)) );
-        connect( m_player->qObject(), SIGNAL(loaded()), this, SLOT(loaded()) );
+        connect( m_player, SIGNAL(error(QString)), this, SLOT(error(QString)) );
+        connect( m_player, SIGNAL(loaded()), this, SLOT(loaded()) );
 
         connect( ui->textBrowser, &QTextBrowser::anchorClicked, this, &MultimediaTestWidget::startTest );
 

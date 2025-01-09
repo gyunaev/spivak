@@ -39,7 +39,6 @@ MediaPlayer::MediaPlayer( QObject * parent )
     m_gst_audioconverter = 0;
     m_gst_audio_volume = 0;
     m_gst_audiosink = 0;
-    m_gst_audio_karaokesplitter = 0;
     m_gst_audio_tempo = 0;
     m_gst_audio_pitchadjust = 0;
     m_gst_video_colorconv = 0;
@@ -226,22 +225,6 @@ bool MediaPlayer::adjustPitch( int newvalue )
     return true;
 }
 
-bool MediaPlayer::toggleKaraokeSplitter( int value )
-{
-    // Do nothing if the status did not change
-    if ( (m_gst_audio_karaokesplitter && value) || (!m_gst_audio_karaokesplitter && !value) )
-        return true;
-
-    // To enable or disable the splitter, we insert or remove it.
-    // The m_gst_karaokesplitter goes to a specific place which is between m_gst_audioconverter and m_gst_volume
-
-    // To start we block the m_gst_audioconverter - this will trigger cb_event_probe_toggle_splitter() callback once it is blocked
-    GstPad * srcpad = gst_element_get_static_pad( m_gst_audioconverter, "src" );
-    gst_pad_add_probe( srcpad, GST_PAD_PROBE_TYPE_BLOCK_DOWNSTREAM, cb_event_probe_toggle_splitter, this, NULL );
-
-    return true;
-}
-
 void MediaPlayer::drawVideoFrame(QPainter &p, const QRect &rect)
 {
     QMutexLocker m( &m_lastVideoSampleMutex );
@@ -289,11 +272,6 @@ void MediaPlayer::drawVideoFrame(QPainter &p, const QRect &rect)
 
     // And clean up
     gst_buffer_unmap( buffer, &map );
-}
-
-QObject *MediaPlayer::qObject()
-{
-    return this;
 }
 
 void MediaPlayer::loadMediaGeneric()
@@ -470,7 +448,6 @@ void MediaPlayer::reset()
     m_gst_audioconverter = 0;
     m_gst_audio_volume = 0;
     m_gst_audiosink = 0;
-    m_gst_audio_karaokesplitter = 0;
     m_gst_audio_tempo = 0;
     m_gst_audio_pitchadjust = 0;
     m_gst_video_colorconv = 0;
@@ -723,57 +700,6 @@ GstFlowReturn MediaPlayer::cb_new_sample(GstAppSink *appsink, gpointer user_data
     }
 
     return GST_FLOW_OK;
-}
-
-GstPadProbeReturn MediaPlayer::cb_event_probe_toggle_splitter(GstPad *pad, GstPadProbeInfo *info, gpointer user_data)
-{
-    MediaPlayer * self = reinterpret_cast<MediaPlayer*>( user_data );
-
-    // remove the probe first
-    gst_pad_remove_probe( pad, GST_PAD_PROBE_INFO_ID (info) );
-
-    // Is the element already in the bin?
-    if ( self->m_gst_audio_karaokesplitter == 0 )
-    {
-        self->addlog( "DEBUG",  "GstMediaPlayer:  karaokesplitter is not enabled, enabling");
-        self->m_gst_audio_karaokesplitter = self->createElement ("audiokaraoke", "karaoke", false );
-
-        // This might happen if the player requested it despite us returning no such capability
-        if ( !self->m_gst_audio_karaokesplitter )
-            return GST_PAD_PROBE_OK;
-
-        // Add splitter into the bin
-        gst_bin_add( GST_BIN (self->m_gst_pipeline), self->m_gst_audio_karaokesplitter );
-
-        // Unlink the place for the splitter
-        gst_element_unlink( self->m_gst_audioconverter, self->m_gst_audio_volume );
-
-        // Link it in
-        gst_element_link_many( self->m_gst_audioconverter, self->m_gst_audio_karaokesplitter, self->m_gst_audio_volume, NULL );
-
-        // And start playing it
-        gst_element_set_state( self->m_gst_audio_karaokesplitter, GST_STATE_PLAYING );
-
-        self->addlog( "DEBUG",  "GstMediaPlayer: karaoke splitter enabled");
-    }
-    else
-    {
-        self->addlog( "DEBUG",  "GstMediaPlayer: karaokesplitter is enabled, disabling");
-
-        // Stop the splitter
-        gst_element_set_state( self->m_gst_audio_karaokesplitter, GST_STATE_NULL );
-
-        // Remove splitter from the bin (it unlinks it too)
-        gst_bin_remove( GST_BIN (self->m_gst_pipeline), self->m_gst_audio_karaokesplitter );
-        self->m_gst_audio_karaokesplitter = 0;
-
-        // And link the disconnected elements again
-        gst_element_link_many( self->m_gst_audioconverter, self->m_gst_audio_volume, NULL );
-
-        self->addlog( "DEBUG",  "GstMediaPlayer: karaoke splitter disabled");
-    }
-
-    return GST_PAD_PROBE_OK;
 }
 
 GstBusSyncReply MediaPlayer::cb_busMessageDispatcher( GstBus *bus, GstMessage *msg, gpointer user_data )

@@ -52,9 +52,9 @@ void MediaPlayerInitializer::run()
     // Create and connect the player
     mPlayer = new MediaPlayer();
 
-    connect( mPlayer->qObject(), SIGNAL( error( QString )), this, SLOT(audioError(QString)) );
-    connect( mPlayer->qObject(), SIGNAL( loaded() ), this, SLOT(audioLoaded()) );
-    connect( mPlayer->qObject(), SIGNAL( finished() ), this, SLOT(audioFinished()) );
+    connect( mPlayer, SIGNAL( error( QString )), this, SLOT(audioError(QString)) );
+    connect( mPlayer, SIGNAL( loaded() ), this, SLOT(audioLoaded()) );
+    connect( mPlayer, SIGNAL( finished() ), this, SLOT(audioFinished()) );
 
     // Load the media file here - this would initialize the player and thus take a while.
     // This is why we are doing it in a separate thread so we don't block the UI
