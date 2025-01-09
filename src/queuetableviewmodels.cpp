@@ -141,7 +141,6 @@ bool TableModelQueue::dropMimeData(const QMimeData *data, Qt::DropAction, int ro
         QDataStream stream( data->data( "application/x-karaoke-song" ) );
 
         stream >> size;
-        qDebug( "size: %d", size );
 
         while ( size > 0 )
         {
@@ -158,7 +157,6 @@ bool TableModelQueue::dropMimeData(const QMimeData *data, Qt::DropAction, int ro
 
             stream >> songid;
 
-            qDebug( ">> song id: %d",  songid );
             if ( !pDatabase->songById( songid, info ) )
                 return false;
 
@@ -367,7 +365,7 @@ QMimeData *TableModelSearch::mimeData(const QModelIndexList &indexes) const
     QDataStream stream( &mimedata, QIODevice::WriteOnly );
 
     // Serialize all indexes into list
-    stream << (quint32) indexes.size();
+    stream << (quint32) indexes.size() / columnCount();
 
     for ( auto idx : indexes )
     {
@@ -375,7 +373,6 @@ QMimeData *TableModelSearch::mimeData(const QModelIndexList &indexes) const
         if ( idx.column() != 0 )
             continue;
 
-        qDebug( "<< song id: %d", (quint32) m_results[idx.row()].id );
         stream << m_results[idx.row()].id;
     }
 
