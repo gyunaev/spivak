@@ -293,10 +293,6 @@ void Settings::fromJson(const QJsonObject &data)
     if ( data.contains( "advanced/gstreamerpath" ) )
         pathGStreamerBinaries = data.value( "advanced/gstreamerpath" ).toString();
 
-    // Registration info
-    if ( data.contains( "misc/certinfo" ) )
-        validateCert( data.value( "misc/certinfo" ).toString() );
-
     // Collections
     collections.clear();
     QJsonArray colarray = data.value("collection").toArray();
@@ -307,6 +303,10 @@ void Settings::fromJson(const QJsonObject &data)
         entry.fromJson( v.toObject() );
         collections[ entry.id ] = entry;
     }
+
+    // Registration info - must be the last one, since it calls Save
+    if ( data.contains( "misc/certinfo" ) )
+        validateCert( data.value( "misc/certinfo" ).toString() );
 }
 
 QJsonValue Settings::fromStringList(const QStringList &list)
