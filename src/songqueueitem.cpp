@@ -23,6 +23,7 @@ SongQueueItem::SongQueueItem()
     id = 0;
     songid = 0;
     readiness = 0;
+    state = STATE_READY;
 }
 
 SongQueueItem::~SongQueueItem()
