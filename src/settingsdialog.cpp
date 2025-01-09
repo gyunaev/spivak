@@ -127,7 +127,8 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 
     ui->boxCollectionSeparator->addItem( tr("Add a new separator..." ) );
 
-    if ( !pSettings->collections.isEmpty() )
+    // If we have more than one collection, ignore the UI part - this can't be handled manually yet
+    if ( pSettings->collections.size() == 1 )
     {
         const CollectionEntry& col = pSettings->collections.first();
 
@@ -550,6 +551,10 @@ void SettingsDialog::updateLyricsPreview()
 
 bool SettingsDialog::validateAndStoreCollection()
 {
+    // More than one collection, ignore
+    if ( pSettings->collections.size() > 1 )
+        return true;
+
     if ( ui->leCollectionPath->text().isEmpty() )
     {
         // Collection removed
