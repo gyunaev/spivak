@@ -776,7 +776,7 @@ GstBusSyncReply MediaPlayer::cb_busMessageDispatcher( GstBus *bus, GstMessage *m
                     break;
 
                 case GST_STATE_READY:
-                    self->m_playState = (State) StateStopped;
+                    // meaningless for us
                     break;
 
                 default:

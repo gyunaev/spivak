@@ -41,7 +41,6 @@ class MediaPlayer : public QObject
         enum State
         {
             StateReset,
-            StateStopped,
             StatePlaying,
             StatePaused,
         };
