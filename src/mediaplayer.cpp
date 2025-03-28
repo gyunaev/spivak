@@ -271,6 +271,7 @@ void MediaPlayer::loadMediaGeneric()
     }
 
     // The content of the pipeline - which could be video-only, audio-only or audio-video
+    // See https://gstreamer.freedesktop.org/documentation/tutorials/basic/gstreamer-tools.html
     QString pipeline;
 
     // Data source for our pipeline
