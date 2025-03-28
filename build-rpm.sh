@@ -2,7 +2,12 @@
 
 RPMBUILDROOT="${PWD}/rpmbuild"
 
-VERSION=2.0
+FILE_VERSION="src/version.h"
+
+# Get current version
+VERSION_MAJOR=`sed -n 's/^\#define\s\+APP_VERSION_MAJOR\s\+\([0-9]\+\)/\1/p' $FILE_VERSION`
+VERSION_MINOR=`sed -n 's/^\#define\s\+APP_VERSION_MINOR\s\+\([0-9]\+\)/\1/p' $FILE_VERSION`
+VERSION="$VERSION_MAJOR.$VERSION_MINOR"
 
 for d in BUILD  BUILDROOT  RPMS  SOURCES  SPECS  SRPMS; do
     mkdir -p $RPMBUILDROOT/$d || exit 1
