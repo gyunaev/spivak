@@ -122,13 +122,11 @@ class MediaPlayer : public QObject
         virtual void    drawVideoFrame( QPainter& p, const QRect& rect );
 
     private:
+        // Generic loader
         void    loadMediaGeneric();
 
         // Resets the pipeline
         void    reset();
-
-        // Sets up the source according to file type
-        void    setupSource();
 
         // Change the pipeline state, and emit error if failed
         void    setPipelineState( GstState state );
@@ -142,8 +140,7 @@ class MediaPlayer : public QObject
         bool    adjustPitch(int value);
 
         // Element creation
-        GstElement * createElement( const char * type, const char * name, bool mandatory = true );
-        GstElement * createVideoSink();
+        GstElement * getElement(const QString &name );
 
         // Source callbacks
         static void cb_source_need_data( GstAppSrc *src, guint length, gpointer user_data );
@@ -151,13 +148,6 @@ class MediaPlayer : public QObject
 
         // Video sink callback
         static GstFlowReturn cb_new_sample( GstAppSink *appsink, gpointer user_data );
-
-        // Decoder pad handling callbacks
-        static void cb_pad_added(GstElement *src, GstPad *new_pad, MediaPlayer *self );
-        static void cb_no_more_pads( GstElement *src, MediaPlayer *self );
-
-        // see http://gstreamer.freedesktop.org/data/doc/gstreamer/head/manual/html/section-dynamic-pipelines.html#section-dynamic-changing
-        static GstPadProbeReturn cb_event_probe_add_pitcher( GstPad * pad, GstPadProbeInfo * info, gpointer user_data );
 
         // Bus callback
         static GstBusSyncReply cb_busMessageDispatcher( GstBus *bus, GstMessage *message, gpointer userData );
@@ -170,18 +160,6 @@ class MediaPlayer : public QObject
 
         // Those are created objects
         GstElement *m_gst_pipeline;
-        GstElement *m_gst_source;
-        GstElement *m_gst_decoder;
-        GstElement *m_gst_audioconverter;
-        GstElement *m_gst_audioconverter2;
-        GstElement *m_gst_audio_volume;
-        GstElement *m_gst_audiosink;
-        GstElement *m_gst_audio_tempo;
-        GstElement *m_gst_audio_pitchadjust;
-
-        // For video playing
-        GstElement *m_gst_video_colorconv;
-        GstElement *m_gst_video_sink;
 
         // Bus object
         GstBus   *  m_gst_bus;
