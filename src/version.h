@@ -19,16 +19,7 @@
 #ifndef VERSION_H
 #define VERSION_H
 
-// TODO:
-//
-// Separate gst plugins
-// - Audio recording
-// - Video screen capture/webcam capture
-// - Remote song storage, download (incl encrypted)
-// - Video + voice recording
-
-
 #define APP_VERSION_MAJOR	2
-#define APP_VERSION_MINOR	1
+#define APP_VERSION_MINOR	2
 
 #endif // VERSION_H
