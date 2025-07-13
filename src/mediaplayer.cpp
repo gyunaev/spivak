@@ -266,6 +266,9 @@ void MediaPlayer::loadMediaGeneric()
     // Initialize gstreamer if not initialized yet
     if ( !gst_is_initialized() )
     {
+#if defined (WIN32)
+        qputenv( "GST_PLUGIN_PATH", qPrintable( QCoreApplication::applicationDirPath() ) );
+#endif
         //qputenv( "GST_DEBUG", "*:4" );
         gst_init(0, 0);
     }
