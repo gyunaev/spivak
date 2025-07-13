@@ -34,29 +34,15 @@ Currently the only way to test the player is to build it from source, which shou
 
 - Qt6 (it might work with later versions of Qt5 too);
 - GStreamer 1.0 (will NOT work on 0.10) and related libraries, notably Glib;
-- uchardet2 (for automatic charset decoding);
-- libzip (for handling ZIP and old KFN files);
-- libcld2 (to build Karaoke language detector plugin; optional);
-- sqlite3 (for karaoke database);
+- libzip-devel
 
 Spivak builds as usual:
 
     qmake6
     make
-    
-Apologies for the "make -jX" build being still broken.
 
-The player executable `spivak` is located in `src/` but it requires `libmediaplayer_spivak` to be loadable via dlopen. This means that either all files from `libmediaplayer/libmediaplayer_spivak.so*` must be copied somewhere where ld.so can pick them up (such as /usr/lib64) or `LD_LIBRARY_PATH` must be set to that directory.
+The player executable `spivak` is located in `src/`.
 
-You also need to copy all the plugins into either /usr/lib or into Spivak directory.
-
-If you're building it, you can run spivak as following:
-
-'''
-cd src
-export LD_LIBRARY_PATH=`pwd`/../libmediaplayer
-./spivak
-'''
 
 ## Limitations
 
