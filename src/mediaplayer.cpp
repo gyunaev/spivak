@@ -18,6 +18,7 @@
 
 #include <QObject>
 #include <QPainter>
+#include <QCoreApplication>
 #include <QFile>
 #include <QUrl>
 
