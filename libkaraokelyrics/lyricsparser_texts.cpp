@@ -156,7 +156,7 @@ void LyricsParser_Texts::parseUStar( const QByteArray& data, LyricsLoader::Conta
         // We may fall-through, so no else
         if ( !header )
         {
-            if ( line[0] != 'E' && line[0] != ':' && line[0] != '*' && line[0] != 'F' && line[0] != '-' )
+            if ( !QString("E:*FRG-").contains(line[0]) )
                 throw( "Not a valid format");
 
             // End?
@@ -176,7 +176,7 @@ void LyricsParser_Texts::parseUStar( const QByteArray& data, LyricsLoader::Conta
             else
             {
                 // Lyrics
-                QRegularExpression regex( "^[*Ff:]\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*(.*)?$" );
+                QRegularExpression regex( "^[*FRG:]\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*(.*)?$" );
                 QRegularExpressionMatch match = regex.match( line );
 
                 if ( !match.hasMatch() )
